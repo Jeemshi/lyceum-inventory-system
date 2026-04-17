@@ -1,0 +1,2034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyceum Kitchen - Admin Reports</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #F8FAFC;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        /* Main Layout */
+        .app {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background: #F8FAFC;
+        }
+
+        /* Side Navigation - Black */
+        .sidebar {
+            width: 280px;
+            background: #000000;
+            border-right: 1px solid #333333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            padding: 28px 24px;
+            border-bottom: 1px solid #333333;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .sidebar-logo {
+            font-size: 32px;
+            background: #8B0000;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            color: #FFFFFF;
+            box-shadow: 0 8px 16px rgba(139,0,0,0.3);
+        }
+
+        .sidebar-title h2 {
+            font-size: 18px;
+            color: #FFFFFF;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar-title p {
+            font-size: 12px;
+            color: #B0B0B0;
+            font-weight: 400;
+        }
+
+        /* Profile Section */
+        .sidebar-profile {
+            padding: 20px 24px;
+            border-bottom: 1px solid #333333;
+            position: relative;
+        }
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: #1A1A1A;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #333333;
+        }
+
+        .profile-card:hover {
+            background: #222222;
+            border-color: #8B0000;
+        }
+
+        .profile-avatar {
+            width: 48px;
+            height: 48px;
+            background: #8B0000;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            font-weight: 600;
+            font-size: 18px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .profile-details {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 4px;
+            letter-spacing: -0.2px;
+        }
+
+        .profile-role {
+            font-size: 12px;
+            color: #8B0000;
+            font-weight: 600;
+        }
+
+        .hamburger-btn {
+            width: 36px;
+            height: 36px;
+            background: #1A1A1A;
+            border: 1px solid #333333;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #FFFFFF;
+        }
+
+        .hamburger-btn:hover {
+            background: #8B0000;
+            border-color: #8B0000;
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: absolute;
+            top: 100px;
+            left: 24px;
+            right: 24px;
+            background: #1A1A1A;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+            border: 1px solid #333333;
+        }
+
+        .profile-dropdown.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #FFFFFF;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 1px solid #333333;
+        }
+
+        .dropdown-item:hover {
+            background: #8B0000;
+        }
+
+        .dropdown-item span:first-child {
+            font-size: 18px;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #333333;
+            margin: 4px 0;
+        }
+
+        .badge {
+            margin-left: auto;
+            background: #8B0000;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 16px;
+            color: #B0B0B0;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: #1A1A1A;
+            color: #FFFFFF;
+        }
+
+        .nav-item.active {
+            background: #8B0000;
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-text {
+            font-size: 14px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background: #F8FAFC;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 80px;
+            background: white;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            flex-shrink: 0;
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            color: #1A1A1A;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .page-title p {
+            font-size: 13px;
+            color: #64748B;
+            font-weight: 400;
+        }
+
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .notification {
+            position: relative;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            background: #F8FAFC;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .notification:hover {
+            background: #FEE9E9;
+        }
+
+        .notification i {
+            font-size: 20px;
+            color: #4A5568;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #8B0000;
+            color: white;
+            font-size: 10px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 2px solid white;
+            font-weight: 600;
+        }
+
+        .date-display {
+            background: #F8FAFC;
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid #E5E7EB;
+        }
+
+        /* Reports Content */
+        .reports-content {
+            flex: 1;
+            padding: 24px 28px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(145deg, #8B0000, #4A0000);
+            border-radius: 20px;
+            padding: 18px 24px;
+            margin-bottom: 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .welcome-text h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .welcome-text p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .stats-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* Report Tabs */
+        .report-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 22px;
+            flex-shrink: 0;
+            border-bottom: 1px solid #E5E7EB;
+            padding-bottom: 12px;
+        }
+
+        .report-tab {
+            padding: 8px 20px;
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748B;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .report-tab:hover {
+            color: #8B0000;
+        }
+
+        .report-tab.active {
+            color: #8B0000;
+        }
+
+        .report-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #8B0000;
+            border-radius: 3px 3px 0 0;
+        }
+
+        /* Date Range Selector */
+        .date-range {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            flex-shrink: 0;
+            background: white;
+            padding: 12px 18px;
+            border-radius: 16px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .range-selector {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .range-btn {
+            padding: 6px 14px;
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #64748B;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .range-btn:hover {
+            border-color: #8B0000;
+            color: #8B0000;
+        }
+
+        .range-btn.active {
+            background: #8B0000;
+            color: white;
+            border-color: #8B0000;
+        }
+
+        .date-pickers {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .date-input {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .date-input label {
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .date-input input {
+            padding: 6px 10px;
+            border: 1px solid #E5E7EB;
+            border-radius: 30px;
+            font-size: 12px;
+            color: #1A1A1A;
+            width: 130px;
+        }
+
+        .date-input input:focus {
+            border-color: #8B0000;
+            outline: none;
+        }
+
+        .export-btn {
+            padding: 8px 18px;
+            background: #8B0000;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .export-btn:hover {
+            background: #9A0000;
+            transform: translateY(-2px);
+        }
+
+        /* Reports Grid */
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 6px;
+            min-height: 0;
+        }
+
+        /* Report Card */
+        .report-card {
+            background: white;
+            border-radius: 18px;
+            padding: 18px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            cursor: pointer;
+        }
+
+        .report-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(139,0,0,0.08);
+            border-color: #8B0000;
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .report-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .report-icon {
+            width: 44px;
+            height: 44px;
+            background: #FEE9E9;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #8B0000;
+            flex-shrink: 0;
+        }
+
+        .report-info {
+            min-width: 0;
+        }
+
+        .report-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .report-info p {
+            font-size: 12px;
+            color: #64748B;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .report-badge {
+            padding: 4px 10px;
+            background: #FEE9E9;
+            color: #8B0000;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* Chart Preview */
+        .chart-preview {
+            background: #F8FAFC;
+            border-radius: 12px;
+            padding: 14px;
+            height: 100px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            gap: 6px;
+        }
+
+        .chart-bar {
+            width: 30px;
+            background: #8B0000;
+            border-radius: 6px 6px 0 0;
+            transition: height 0.3s;
+        }
+
+        .chart-bar.small {
+            height: 35px;
+            background: #FEE9E9;
+        }
+
+        .chart-bar.medium {
+            height: 55px;
+            background: #F57C00;
+        }
+
+        .chart-bar.large {
+            height: 75px;
+            background: #8B0000;
+        }
+
+        .chart-bar.xlarge {
+            height: 65px;
+            background: #1976D2;
+        }
+
+        .chart-bar.full {
+            height: 45px;
+            background: #2E7D32;
+        }
+
+        /* Chart Legend */
+        .chart-legend {
+            display: flex;
+            gap: 14px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #64748B;
+        }
+
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+        }
+
+        .legend-color.red {
+            background: #8B0000;
+        }
+
+        .legend-color.orange {
+            background: #F57C00;
+        }
+
+        .legend-color.blue {
+            background: #1976D2;
+        }
+
+        .legend-color.green {
+            background: #2E7D32;
+        }
+
+        .legend-color.gray {
+            background: #94A3B8;
+        }
+
+        /* Report Stats */
+        .report-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            padding: 10px 0;
+            border-top: 1px solid #F0F0F0;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .stat-item {
+            text-align: center;
+            min-width: 0;
+        }
+
+        .stat-item .label {
+            font-size: 10px;
+            color: #64748B;
+            margin-bottom: 2px;
+            white-space: nowrap;
+        }
+
+        .stat-item .value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1A1A1A;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stat-item .trend {
+            font-size: 10px;
+            margin-left: 2px;
+        }
+
+        .trend.up {
+            color: #2E7D32;
+        }
+
+        .trend.down {
+            color: #C62828;
+        }
+
+        /* Mini Table */
+        .mini-table {
+            background: #F8FAFC;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 11px;
+        }
+
+        .mini-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .mini-row:last-child {
+            border-bottom: none;
+        }
+
+        .mini-label {
+            color: #64748B;
+        }
+
+        .mini-value {
+            font-weight: 600;
+            color: #8B0000;
+        }
+
+        /* Progress Bars */
+        .progress-item {
+            margin-bottom: 8px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #64748B;
+            margin-bottom: 2px;
+        }
+
+        .progress-bar-bg {
+            height: 6px;
+            background: #E5E7EB;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+        }
+
+        .fill-red {
+            background: #C62828;
+        }
+
+        .fill-orange {
+            background: #F57C00;
+        }
+
+        .fill-blue {
+            background: #1976D2;
+        }
+
+        .fill-green {
+            background: #2E7D32;
+        }
+
+        /* Donut Chart Preview */
+        .donut-preview {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 0;
+        }
+
+        .donut-segment {
+            text-align: center;
+        }
+
+        .donut-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 4px;
+            font-weight: 700;
+            font-size: 14px;
+            color: white;
+        }
+
+        .donut-circle.red {
+            background: #8B0000;
+        }
+
+        .donut-circle.blue {
+            background: #1976D2;
+        }
+
+        .donut-circle.green {
+            background: #2E7D32;
+        }
+
+        .donut-label {
+            font-size: 10px;
+            color: #64748B;
+        }
+
+        /* Report Footer */
+        .report-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 4px;
+        }
+
+        .view-report-btn {
+            padding: 6px 14px;
+            background: transparent;
+            color: #8B0000;
+            border: 1.5px solid #8B0000;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .view-report-btn:hover {
+            background: #8B0000;
+            color: white;
+        }
+
+        /* Report Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #8B0000;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            color: #8B0000;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748B;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+
+        .close-btn:hover {
+            background: #FEE9E9;
+            color: #8B0000;
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .modal-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .modal-stat-card {
+            background: #F8FAFC;
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .modal-stat-card .label {
+            font-size: 11px;
+            color: #64748B;
+            margin-bottom: 6px;
+        }
+
+        .modal-stat-card .value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .modal-stat-card .change {
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .modal-chart {
+            background: #F8FAFC;
+            border-radius: 14px;
+            padding: 18px;
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+        }
+
+        .modal-table-container {
+            overflow-x: auto;
+        }
+
+        .modal-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .modal-table th {
+            text-align: left;
+            padding: 10px;
+            background: #F8FAFC;
+            color: #64748B;
+            font-weight: 600;
+            font-size: 12px;
+            border-bottom: 2px solid #E5E7EB;
+        }
+
+        .modal-table td {
+            padding: 10px;
+            border-bottom: 1px solid #F0F0F0;
+            color: #1A1A1A;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.export {
+            background: #8B0000;
+            color: white;
+        }
+
+        .modal-btn.export:hover {
+            background: #9A0000;
+        }
+
+        .modal-btn.close {
+            background: #F0F0F0;
+            color: #666;
+        }
+
+        .modal-btn.close:hover {
+            background: #E0E0E0;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #8B0000;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(139,0,0,0.2);
+            z-index: 3000;
+            font-size: 13px;
+            font-weight: 500;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            border: 1px solid #FFFFFF;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: #2E7D32;
+        }
+
+        .toast.error {
+            background: #C62828;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #8B0000;
+            border-radius: 10px;
+        }
+
+        /* No scrolling on body */
+        html, body {
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Side Navigation - Black -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">🍳</div>
+                <div class="sidebar-title">
+                    <h2>Lyceum Kitchen</h2>
+                    <p>Admin Panel</p>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div class="sidebar-profile">
+                <div class="profile-card" onclick="toggleDropdown()">
+                    <div class="profile-avatar">MA</div>
+                    <div class="profile-details">
+                        <div class="profile-name">Maria Santos</div>
+                        <div class="profile-role">Administrator</div>
+                    </div>
+                    <div class="hamburger-btn">☰</div>
+                </div>
+
+                <!-- Profile Dropdown Menu -->
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-item" onclick="window.location.href='admin-profile.html'">
+                        <span>👤</span> My Profile
+                    </div>
+                    <div class="dropdown-item" onclick="window.location.href='admin-settings.html'">
+                        <span>⚙️</span> System Settings
+                    </div>
+                    <div class="dropdown-item" onclick="window.location.href='admin-audit.html'">
+                        <span>📋</span> Audit Trail
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="window.location.href='admin-backup.html'">
+                        <span>💾</span> Backup & Export
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="window.location.href='login.html'">
+                        <span>🚪</span> Logout
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <div class="nav-menu">
+                <div class="nav-item" onclick="window.location.href='admin-dashboard.html'">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-ingredients.html'">
+                    <span class="nav-icon">📦</span>
+                    <span class="nav-text">Ingredients</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-categories.html'">
+                    <span class="nav-icon">🏷️</span>
+                    <span class="nav-text">Categories</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-storage.html'">
+                    <span class="nav-icon">📍</span>
+                    <span class="nav-text">Storage</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-units.html'">
+                    <span class="nav-icon">⚖️</span>
+                    <span class="nav-text">Units</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-suppliers.html'">
+                    <span class="nav-icon">🏢</span>
+                    <span class="nav-text">Suppliers</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-purchases.html'">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">Purchases</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-users.html'">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-text">Users</span>
+                </div>
+                <div class="nav-item active" onclick="window.location.href='admin-reports.html'">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Reports</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-audit.html'">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-text">Audit</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-backup.html'">
+                    <span class="nav-icon">💾</span>
+                    <span class="nav-text">Backup</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1>Reports</h1>
+                    <p>Analytics and insights</p>
+                </div>
+                <div class="top-right">
+                    <div class="notification" onclick="window.location.href='admin-notifications.html'">
+                        <i>🔔</i>
+                        <span class="notification-badge">5</span>
+                    </div>
+                    <div class="date-display" id="currentDate"></div>
+                </div>
+            </div>
+
+            <!-- Reports Content -->
+            <div class="reports-content">
+                <!-- Welcome Banner -->
+                <div class="welcome-banner">
+                    <div class="welcome-text">
+                        <h3>Reports Dashboard</h3>
+                        <p>Inventory, financial, and usage analytics</p>
+                    </div>
+                    <div class="stats-badge" id="totalReportsBadge">📊 6 Reports</div>
+                </div>
+
+                <!-- Report Tabs -->
+                <div class="report-tabs">
+                    <div class="report-tab active" onclick="switchReportTab('inventory', this)">Inventory Reports</div>
+                    <div class="report-tab" onclick="switchReportTab('financial', this)">Financial Reports</div>
+                    <div class="report-tab" onclick="switchReportTab('usage', this)">Usage Reports</div>
+                    <div class="report-tab" onclick="switchReportTab('waste', this)">Waste Reports</div>
+                </div>
+
+                <!-- Date Range Selector -->
+                <div class="date-range">
+                    <div class="range-selector">
+                        <span class="range-btn active" onclick="setDateRange('today', this)">Today</span>
+                        <span class="range-btn" onclick="setDateRange('week', this)">This Week</span>
+                        <span class="range-btn" onclick="setDateRange('month', this)">This Month</span>
+                        <span class="range-btn" onclick="setDateRange('quarter', this)">This Quarter</span>
+                        <span class="range-btn" onclick="setDateRange('year', this)">This Year</span>
+                    </div>
+                    <div class="date-pickers">
+                        <div class="date-input">
+                            <label>From:</label>
+                            <input type="date" id="startDate" value="2024-01-01">
+                        </div>
+                        <div class="date-input">
+                            <label>To:</label>
+                            <input type="date" id="endDate" value="2024-01-31">
+                        </div>
+                        <button class="export-btn" onclick="exportAllReports()">
+                            <span>📥</span> Export
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Reports Grid -->
+                <div class="reports-grid" id="reportsGrid">
+                    <!-- Report 1 - Inventory Summary -->
+                    <div class="report-card" onclick="viewReport('inventory-summary')">
+                        <div class="report-header">
+                            <div class="report-title">
+                                <div class="report-icon">📋</div>
+                                <div class="report-info">
+                                    <h3>Inventory Summary</h3>
+                                    <p>Current stock levels by category</p>
+                                </div>
+                            </div>
+                            <span class="report-badge">Updated Today</span>
+                        </div>
+
+                        <div class="chart-preview">
+                            <div class="chart-bar small" style="height: 35px;"></div>
+                            <div class="chart-bar medium" style="height: 55px;"></div>
+                            <div class="chart-bar large" style="height: 75px;"></div>
+                            <div class="chart-bar xlarge" style="height: 65px;"></div>
+                            <div class="chart-bar full" style="height: 45px;"></div>
+                        </div>
+
+                        <div class="chart-legend">
+                            <div class="legend-item"><span class="legend-color red"></span> Vegetables</div>
+                            <div class="legend-item"><span class="legend-color orange"></span> Meat</div>
+                            <div class="legend-item"><span class="legend-color blue"></span> Dairy</div>
+                            <div class="legend-item"><span class="legend-color green"></span> Grains</div>
+                        </div>
+
+                        <div class="report-stats">
+                            <div class="stat-item">
+                                <div class="label">Total Items</div>
+                                <div class="value">156</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="label">Categories</div>
+                                <div class="value">6</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="label">Value</div>
+                                <div class="value">₱24.5k</div>
+                            </div>
+                        </div>
+
+                        <div class="report-footer">
+                            <button class="view-report-btn" onclick="event.stopPropagation(); viewReport('inventory-summary')">
+                                <span>📊</span> View Full Report
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Report 2 - Expiration Status -->
+                    <div class="report-card" onclick="viewReport('expiration-status')">
+                        <div class="report-header">
+                            <div class="report-title">
+                                <div class="report-icon">⏰</div>
+                                <div class="report-info">
+                                    <h3>Expiration Status</h3>
+                                    <p>Items nearing expiration</p>
+                                </div>
+                            </div>
+                            <span class="report-badge">⚠️ 12 Expiring</span>
+                        </div>
+
+                        <div class="chart-preview">
+                            <div style="display: flex; align-items: flex-end; gap: 8px; width: 100%; height: 100%;">
+                                <div style="flex: 1; height: 30px; background: #2E7D32; border-radius: 4px 4px 0 0;"></div>
+                                <div style="flex: 1; height: 50px; background: #F57C00; border-radius: 4px 4px 0 0;"></div>
+                                <div style="flex: 1; height: 70px; background: #C62828; border-radius: 4px 4px 0 0;"></div>
+                            </div>
+                        </div>
+
+                        <div class="chart-legend">
+                            <div class="legend-item"><span class="legend-color green"></span> Good (120)</div>
+                            <div class="legend-item"><span class="legend-color orange"></span> Expiring (12)</div>
+                            <div class="legend-item"><span class="legend-color red"></span> Expired (3)</div>
+                        </div>
+
+                        <div class="report-stats">
+                            <div class="stat-item">
+                                <div class="label">Good</div>
+                                <div class="value">120</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="label">Expiring</div>
+                                <div class="value">12</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="label">Expired</div>
+                                <div class="value">3</div>
+                            </div>
+                        </div>
+
+                        <div class="report-footer">
+                            <button class="view-report-btn" onclick="event.stopPropagation(); viewReport('expiration-status')">
+                                <span>📊</span> View Full Report
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Report 3 - Monthly Usage Trends -->
+                    <div class="report-card" onclick="viewReport('usage-trends')">
+                        <div class="report-header">
+                            <div class="report-title">
+                                <div class="report-icon">📈</div>
+                                <div class="report-info">
+                                    <h3>Monthly Usage Trends</h3>
+                                    <p>Consumption patterns</p>
+                                </div>
+                            </div>
+                            <span class="report-badge">↑ 8% vs last month</span>
+                        </div>
+
+                        <div class="chart-preview">
+                            <div style="display: flex; align-items: flex-end; gap: 4px; height: 100%; width: 100%;">
+                                <div style="flex: 1; height: 40px; background: #8B0000; border-radius: 4px 4px 0 0;"></div>
+                                <div style="flex: 1; height: 55px; background: #8B0000; border-radius: 4px 4px 0 0;"></div>
+                                <div style="flex: 1; height: 35px; background: #8B0000; border-radius: 4px 4px 0 0;"></div>
+                                <div style="flex: 1; height: 65px; background: #8B0000; border-radius: 4px 4px 0 0;"></div>
+                                <div style="flex: 1; height: 45px; background: #8B0000; border-radius: 4px 4px 0 0;"></div>
+                                <div style="flex: 1; height: 50px; background: #8B0000; border-radius: 4px 4px 0 0;"></div>
+                                <div style="flex: 1; height: 30px; background: #8B0000; border-radius: 4px 4px 0 0;"></div>
+                            </div>
+                        </div>
+
+                        <div class="report-stats">
+                            <div class="stat-item">
+                                <div class="label">This Month</div>
+                                <div class="value">1,245</div>
+                                <span class="trend up">↑8%</span>
+                            </div>
+                            <div class="stat-item">
+                                <div class="label">Last Month</div>
+                                <div class="value">1,153</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="label">Avg Daily</div>
+                                <div class="value">41.5</div>
+                            </div>
+                        </div>
+
+                        <div class="report-footer">
+                            <button class="view-report-btn" onclick="event.stopPropagation(); viewReport('usage-trends')">
+                                <span>📊</span> View Full Report
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Report 4 - Purchase History -->
+                    <div class="report-card" onclick="viewReport('purchase-history')">
+                        <div class="report-header">
+                            <div class="report-title">
+                                <div class="report-icon">📦</div>
+                                <div class="report-info">
+                                    <h3>Purchase History</h3>
+                                    <p>Procurement records</p>
+                                </div>
+                            </div>
+                            <span class="report-badge">12 Orders</span>
+                        </div>
+
+                        <div class="mini-table">
+                            <div class="mini-row">
+                                <span class="mini-label">Fresh Farms</span>
+                                <span class="mini-value">₱2,450</span>
+                            </div>
+                            <div class="mini-row">
+                                <span class="mini-label">Meat Masters</span>
+                                <span class="mini-value">₱3,800</span>
+                            </div>
+                            <div class="mini-row">
+                                <span class="mini-label">Seafood Direct</span>
+                                <span class="mini-value">₱2,800</span>
+                            </div>
+                            <div class="mini-row">
+                                <span class="mini-label">Dairy Delights</span>
+                                <span class="mini-value">₱1,250</span>
+                            </div>
+                        </div>
+
+                        <div class="report-stats">
+                            <div class="stat-item">
+                                <div class="label">Orders</div>
+                                <div class="value">12</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="label">Total Spent</div>
+                                <div class="value">₱18.2k</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="label">Avg Order</div>
+                                <div class="value">₱1.5k</div>
+                            </div>
+                        </div>
+
+                        <div class="report-footer">
+                            <button class="view-report-btn" onclick="event.stopPropagation(); viewReport('purchase-history')">
+                                <span>📊</span> View Full Report
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Report 5 - Waste Report -->
+                    <div class="report-card" onclick="viewReport('waste-report')">
+                        <div class="report-header">
+                            <div class="report-title">
+                                <div class="report-icon">⚠️</div>
+                                <div class="report-info">
+                                    <h3>Waste Report</h3>
+                                    <p>Spoiled & discarded items</p>
+                                </div>
+                            </div>
+                            <span class="report-badge">₱3.2k lost</span>
+                        </div>
+
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>Meat</span>
+                                <span>65%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill fill-red" style="width: 65%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>Dairy</span>
+                                <span>40%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill fill-orange" style="width: 40%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>Vegetables</span>
+                                <span>25%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill fill-green" style="width: 25%"></div>
+                            </div>
+                        </div>
+
+                        <div class="report-stats">
+                            <div class="stat-item">
+                                <div class="label">Total Waste</div>
+                                <div class="value">₱3.2k</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="label">vs Last Month</div>
+                                <div class="value">-8%</div>
+                                <span class="trend down">↓</span>
+                            </div>
+                            <div class="stat-item">
+                                <div class="label">Top Category</div>
+                                <div class="value">Meat</div>
+                            </div>
+                        </div>
+
+                        <div class="report-footer">
+                            <button class="view-report-btn" onclick="event.stopPropagation(); viewReport('waste-report')">
+                                <span>📊</span> View Full Report
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Report 6 - Cost Analysis -->
+                    <div class="report-card" onclick="viewReport('cost-analysis')">
+                        <div class="report-header">
+                            <div class="report-title">
+                                <div class="report-icon">💰</div>
+                                <div class="report-info">
+                                    <h3>Cost Analysis</h3>
+                                    <p>Financial breakdown</p>
+                                </div>
+                            </div>
+                            <span class="report-badge">This Month</span>
+                        </div>
+
+                        <div class="donut-preview">
+                            <div class="donut-segment">
+                                <div class="donut-circle red">45%</div>
+                                <div class="donut-label">Food Cost</div>
+                            </div>
+                            <div class="donut-segment">
+                                <div class="donut-circle blue">30%</div>
+                                <div class="donut-label">Labor</div>
+                            </div>
+                            <div class="donut-segment">
+                                <div class="donut-circle green">25%</div>
+                                <div class="donut-label">Overhead</div>
+                            </div>
+                        </div>
+
+                        <div class="report-stats">
+                            <div class="stat-item">
+                                <div class="label">Total Cost</div>
+                                <div class="value">₱45.2k</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="label">Revenue</div>
+                                <div class="value">₱82.5k</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="label">Profit</div>
+                                <div class="value">₱37.3k</div>
+                            </div>
+                        </div>
+
+                        <div class="report-footer">
+                            <button class="view-report-btn" onclick="event.stopPropagation(); viewReport('cost-analysis')">
+                                <span>📊</span> View Full Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div class="modal" id="reportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalReportTitle">Report Title</h2>
+                <button class="close-btn" onclick="closeReportModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalReportContent">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn export" onclick="exportReport()">Export Report</button>
+                <button class="modal-btn close" onclick="closeReportModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">Action completed successfully</div>
+
+    <script>
+        // ============================================
+        // REPORTS STATE MANAGEMENT
+        // ============================================
+        
+        let currentReportTab = 'inventory';
+        let currentDateRange = 'month';
+        let startDate = '2024-01-01';
+        let endDate = '2024-01-31';
+
+        // Load inventory data for reports
+        function loadInventoryData() {
+            const saved = localStorage.getItem('lyceum_inventory');
+            if (saved) {
+                try {
+                    return JSON.parse(saved);
+                } catch (e) {
+                    console.error('Error loading inventory:', e);
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        // Toggle profile dropdown
+        function toggleDropdown() {
+            document.getElementById('profileDropdown').classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.profile-card') && !event.target.matches('.profile-avatar') && !event.target.matches('.profile-details') && !event.target.matches('.profile-name') && !event.target.matches('.profile-role') && !event.target.matches('.hamburger-btn')) {
+                const dropdowns = document.getElementsByClassName('profile-dropdown');
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        };
+
+        // Display current date
+        function updateDate() {
+            const now = new Date();
+            const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        // Switch report tabs
+        function switchReportTab(tab, element) {
+            document.querySelectorAll('.report-tab').forEach(t => t.classList.remove('active'));
+            element.classList.add('active');
+            currentReportTab = tab;
+            showToast(`Loading ${tab} reports...`, 'info');
+            
+            // In a real app, this would filter the reports
+            // For now, just show a toast
+        }
+
+        // Set date range
+        function setDateRange(range, element) {
+            document.querySelectorAll('.range-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            currentDateRange = range;
+            
+            const today = new Date();
+            const startInput = document.getElementById('startDate');
+            const endInput = document.getElementById('endDate');
+            
+            switch(range) {
+                case 'today':
+                    startInput.value = formatDate(today);
+                    endInput.value = formatDate(today);
+                    break;
+                case 'week':
+                    const weekStart = new Date(today);
+                    weekStart.setDate(today.getDate() - today.getDay());
+                    startInput.value = formatDate(weekStart);
+                    endInput.value = formatDate(today);
+                    break;
+                case 'month':
+                    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+                    startInput.value = formatDate(monthStart);
+                    endInput.value = formatDate(today);
+                    break;
+                case 'quarter':
+                    const quarterStart = new Date(today.getFullYear(), Math.floor(today.getMonth()/3)*3, 1);
+                    startInput.value = formatDate(quarterStart);
+                    endInput.value = formatDate(today);
+                    break;
+                case 'year':
+                    const yearStart = new Date(today.getFullYear(), 0, 1);
+                    startInput.value = formatDate(yearStart);
+                    endInput.value = formatDate(today);
+                    break;
+            }
+        }
+
+        // Format date for input
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Report database
+        const reportDetails = {
+            'inventory-summary': {
+                title: 'Inventory Summary Report',
+                data: {
+                    totalItems: 156,
+                    categories: 7,
+                    totalValue: '₱24,500',
+                    itemsByCategory: [
+                        { category: 'Vegetables', count: 45, value: '₱3,200' },
+                        { category: 'Meat', count: 32, value: '₱8,500' },
+                        { category: 'Dairy', count: 28, value: '₱4,200' },
+                        { category: 'Seafood', count: 18, value: '₱5,100' },
+                        { category: 'Grains', count: 22, value: '₱2,800' },
+                        { category: 'Spices', count: 11, value: '₱700' }
+                    ]
+                }
+            },
+            'expiration-status': {
+                title: 'Expiration Status Report',
+                data: {
+                    good: 120,
+                    expiring: 12,
+                    expired: 3,
+                    expiringItems: [
+                        { name: 'Tomatoes', days: 3, category: 'Vegetables' },
+                        { name: 'Fresh Milk', days: 5, category: 'Dairy' },
+                        { name: 'Cheddar Cheese', days: 4, category: 'Dairy' },
+                        { name: 'Lettuce', days: 2, category: 'Vegetables' }
+                    ]
+                }
+            },
+            'usage-trends': {
+                title: 'Monthly Usage Trends',
+                data: {
+                    thisMonth: 1245,
+                    lastMonth: 1153,
+                    avgDaily: 41.5,
+                    monthlyData: [980, 1050, 1153, 1245]
+                }
+            },
+            'purchase-history': {
+                title: 'Purchase History Report',
+                data: {
+                    orders: 12,
+                    totalSpent: 18200,
+                    avgOrder: 1517,
+                    suppliers: [
+                        { name: 'Fresh Farms', amount: 2450 },
+                        { name: 'Meat Masters', amount: 3800 },
+                        { name: 'Seafood Direct', amount: 2800 },
+                        { name: 'Dairy Delights', amount: 1250 }
+                    ]
+                }
+            },
+            'waste-report': {
+                title: 'Waste Report',
+                data: {
+                    totalWaste: 3200,
+                    vsLastMonth: -8,
+                    topCategory: 'Meat',
+                    categories: [
+                        { name: 'Meat', percentage: 65 },
+                        { name: 'Dairy', percentage: 40 },
+                        { name: 'Vegetables', percentage: 25 },
+                        { name: 'Seafood', percentage: 50 }
+                    ]
+                }
+            },
+            'cost-analysis': {
+                title: 'Cost Analysis Report',
+                data: {
+                    foodCost: 45,
+                    labor: 30,
+                    overhead: 25,
+                    totalCost: 45200,
+                    revenue: 82500,
+                    profit: 37300
+                }
+            }
+        };
+
+        // View report
+        function viewReport(reportId) {
+            const report = reportDetails[reportId] || {
+                title: 'Report',
+                data: {}
+            };
+            
+            document.getElementById('modalReportTitle').textContent = report.title;
+            
+            let content = '';
+            
+            if (reportId === 'inventory-summary') {
+                content = `
+                    <div class="modal-stats">
+                        <div class="modal-stat-card">
+                            <div class="label">Total Items</div>
+                            <div class="value">${report.data.totalItems}</div>
+                        </div>
+                        <div class="modal-stat-card">
+                            <div class="label">Categories</div>
+                            <div class="value">${report.data.categories}</div>
+                        </div>
+                        <div class="modal-stat-card">
+                            <div class="label">Total Value</div>
+                            <div class="value">${report.data.totalValue}</div>
+                        </div>
+                        <div class="modal-stat-card">
+                            <div class="label">Low Stock</div>
+                            <div class="value">8</div>
+                        </div>
+                    </div>
+                    <div class="modal-chart">
+                        <div style="width: 100%;">
+                            <h3 style="margin-bottom: 16px; font-size: 16px;">Items by Category</h3>
+                            <table class="modal-table">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Item Count</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${report.data.itemsByCategory.map(item => `
+                                        <tr>
+                                            <td>${item.category}</td>
+                                            <td>${item.count}</td>
+                                            <td>${item.value}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } else if (reportId === 'expiration-status') {
+                content = `
+                    <div class="modal-stats">
+                        <div class="modal-stat-card">
+                            <div class="label">Good</div>
+                            <div class="value">${report.data.good}</div>
+                        </div>
+                        <div class="modal-stat-card">
+                            <div class="label">Expiring Soon</div>
+                            <div class="value">${report.data.expiring}</div>
+                        </div>
+                        <div class="modal-stat-card">
+                            <div class="label">Expired</div>
+                            <div class="value">${report.data.expired}</div>
+                        </div>
+                        <div class="modal-stat-card">
+                            <div class="label">At Risk Value</div>
+                            <div class="value">₱1,250</div>
+                        </div>
+                    </div>
+                    <div class="modal-chart">
+                        <div style="width: 100%;">
+                            <h3 style="margin-bottom: 16px; font-size: 16px;">Expiring Items</h3>
+                            <table class="modal-table">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Category</th>
+                                        <th>Days Left</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${report.data.expiringItems.map(item => `
+                                        <tr>
+                                            <td>${item.name}</td>
+                                            <td>${item.category}</td>
+                                            <td>${item.days} days</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } else if (reportId === 'purchase-history') {
+                content = `
+                    <div class="modal-stats">
+                        <div class="modal-stat-card">
+                            <div class="label">Total Orders</div>
+                            <div class="value">${report.data.orders}</div>
+                        </div>
+                        <div class="modal-stat-card">
+                            <div class="label">Total Spent</div>
+                            <div class="value">₱${(report.data.totalSpent/1000).toFixed(1)}k</div>
+                        </div>
+                        <div class="modal-stat-card">
+                            <div class="label">Average Order</div>
+                            <div class="value">₱${report.data.avgOrder}</div>
+                        </div>
+                        <div class="modal-stat-card">
+                            <div class="label">Suppliers</div>
+                            <div class="value">4</div>
+                        </div>
+                    </div>
+                    <div class="modal-chart">
+                        <div style="width: 100%;">
+                            <h3 style="margin-bottom: 16px; font-size: 16px;">Supplier Breakdown</h3>
+                            <table class="modal-table">
+                                <thead>
+                                    <tr>
+                                        <th>Supplier</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${report.data.suppliers.map(sup => `
+                                        <tr>
+                                            <td>${sup.name}</td>
+                                            <td>₱${sup.amount.toLocaleString()}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } else {
+                content = `
+                    <div class="modal-stats">
+                        <div class="modal-stat-card">
+                            <div class="label">This Month</div>
+                            <div class="value">1,245</div>
+                        </div>
+                        <div class="modal-stat-card">
+                            <div class="label">Last Month</div>
+                            <div class="value">1,153</div>
+                        </div>
+                        <div class="modal-stat-card">
+                            <div class="label">Change</div>
+                            <div class="value">+8%</div>
+                        </div>
+                        <div class="modal-stat-card">
+                            <div class="label">Avg Daily</div>
+                            <div class="value">41.5</div>
+                        </div>
+                    </div>
+                    <div class="modal-chart">
+                        <div style="width: 100%; text-align: center; color: #64748B;">
+                            <p>Detailed chart would appear here</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('modalReportContent').innerHTML = content;
+            document.getElementById('reportModal').classList.add('show');
+        }
+
+        // Close report modal
+        function closeReportModal() {
+            document.getElementById('reportModal').classList.remove('show');
+        }
+
+        // Export report
+        function exportReport() {
+            showToast('Exporting report...', 'info');
+            closeReportModal();
+        }
+
+        // Export all reports
+        function exportAllReports() {
+            showToast('Exporting all reports...', 'info');
+        }
+
+        // Toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            
+            if (type === 'success') {
+                toast.style.background = '#2E7D32';
+            } else if (type === 'error') {
+                toast.style.background = '#C62828';
+            } else {
+                toast.style.background = '#8B0000';
+            }
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDate();
+            
+            // Set default dates
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            document.getElementById('startDate').value = formatDate(firstDay);
+            document.getElementById('endDate').value = formatDate(today);
+        });
+    </script>
+</body>
+</html>

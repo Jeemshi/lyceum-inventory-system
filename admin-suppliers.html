@@ -1,0 +1,2047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyceum Kitchen - Admin Suppliers</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #F8FAFC;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        /* Main Layout */
+        .app {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background: #F8FAFC;
+        }
+
+        /* Side Navigation - Black */
+        .sidebar {
+            width: 280px;
+            background: #000000;
+            border-right: 1px solid #333333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            padding: 28px 24px;
+            border-bottom: 1px solid #333333;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .sidebar-logo {
+            font-size: 32px;
+            background: #8B0000;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            color: #FFFFFF;
+            box-shadow: 0 8px 16px rgba(139,0,0,0.3);
+        }
+
+        .sidebar-title h2 {
+            font-size: 18px;
+            color: #FFFFFF;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar-title p {
+            font-size: 12px;
+            color: #B0B0B0;
+            font-weight: 400;
+        }
+
+        /* Profile Section */
+        .sidebar-profile {
+            padding: 20px 24px;
+            border-bottom: 1px solid #333333;
+            position: relative;
+        }
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: #1A1A1A;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #333333;
+        }
+
+        .profile-card:hover {
+            background: #222222;
+            border-color: #8B0000;
+        }
+
+        .profile-avatar {
+            width: 48px;
+            height: 48px;
+            background: #8B0000;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            font-weight: 600;
+            font-size: 18px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .profile-details {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 4px;
+            letter-spacing: -0.2px;
+        }
+
+        .profile-role {
+            font-size: 12px;
+            color: #8B0000;
+            font-weight: 600;
+        }
+
+        .hamburger-btn {
+            width: 36px;
+            height: 36px;
+            background: #1A1A1A;
+            border: 1px solid #333333;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #FFFFFF;
+        }
+
+        .hamburger-btn:hover {
+            background: #8B0000;
+            border-color: #8B0000;
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: absolute;
+            top: 100px;
+            left: 24px;
+            right: 24px;
+            background: #1A1A1A;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+            border: 1px solid #333333;
+        }
+
+        .profile-dropdown.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #FFFFFF;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 1px solid #333333;
+        }
+
+        .dropdown-item:hover {
+            background: #8B0000;
+        }
+
+        .dropdown-item span:first-child {
+            font-size: 18px;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #333333;
+            margin: 4px 0;
+        }
+
+        .badge {
+            margin-left: auto;
+            background: #8B0000;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 16px;
+            color: #B0B0B0;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: #1A1A1A;
+            color: #FFFFFF;
+        }
+
+        .nav-item.active {
+            background: #8B0000;
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-text {
+            font-size: 14px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background: #F8FAFC;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 80px;
+            background: white;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            flex-shrink: 0;
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            color: #1A1A1A;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .page-title p {
+            font-size: 13px;
+            color: #64748B;
+            font-weight: 400;
+        }
+
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .notification {
+            position: relative;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            background: #F8FAFC;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .notification:hover {
+            background: #FEE9E9;
+        }
+
+        .notification i {
+            font-size: 20px;
+            color: #4A5568;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #8B0000;
+            color: white;
+            font-size: 10px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 2px solid white;
+            font-weight: 600;
+        }
+
+        .date-display {
+            background: #F8FAFC;
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid #E5E7EB;
+        }
+
+        /* Suppliers Content */
+        .suppliers-content {
+            flex: 1;
+            padding: 24px 28px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(145deg, #8B0000, #4A0000);
+            border-radius: 20px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .welcome-text h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .welcome-text p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .stats-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Quick Stats */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 24px;
+            flex-shrink: 0;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 18px;
+            padding: 16px;
+            border: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            background: #FEE9E9;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #8B0000;
+        }
+
+        .stat-info h4 {
+            font-size: 13px;
+            color: #64748B;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .stat-number {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        /* Header Actions */
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            flex-shrink: 0;
+        }
+
+        .header-actions h2 {
+            font-size: 20px;
+            color: #1A1A1A;
+            font-weight: 700;
+            position: relative;
+            padding-left: 12px;
+        }
+
+        .header-actions h2::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(to bottom, #8B0000, #D4AF37);
+            border-radius: 4px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            background: #8B0000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #9A0000;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #1A1A1A;
+            border: 1px solid #E5E7EB;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary:hover {
+            border-color: #8B0000;
+            color: #8B0000;
+        }
+
+        /* Suppliers Grid */
+        .suppliers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 8px;
+            min-height: 0;
+        }
+
+        /* Supplier Card */
+        .supplier-card {
+            background: white;
+            border-radius: 18px;
+            padding: 20px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .supplier-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(139,0,0,0.08);
+            border-color: #8B0000;
+        }
+
+        .supplier-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .supplier-icon-large {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(145deg, #FEE9E9, #FFFFFF);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: #8B0000;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .supplier-info {
+            flex: 1;
+            margin-left: 16px;
+        }
+
+        .supplier-info h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+
+        .supplier-rating {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .stars {
+            color: #FFB800;
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+
+        .rating-value {
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .supplier-category {
+            font-size: 12px;
+            color: #8B0000;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-active {
+            background: #E6F7E6;
+            color: #2E7D32;
+        }
+
+        .status-inactive {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .status-preferred {
+            background: #FFF3E0;
+            color: #F57C00;
+        }
+
+        .supplier-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 12px 0;
+            border-top: 1px solid #F0F0F0;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .detail-icon {
+            width: 24px;
+            color: #8B0000;
+            font-size: 14px;
+        }
+
+        .detail-text {
+            color: #1A1A1A;
+        }
+
+        .detail-text a {
+            color: #8B0000;
+            text-decoration: none;
+        }
+
+        .detail-text a:hover {
+            text-decoration: underline;
+        }
+
+        .supplier-stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-item .label {
+            font-size: 11px;
+            color: #64748B;
+            margin-bottom: 4px;
+        }
+
+        .stat-item .value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .stat-item .value small {
+            font-size: 11px;
+            color: #8B0000;
+        }
+
+        .products-section {
+            max-height: 80px;
+            overflow-y: auto;
+        }
+
+        .products-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .product-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .product-tag {
+            background: #F8FAFC;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            color: #4A5568;
+            border: 1px solid #E5E7EB;
+        }
+
+        .product-tag .count {
+            color: #8B0000;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .action-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 10px;
+            background: #F8FAFC;
+            color: #64748B;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #E5E7EB;
+        }
+
+        .action-btn:hover {
+            background: #8B0000;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .action-btn.edit:hover {
+            background: #1976D2;
+        }
+
+        .action-btn.delete:hover {
+            background: #C62828;
+        }
+
+        .action-btn.view:hover {
+            background: #F57C00;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 28px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #8B0000;
+        }
+
+        .modal-header h2 {
+            font-size: 22px;
+            color: #8B0000;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #64748B;
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1A1A1A;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .form-group label i {
+            color: #8B0000;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 16px;
+            border: 2px solid #F0F0F0;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #8B0000;
+            outline: none;
+        }
+
+        .rating-input {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .rating-input input {
+            width: 80px;
+        }
+
+        .rating-stars {
+            color: #FFB800;
+            font-size: 18px;
+            letter-spacing: 4px;
+        }
+
+        .status-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .status-option {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #F0F0F0;
+            border-radius: 30px;
+            text-align: center;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .status-option:hover {
+            border-color: #8B0000;
+        }
+
+        .status-option.selected {
+            background: #8B0000;
+            color: white;
+            border-color: #8B0000;
+        }
+
+        .status-option.active.selected {
+            background: #2E7D32;
+        }
+
+        .status-option.inactive.selected {
+            background: #C62828;
+        }
+
+        .status-option.preferred.selected {
+            background: #F57C00;
+        }
+
+        .products-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px;
+            background: #F8FAFC;
+            border-radius: 12px;
+            min-height: 60px;
+        }
+
+        .product-chip {
+            background: white;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .product-chip .remove {
+            color: #C62828;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .add-product {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .add-product select {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 30px;
+            font-size: 12px;
+        }
+
+        .add-product button {
+            padding: 8px 16px;
+            background: #8B0000;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.save {
+            background: #8B0000;
+            color: white;
+        }
+
+        .modal-btn.save:hover {
+            background: #9A0000;
+        }
+
+        .modal-btn.cancel {
+            background: #F0F0F0;
+            color: #666;
+        }
+
+        .modal-btn.cancel:hover {
+            background: #E0E0E0;
+        }
+
+        .modal-btn.delete {
+            background: #C62828;
+            color: white;
+        }
+
+        /* Delete Modal */
+        .delete-modal {
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .delete-icon {
+            font-size: 48px;
+            color: #C62828;
+            margin-bottom: 16px;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-2px); }
+        }
+
+        .delete-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 8px;
+        }
+
+        .delete-message {
+            font-size: 14px;
+            color: #64748B;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        /* Invoice Modal */
+        .invoice-modal {
+            max-width: 500px;
+        }
+
+        .invoice-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 16px 0;
+        }
+
+        .invoice-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .invoice-item:last-child {
+            border-bottom: none;
+        }
+
+        .invoice-info h4 {
+            font-size: 14px;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+
+        .invoice-info p {
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .invoice-amount {
+            font-size: 14px;
+            font-weight: 600;
+            color: #8B0000;
+        }
+
+        .invoice-status {
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .invoice-status.paid {
+            background: #E6F7E6;
+            color: #2E7D32;
+        }
+
+        .invoice-status.pending {
+            background: #FFF3E0;
+            color: #F57C00;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #8B0000;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(139,0,0,0.2);
+            z-index: 3000;
+            font-size: 14px;
+            font-weight: 500;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            border: 1px solid #FFFFFF;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: #2E7D32;
+        }
+
+        .toast.error {
+            background: #C62828;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #8B0000;
+            border-radius: 10px;
+        }
+
+        /* No scrolling on body */
+        html, body {
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Side Navigation - Black -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">🍳</div>
+                <div class="sidebar-title">
+                    <h2>Lyceum Kitchen</h2>
+                    <p>Admin Panel</p>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div class="sidebar-profile">
+                <div class="profile-card" onclick="toggleDropdown()">
+                    <div class="profile-avatar">MA</div>
+                    <div class="profile-details">
+                        <div class="profile-name">Maria Santos</div>
+                        <div class="profile-role">Administrator</div>
+                    </div>
+                    <div class="hamburger-btn">☰</div>
+                </div>
+
+                <!-- Profile Dropdown Menu -->
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-item" onclick="window.location.href='admin-profile.html'">
+                        <span>👤</span> My Profile
+                    </div>
+                    <div class="dropdown-item" onclick="window.location.href='admin-settings.html'">
+                        <span>⚙️</span> System Settings
+                    </div>
+                    <div class="dropdown-item" onclick="window.location.href='admin-audit.html'">
+                        <span>📋</span> Audit Trail
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="window.location.href='admin-backup.html'">
+                        <span>💾</span> Backup & Export
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="window.location.href='login.html'">
+                        <span>🚪</span> Logout
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <div class="nav-menu">
+                <div class="nav-item" onclick="window.location.href='admin-dashboard.html'">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-inventory.html'">
+                    <span class="nav-icon">📦</span>
+                    <span class="nav-text">Ingredients</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-categories.html'">
+                    <span class="nav-icon">🏷️</span>
+                    <span class="nav-text">Categories</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-storage.html'">
+                    <span class="nav-icon">📍</span>
+                    <span class="nav-text">Storage</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-units.html'">
+                    <span class="nav-icon">⚖️</span>
+                    <span class="nav-text">Units</span>
+                </div>
+                <div class="nav-item active" onclick="window.location.href='admin-suppliers.html'">
+                    <span class="nav-icon">🏢</span>
+                    <span class="nav-text">Suppliers</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-purchases.html'">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">Purchases</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-users.html'">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-text">Users</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-reports.html'">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Reports</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-audit.html'">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-text">Audit</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-backup.html'">
+                    <span class="nav-icon">💾</span>
+                    <span class="nav-text">Backup</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1>Suppliers</h1>
+                    <p>Manage supplier information and invoices</p>
+                </div>
+                <div class="top-right">
+                    <div class="notification" onclick="window.location.href='admin-notifications.html'">
+                        <i>🔔</i>
+                        <span class="notification-badge">5</span>
+                    </div>
+                    <div class="date-display" id="currentDate"></div>
+                </div>
+            </div>
+
+            <!-- Suppliers Content -->
+            <div class="suppliers-content">
+                <!-- Welcome Banner -->
+                <div class="welcome-banner">
+                    <div class="welcome-text">
+                        <h3>Supplier Management</h3>
+                        <p>Manage suppliers, products, and invoices</p>
+                    </div>
+                    <div class="stats-badge" id="totalSuppliersBadge">🏢 4 Suppliers</div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">🏢</div>
+                        <div class="stat-info">
+                            <h4>Total Suppliers</h4>
+                            <div class="stat-number" id="totalSuppliers">4</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-info">
+                            <h4>Products Supplied</h4>
+                            <div class="stat-number" id="totalProducts">31</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <h4>Total Spent</h4>
+                            <div class="stat-number" id="totalSpent">₱18.2k</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Header Actions -->
+                <div class="header-actions">
+                    <h2>Supplier Records</h2>
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="openAddModal()">
+                            <span>➕</span> Add Supplier
+                        </button>
+                        <button class="btn-secondary" onclick="exportSuppliers()">
+                            <span>📥</span> Export
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Suppliers Grid -->
+                <div class="suppliers-grid" id="suppliersGrid">
+                    <!-- Suppliers will be dynamically loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Supplier Modal -->
+    <div class="modal" id="supplierModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Supplier</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i>🏢</i> Company Name</label>
+                        <input type="text" id="companyName" placeholder="e.g., Fresh Farms">
+                    </div>
+                    <div class="form-group">
+                        <label><i>👤</i> Contact Person</label>
+                        <input type="text" id="contactPerson" placeholder="e.g., Juan Dela Cruz">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i>📧</i> Email</label>
+                        <input type="email" id="email" placeholder="contact@freshfarms.com">
+                    </div>
+                    <div class="form-group">
+                        <label><i>📞</i> Phone</label>
+                        <input type="text" id="phone" placeholder="+63 912 345 6789">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i>📍</i> Address</label>
+                    <input type="text" id="address" placeholder="e.g., 123 Main St, Manila">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i>⭐</i> Rating</label>
+                        <div class="rating-input">
+                            <input type="number" id="rating" min="0" max="5" step="0.1" value="4.5">
+                            <span class="rating-stars" id="ratingStars">★★★★★</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i>📊</i> Payment Terms</label>
+                        <select id="paymentTerms">
+                            <option value="Net 15">Net 15</option>
+                            <option value="Net 30" selected>Net 30</option>
+                            <option value="Net 45">Net 45</option>
+                            <option value="Due on Receipt">Due on Receipt</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i>📝</i> Products Supplied</label>
+                    <div class="products-input" id="productsContainer">
+                        <!-- Product chips will be added here -->
+                    </div>
+                    <div class="add-product">
+                        <select id="productSelect">
+                            <option value="">Select a product...</option>
+                            <option value="Vegetables">Vegetables</option>
+                            <option value="Fruits">Fruits</option>
+                            <option value="Meat">Meat</option>
+                            <option value="Poultry">Poultry</option>
+                            <option value="Seafood">Seafood</option>
+                            <option value="Dairy">Dairy</option>
+                            <option value="Grains">Grains</option>
+                            <option value="Spices">Spices</option>
+                            <option value="Canned Goods">Canned Goods</option>
+                        </select>
+                        <button onclick="addProduct()">Add</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i>📝</i> Notes</label>
+                    <textarea id="notes" rows="2" placeholder="Additional information..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label><i>📊</i> Status</label>
+                    <div class="status-options" id="statusOptions">
+                        <div class="status-option active selected" onclick="selectStatus('active', this)">Active</div>
+                        <div class="status-option inactive" onclick="selectStatus('inactive', this)">Inactive</div>
+                        <div class="status-option preferred" onclick="selectStatus('preferred', this)">Preferred</div>
+                    </div>
+                    <input type="hidden" id="supplierStatus" value="active">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
+                <button class="modal-btn save" onclick="saveSupplier()">Save Supplier</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Invoices Modal -->
+    <div class="modal" id="invoiceModal">
+        <div class="modal-content invoice-modal">
+            <div class="modal-header">
+                <h2 id="invoiceModalTitle">Invoices</h2>
+                <button class="close-btn" onclick="closeInvoiceModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="invoice-list" id="invoiceList">
+                    <!-- Invoices will be dynamically loaded here -->
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn save" onclick="closeInvoiceModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content delete-modal">
+            <div class="delete-icon">⚠️</div>
+            <div class="delete-title">Delete Supplier</div>
+            <div class="delete-message" id="deleteMessage">Are you sure you want to delete this supplier? This will also remove all associated invoices.</div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button class="modal-btn delete" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">Action completed successfully</div>
+
+    <script>
+        // ============================================
+        // SUPPLIERS STATE MANAGEMENT
+        // ============================================
+        
+        let inventoryData = null;
+        let suppliers = [];
+        let currentEditId = null;
+        let currentDeleteId = null;
+        let currentViewId = null;
+        let selectedStatus = 'active';
+        let selectedProducts = [];
+
+        // Load inventory data
+        function loadInventoryData() {
+            const saved = localStorage.getItem('lyceum_inventory');
+            if (saved) {
+                try {
+                    inventoryData = JSON.parse(saved);
+                    // Initialize suppliers if not present
+                    if (!inventoryData.suppliers) {
+                        initializeDefaultSuppliers();
+                    } else {
+                        suppliers = inventoryData.suppliers;
+                    }
+                    updateUI();
+                } catch (e) {
+                    console.error('Error loading inventory:', e);
+                    initializeDefaultSuppliers();
+                }
+            } else {
+                initializeDefaultSuppliers();
+            }
+        }
+
+        // Initialize default suppliers
+        function initializeDefaultSuppliers() {
+            suppliers = [
+                { 
+                    id: 1, 
+                    name: 'Fresh Farms', 
+                    contact: 'Juan Dela Cruz',
+                    email: 'juan@freshfarms.com',
+                    phone: '+63 912 345 6789',
+                    address: '123 Farm Road, Manila',
+                    rating: 4.8,
+                    paymentTerms: 'Net 30',
+                    products: ['Vegetables', 'Fruits', 'Herbs'],
+                    notes: 'Organic produce supplier',
+                    status: 'preferred',
+                    invoices: [
+                        { id: 'INV-001', date: '2024-01-15', amount: 2450, status: 'paid' },
+                        { id: 'INV-002', date: '2024-01-05', amount: 1800, status: 'paid' }
+                    ],
+                    totalOrders: 12,
+                    totalSpent: 12500,
+                    icon: '🥬'
+                },
+                { 
+                    id: 2, 
+                    name: 'Meat Masters', 
+                    contact: 'Maria Santos',
+                    email: 'maria@meatmasters.com',
+                    phone: '+63 923 456 7890',
+                    address: '456 Meat Ave, Quezon City',
+                    rating: 4.5,
+                    paymentTerms: 'Net 15',
+                    products: ['Meat', 'Poultry'],
+                    notes: 'Premium meat supplier',
+                    status: 'active',
+                    invoices: [
+                        { id: 'INV-003', date: '2024-01-18', amount: 3800, status: 'pending' },
+                        { id: 'INV-004', date: '2024-01-10', amount: 4200, status: 'paid' }
+                    ],
+                    totalOrders: 8,
+                    totalSpent: 15800,
+                    icon: '🥩'
+                },
+                { 
+                    id: 3, 
+                    name: 'Dairy Delights', 
+                    contact: 'Pedro Reyes',
+                    email: 'pedro@dairydelights.com',
+                    phone: '+63 934 567 8901',
+                    address: '789 Dairy Lane, Makati',
+                    rating: 4.2,
+                    paymentTerms: 'Net 30',
+                    products: ['Dairy', 'Eggs'],
+                    notes: 'Fresh dairy products',
+                    status: 'active',
+                    invoices: [
+                        { id: 'INV-005', date: '2024-01-12', amount: 1250, status: 'paid' }
+                    ],
+                    totalOrders: 5,
+                    totalSpent: 6200,
+                    icon: '🧀'
+                },
+                { 
+                    id: 4, 
+                    name: 'Seafood Direct', 
+                    contact: 'Ana Lopez',
+                    email: 'ana@seafooddirect.com',
+                    phone: '+63 945 678 9012',
+                    address: '321 Ocean Drive, Pasay',
+                    rating: 4.7,
+                    paymentTerms: 'Net 15',
+                    products: ['Seafood'],
+                    notes: 'Fresh seafood daily',
+                    status: 'active',
+                    invoices: [
+                        { id: 'INV-006', date: '2024-01-19', amount: 2800, status: 'pending' }
+                    ],
+                    totalOrders: 6,
+                    totalSpent: 9800,
+                    icon: '🐟'
+                }
+            ];
+            
+            if (!inventoryData) {
+                inventoryData = { suppliers: suppliers, ingredients: [] };
+            } else {
+                inventoryData.suppliers = suppliers;
+            }
+            saveToLocalStorage();
+        }
+
+        // Save to localStorage
+        function saveToLocalStorage() {
+            if (!inventoryData) {
+                inventoryData = { suppliers: suppliers, ingredients: [] };
+            } else {
+                inventoryData.suppliers = suppliers;
+            }
+            localStorage.setItem('lyceum_inventory', JSON.stringify(inventoryData));
+            
+            // Dispatch event for other pages
+            window.dispatchEvent(new CustomEvent('inventoryUpdated', { 
+                detail: inventoryData 
+            }));
+        }
+
+        // Update UI
+        function updateUI() {
+            updateStats();
+            renderSuppliers();
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('totalSuppliers').textContent = suppliers.length;
+            document.getElementById('totalSuppliersBadge').textContent = `🏢 ${suppliers.length} Suppliers`;
+            
+            // Calculate total products
+            const allProducts = suppliers.flatMap(s => s.products || []);
+            const uniqueProducts = [...new Set(allProducts)];
+            document.getElementById('totalProducts').textContent = uniqueProducts.length;
+            
+            // Calculate total spent
+            const totalSpent = suppliers.reduce((sum, s) => sum + (s.totalSpent || 0), 0);
+            document.getElementById('totalSpent').textContent = `₱${(totalSpent/1000).toFixed(1)}k`;
+        }
+
+        // Get status class
+        function getStatusClass(status) {
+            switch(status) {
+                case 'active': return 'status-active';
+                case 'inactive': return 'status-inactive';
+                case 'preferred': return 'status-preferred';
+                default: return 'status-active';
+            }
+        }
+
+        // Render suppliers
+        function renderSuppliers() {
+            const grid = document.getElementById('suppliersGrid');
+            
+            grid.innerHTML = suppliers.map(supplier => {
+                // Get ingredients from this supplier
+                const ingredients = inventoryData?.ingredients?.filter(i => 
+                    i.supplier === supplier.name && !i.archived
+                ) || [];
+                
+                // Generate star rating
+                const fullStars = Math.floor(supplier.rating || 0);
+                const halfStar = (supplier.rating || 0) % 1 >= 0.5;
+                let stars = '★'.repeat(fullStars);
+                if (halfStar) stars += '½';
+                stars += '☆'.repeat(5 - Math.ceil(supplier.rating || 0));
+                
+                return `
+                    <div class="supplier-card" data-id="${supplier.id}">
+                        <div class="supplier-header">
+                            <div class="supplier-icon-large">${supplier.icon || '🏢'}</div>
+                            <div class="supplier-info">
+                                <h3>${supplier.name}</h3>
+                                <div class="supplier-rating">
+                                    <span class="stars">${stars}</span>
+                                    <span class="rating-value">${supplier.rating.toFixed(1)}</span>
+                                </div>
+                                <div class="supplier-category">${supplier.products?.slice(0, 2).join(' • ')}${supplier.products?.length > 2 ? ' • ...' : ''}</div>
+                            </div>
+                            <span class="status-badge ${getStatusClass(supplier.status)}">${supplier.status.charAt(0).toUpperCase() + supplier.status.slice(1)}</span>
+                        </div>
+
+                        <div class="supplier-details">
+                            <div class="detail-row">
+                                <span class="detail-icon">👤</span>
+                                <span class="detail-text">${supplier.contact}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-icon">📧</span>
+                                <span class="detail-text"><a href="mailto:${supplier.email}">${supplier.email}</a></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-icon">📞</span>
+                                <span class="detail-text">${supplier.phone}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-icon">📍</span>
+                                <span class="detail-text">${supplier.address}</span>
+                            </div>
+                        </div>
+
+                        <div class="supplier-stats">
+                            <div class="stat-item">
+                                <div class="label">Orders</div>
+                                <div class="value">${supplier.totalOrders || 0}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="label">Items</div>
+                                <div class="value">${ingredients.length}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="label">Total</div>
+                                <div class="value">₱${(supplier.totalSpent || 0)/1000}k</div>
+                            </div>
+                        </div>
+
+                        ${supplier.invoices && supplier.invoices.length > 0 ? `
+                            <div class="products-section">
+                                <div class="products-title">
+                                    <span>📋</span> Recent Invoices
+                                </div>
+                                <div class="product-tags">
+                                    ${supplier.invoices.slice(0, 2).map(inv => `
+                                        <span class="product-tag">
+                                            ${inv.id} 
+                                            <span class="count">₱${inv.amount/1000}k</span>
+                                            <span class="invoice-status ${inv.status}">•</span>
+                                        </span>
+                                    `).join('')}
+                                    ${supplier.invoices.length > 2 ? `<span class="product-tag">+${supplier.invoices.length - 2} more</span>` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <div class="action-group">
+                            <button class="action-btn view" onclick="viewInvoices(${supplier.id})" title="View Invoices">📋</button>
+                            <button class="action-btn edit" onclick="editSupplier(${supplier.id})" title="Edit">✏️</button>
+                            <button class="action-btn delete" onclick="deleteSupplier(${supplier.id})" title="Delete">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================
+        // SUPPLIER CRUD OPERATIONS
+        // ============================================
+
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add Supplier';
+            document.getElementById('companyName').value = '';
+            document.getElementById('contactPerson').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('address').value = '';
+            document.getElementById('rating').value = '4.5';
+            document.getElementById('paymentTerms').value = 'Net 30';
+            document.getElementById('notes').value = '';
+            updateRatingStars(4.5);
+            
+            // Reset products
+            selectedProducts = [];
+            updateProductsContainer();
+            
+            // Reset status
+            document.querySelectorAll('.status-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector('.status-option.active').classList.add('selected');
+            selectedStatus = 'active';
+            document.getElementById('supplierStatus').value = 'active';
+            
+            currentEditId = null;
+            document.getElementById('supplierModal').classList.add('show');
+        }
+
+        function editSupplier(id) {
+            const supplier = suppliers.find(s => s.id === id);
+            if (!supplier) return;
+            
+            document.getElementById('modalTitle').textContent = 'Edit Supplier';
+            document.getElementById('companyName').value = supplier.name;
+            document.getElementById('contactPerson').value = supplier.contact;
+            document.getElementById('email').value = supplier.email;
+            document.getElementById('phone').value = supplier.phone;
+            document.getElementById('address').value = supplier.address;
+            document.getElementById('rating').value = supplier.rating;
+            document.getElementById('paymentTerms').value = supplier.paymentTerms || 'Net 30';
+            document.getElementById('notes').value = supplier.notes || '';
+            updateRatingStars(supplier.rating);
+            
+            // Set products
+            selectedProducts = supplier.products || [];
+            updateProductsContainer();
+            
+            // Set status
+            document.querySelectorAll('.status-option').forEach(opt => opt.classList.remove('selected'));
+            const statusOption = document.querySelector(`.status-option.${supplier.status}`);
+            if (statusOption) statusOption.classList.add('selected');
+            selectedStatus = supplier.status;
+            document.getElementById('supplierStatus').value = supplier.status;
+            
+            currentEditId = id;
+            document.getElementById('supplierModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('supplierModal').classList.remove('show');
+        }
+
+        function updateRatingStars(rating) {
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5;
+            let stars = '★'.repeat(fullStars);
+            if (halfStar) stars += '½';
+            stars += '☆'.repeat(5 - Math.ceil(rating));
+            document.getElementById('ratingStars').textContent = stars;
+        }
+
+        // Update rating on input
+        document.getElementById('rating')?.addEventListener('input', function(e) {
+            updateRatingStars(parseFloat(e.target.value) || 0);
+        });
+
+        function selectStatus(status, element) {
+            document.querySelectorAll('.status-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            document.getElementById('supplierStatus').value = status;
+            selectedStatus = status;
+        }
+
+        function addProduct() {
+            const select = document.getElementById('productSelect');
+            const product = select.value;
+            if (product && !selectedProducts.includes(product)) {
+                selectedProducts.push(product);
+                updateProductsContainer();
+            }
+            select.value = '';
+        }
+
+        function removeProduct(product) {
+            selectedProducts = selectedProducts.filter(p => p !== product);
+            updateProductsContainer();
+        }
+
+        function updateProductsContainer() {
+            const container = document.getElementById('productsContainer');
+            container.innerHTML = selectedProducts.map(product => `
+                <div class="product-chip">
+                    ${product}
+                    <span class="remove" onclick="removeProduct('${product}')">✕</span>
+                </div>
+            `).join('');
+        }
+
+        function saveSupplier() {
+            const name = document.getElementById('companyName').value.trim();
+            if (!name) {
+                showToast('Please enter company name', 'error');
+                return;
+            }
+            
+            const supplierData = {
+                name: name,
+                contact: document.getElementById('contactPerson').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                address: document.getElementById('address').value.trim(),
+                rating: parseFloat(document.getElementById('rating').value) || 0,
+                paymentTerms: document.getElementById('paymentTerms').value,
+                products: selectedProducts,
+                notes: document.getElementById('notes').value.trim(),
+                status: selectedStatus,
+                icon: getSupplierIcon(name),
+                invoices: [],
+                totalOrders: 0,
+                totalSpent: 0
+            };
+            
+            if (currentEditId) {
+                // Update existing supplier
+                const index = suppliers.findIndex(s => s.id === currentEditId);
+                if (index !== -1) {
+                    // Preserve invoices and stats
+                    supplierData.invoices = suppliers[index].invoices || [];
+                    supplierData.totalOrders = suppliers[index].totalOrders || 0;
+                    supplierData.totalSpent = suppliers[index].totalSpent || 0;
+                    
+                    suppliers[index] = { ...suppliers[index], ...supplierData };
+                    showToast('Supplier updated successfully!', 'success');
+                }
+            } else {
+                // Add new supplier
+                supplierData.id = Date.now();
+                suppliers.push(supplierData);
+                showToast('Supplier added successfully!', 'success');
+            }
+            
+            saveToLocalStorage();
+            updateUI();
+            closeModal();
+        }
+
+        function getSupplierIcon(name) {
+            const icons = {
+                'Fresh Farms': '🥬',
+                'Meat Masters': '🥩',
+                'Dairy Delights': '🧀',
+                'Seafood Direct': '🐟'
+            };
+            return icons[name] || '🏢';
+        }
+
+        function viewInvoices(id) {
+            const supplier = suppliers.find(s => s.id === id);
+            if (!supplier) return;
+            
+            currentViewId = id;
+            document.getElementById('invoiceModalTitle').textContent = `Invoices - ${supplier.name}`;
+            
+            const invoiceList = document.getElementById('invoiceList');
+            
+            if (supplier.invoices && supplier.invoices.length > 0) {
+                invoiceList.innerHTML = supplier.invoices.map(inv => `
+                    <div class="invoice-item">
+                        <div class="invoice-info">
+                            <h4>${inv.id}</h4>
+                            <p>${inv.date}</p>
+                        </div>
+                        <div>
+                            <span class="invoice-amount">₱${inv.amount.toLocaleString()}</span>
+                            <span class="invoice-status ${inv.status}">${inv.status}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                invoiceList.innerHTML = '<p style="text-align: center; color: #64748B; padding: 20px;">No invoices found</p>';
+            }
+            
+            document.getElementById('invoiceModal').classList.add('show');
+        }
+
+        function closeInvoiceModal() {
+            document.getElementById('invoiceModal').classList.remove('show');
+        }
+
+        function deleteSupplier(id) {
+            const supplier = suppliers.find(s => s.id === id);
+            if (!supplier) return;
+            
+            // Check if supplier has items
+            const itemsFromSupplier = inventoryData?.ingredients?.filter(i => 
+                i.supplier === supplier.name && !i.archived
+            ) || [];
+            
+            if (itemsFromSupplier.length > 0) {
+                document.getElementById('deleteMessage').textContent = 
+                    `"${supplier.name}" supplies ${itemsFromSupplier.length} items. Deleting this supplier will affect these items.`;
+            } else {
+                document.getElementById('deleteMessage').textContent = 
+                    `Are you sure you want to delete "${supplier.name}"?`;
+            }
+            
+            currentDeleteId = id;
+            document.getElementById('deleteModal').classList.add('show');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('show');
+            currentDeleteId = null;
+        }
+
+        function confirmDelete() {
+            if (currentDeleteId) {
+                suppliers = suppliers.filter(s => s.id !== currentDeleteId);
+                saveToLocalStorage();
+                updateUI();
+                showToast('Supplier deleted successfully!', 'success');
+                closeDeleteModal();
+            }
+        }
+
+        // Export suppliers
+        function exportSuppliers() {
+            const dataStr = JSON.stringify(suppliers, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = `suppliers_export_${new Date().toISOString().slice(0,10)}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showToast('Suppliers exported successfully!', 'success');
+        }
+
+        // Toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            
+            if (type === 'success') {
+                toast.style.background = '#2E7D32';
+            } else if (type === 'error') {
+                toast.style.background = '#C62828';
+            } else {
+                toast.style.background = '#8B0000';
+            }
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Toggle profile dropdown
+        function toggleDropdown() {
+            document.getElementById('profileDropdown').classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.profile-card') && !event.target.matches('.profile-avatar') && !event.target.matches('.profile-details') && !event.target.matches('.profile-name') && !event.target.matches('.profile-role') && !event.target.matches('.hamburger-btn')) {
+                const dropdowns = document.getElementsByClassName('profile-dropdown');
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        };
+
+        // Display current date
+        function updateDate() {
+            const now = new Date();
+            const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        // Listen for updates from other pages
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'lyceum_inventory') {
+                loadInventoryData();
+                showToast('Inventory updated from another page', 'info');
+            }
+        });
+
+        window.addEventListener('inventoryUpdated', function(e) {
+            inventoryData = e.detail;
+            suppliers = inventoryData.suppliers || suppliers;
+            updateUI();
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInventoryData();
+            updateDate();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Lyceum Kitchen - Reports</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #F8FAFC;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        /* Main Layout */
+        .app {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background: #F8FAFC;
+        }
+
+        /* Side Navigation - Black */
+        .sidebar {
+            width: 280px;
+            background: #000000;
+            border-right: 1px solid #333333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                z-index: 1000;
+                transition: left 0.3s ease;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            .sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+                display: none;
+            }
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+
+        .sidebar-header {
+            padding: 28px 24px;
+            border-bottom: 1px solid #333333;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .sidebar-logo {
+            font-size: 32px;
+            background: #8B0000;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            color: #FFFFFF;
+            box-shadow: 0 8px 16px rgba(139,0,0,0.3);
+        }
+
+        .sidebar-title h2 {
+            font-size: 18px;
+            color: #FFFFFF;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar-title p {
+            font-size: 12px;
+            color: #B0B0B0;
+            font-weight: 400;
+        }
+
+        /* Profile Section */
+        .sidebar-profile {
+            padding: 20px 24px;
+            border-bottom: 1px solid #333333;
+        }
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 14px;
+            background: #141414;
+            border-radius: 16px;
+            border: 1px solid #2C2C2C;
+        }
+
+        .profile-avatar {
+            width: 44px;
+            height: 44px;
+            background: #8B0000;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .profile-details {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #FFFFFF;
+            margin-bottom: 2px;
+        }
+
+        .profile-role {
+            font-size: 11px;
+            color: #999999;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            flex: 1;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #A0A0A0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: #1A1A1A;
+            color: #FFFFFF;
+        }
+
+        .nav-item.active {
+            background: #8B0000;
+            color: #FFFFFF;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            min-width: 24px;
+        }
+
+        .logout-item {
+            margin-top: auto;
+            margin-bottom: 20px;
+            border-top: 1px solid #2C2C2C;
+            padding-top: 16px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background: #F8FAFC;
+            position: relative;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 80px;
+            background: white;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            flex-shrink: 0;
+        }
+
+        .burger-menu {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: #F8FAFC;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 1px solid #E5E7EB;
+            margin-right: 15px;
+        }
+
+        .hamburger-icon {
+            width: 22px;
+            height: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .hamburger-icon span {
+            display: block;
+            height: 2.5px;
+            background: #1A1A1A;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 1024px) {
+            .burger-menu {
+                display: flex;
+            }
+            .top-bar {
+                padding: 12px 16px;
+                height: 70px;
+            }
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            color: #1A1A1A;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .page-title p {
+            font-size: 13px;
+            color: #64748B;
+            font-weight: 400;
+        }
+
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .notification {
+            position: relative;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            background: #F8FAFC;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .notification:hover {
+            background: #FEE9E9;
+        }
+
+        .notification i {
+            font-size: 20px;
+            color: #4A5568;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #8B0000;
+            color: white;
+            font-size: 10px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 2px solid white;
+            font-weight: 600;
+        }
+
+        .date-display {
+            background: #F8FAFC;
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid #E5E7EB;
+        }
+
+        /* Reports Content */
+        .reports-content {
+            flex: 1;
+            padding: 24px 28px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            padding-bottom: 100px;
+        }
+
+        @media (max-width: 1024px) {
+            .reports-content {
+                padding: 16px;
+                padding-bottom: 100px;
+            }
+        }
+
+        /* Header Stats */
+        .reports-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 22px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .reports-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 18px;
+            padding: 18px;
+            border: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: #FEE9E9;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #8B0000;
+        }
+
+        .stat-info h3 {
+            font-size: 14px;
+            color: #64748B;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .stat-desc {
+            font-size: 12px;
+            color: #8B0000;
+            margin-top: 2px;
+        }
+
+        /* Report Tabs */
+        .report-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 22px;
+            flex-shrink: 0;
+            border-bottom: 1px solid #E5E7EB;
+            padding-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .report-tab {
+            padding: 8px 20px;
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748B;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .report-tab:hover {
+            color: #8B0000;
+        }
+
+        .report-tab.active {
+            color: #8B0000;
+        }
+
+        .report-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #8B0000;
+            border-radius: 3px 3px 0 0;
+        }
+
+        /* Date Range Selector */
+        .date-range {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .range-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .range-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #64748B;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .range-btn:hover {
+            border-color: #8B0000;
+            color: #8B0000;
+        }
+
+        .range-btn.active {
+            background: #8B0000;
+            color: white;
+            border-color: #8B0000;
+        }
+
+        .date-pickers {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .date-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .date-input label {
+            font-size: 13px;
+            color: #64748B;
+        }
+
+        .date-input input {
+            padding: 8px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 30px;
+            font-size: 13px;
+            color: #1A1A1A;
+        }
+
+        .date-input input:focus {
+            border-color: #8B0000;
+            outline: none;
+        }
+
+        .export-btn {
+            padding: 8px 20px;
+            background: #8B0000;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .export-btn:hover {
+            background: #9A0000;
+            transform: translateY(-2px);
+        }
+
+        /* Reports Grid */
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+            overflow-y: visible;
+        }
+
+        @media (max-width: 768px) {
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Report Card */
+        .report-card {
+            background: white;
+            border-radius: 18px;
+            padding: 20px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            cursor: pointer;
+        }
+
+        .report-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(139,0,0,0.08);
+            border-color: #8B0000;
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .report-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .report-icon {
+            width: 48px;
+            height: 48px;
+            background: #F8FAFC;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #8B0000;
+            border: 1px solid #E5E7EB;
+        }
+
+        .report-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+
+        .report-info p {
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .report-badge {
+            padding: 4px 12px;
+            background: #FEE9E9;
+            color: #8B0000;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .chart-preview {
+            background: #F8FAFC;
+            border-radius: 14px;
+            padding: 16px;
+            height: 120px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            gap: 8px;
+        }
+
+        .report-stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-top: 1px solid #F0F0F0;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-item .label {
+            font-size: 11px;
+            color: #64748B;
+            margin-bottom: 4px;
+        }
+
+        .stat-item .value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .report-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .view-report-btn {
+            padding: 8px 16px;
+            background: transparent;
+            color: #8B0000;
+            border: 1.5px solid #8B0000;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .view-report-btn:hover {
+            background: #8B0000;
+            color: white;
+        }
+
+        /* Report Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 28px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #8B0000;
+        }
+
+        .modal-header h2 {
+            font-size: 22px;
+            color: #8B0000;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #64748B;
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .modal-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .modal-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .modal-stat-card {
+            background: #F8FAFC;
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .modal-stat-card .label {
+            font-size: 12px;
+            color: #64748B;
+            margin-bottom: 8px;
+        }
+
+        .modal-stat-card .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .modal-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .modal-table th {
+            text-align: left;
+            padding: 12px;
+            background: #F8FAFC;
+            color: #64748B;
+            font-weight: 600;
+            font-size: 12px;
+            border-bottom: 2px solid #E5E7EB;
+        }
+
+        .modal-table td {
+            padding: 12px;
+            border-bottom: 1px solid #F0F0F0;
+            font-size: 13px;
+            color: #1A1A1A;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.export {
+            background: #8B0000;
+            color: white;
+        }
+
+        .modal-btn.export:hover {
+            background: #9A0000;
+        }
+
+        .modal-btn.close {
+            background: #F0F0F0;
+            color: #666;
+        }
+
+        /* CENTERED CAMERA FAB BUTTON */
+        .camera-fab {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, #8B0000, #6B0000);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(139, 0, 0, 0.4);
+            z-index: 98;
+            transition: all 0.3s ease;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .camera-fab:active {
+            transform: translateX(-50%) scale(0.92);
+        }
+
+        .camera-fab i {
+            font-size: 28px;
+            color: white;
+        }
+
+        @media (max-width: 1024px) {
+            .camera-fab {
+                display: flex;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .camera-fab {
+                display: none !important;
+            }
+        }
+
+        /* Scanner Modal */
+        .scanner-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scanner-modal.active {
+            display: flex;
+        }
+
+        .scanner-container {
+            width: 100%;
+            max-width: 500px;
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #scannerVideo {
+            width: 100%;
+            height: auto;
+            background: #000;
+        }
+
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .scanner-close {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            font-size: 24px;
+            cursor: pointer;
+            align-self: flex-end;
+        }
+
+        .scan-guide {
+            color: white;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 14px;
+        }
+
+        .custom-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            z-index: 3000;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .custom-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8B0000;
+            border-radius: 10px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="app">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">🍳</div>
+            <div class="sidebar-title">
+                <h2>Lyceum Kitchen</h2>
+                <p>Inventory System</p>
+            </div>
+        </div>
+        <div class="sidebar-profile">
+            <div class="profile-card">
+                <div class="profile-avatar">JS</div>
+                <div class="profile-details">
+                    <div class="profile-name">Juan Santos</div>
+                    <div class="profile-role">Kitchen Staff</div>
+                </div>
+            </div>
+        </div>
+        <div class="nav-menu">
+            <div class="nav-item" data-page="dashboard"><span class="nav-icon">📊</span><span>Dashboard</span></div>
+            <div class="nav-item" data-page="inventory"><span class="nav-icon">📦</span><span>Inventory</span></div>
+            <div class="nav-item" data-page="expiring"><span class="nav-icon">⏰</span><span>Expiring Items</span></div>
+            <div class="nav-item" data-page="lowstock"><span class="nav-icon">📉</span><span>Low Stock</span></div>
+            <div class="nav-item" data-page="recipes"><span class="nav-icon">🍳</span><span>Recipes</span></div>
+            <div class="nav-item" data-page="deliveries"><span class="nav-icon">🚚</span><span>Deliveries</span></div>
+            <div class="nav-item active" data-page="reports"><span class="nav-icon">📈</span><span>Reports</span></div>
+            <div class="nav-item" data-page="activity"><span class="nav-icon">📋</span><span>Activity Logs</span></div>
+            <div class="nav-item logout-item" data-page="logout"><span class="nav-icon">🚪</span><span>Logout</span></div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="burger-menu" id="burgerMenu">
+                <div class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            <div class="page-title">
+                <h1>Reports</h1>
+                <p>Analyze your kitchen data</p>
+            </div>
+            <div class="top-right">
+                <div class="notification" onclick="window.location.href='notifications.html'">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="date-display" id="currentDate"></div>
+            </div>
+        </div>
+
+        <div class="reports-content">
+            <!-- Header Stats -->
+            <div class="reports-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-info">
+                        <h3>Inventory Value</h3>
+                        <div class="stat-number">₱24.5k</div>
+                        <div class="stat-desc">↑ 12% from last month</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-info">
+                        <h3>Items Used</h3>
+                        <div class="stat-number">1,245</div>
+                        <div class="stat-desc">This month</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-info">
+                        <h3>Waste</h3>
+                        <div class="stat-number">₱3.2k</div>
+                        <div class="stat-desc">↓ 8% from last month</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-info">
+                        <h3>Orders</h3>
+                        <div class="stat-number">48</div>
+                        <div class="stat-desc">This month</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Tabs -->
+            <div class="report-tabs">
+                <div class="report-tab active" data-tab="inventory">Inventory Reports</div>
+                <div class="report-tab" data-tab="financial">Financial Reports</div>
+                <div class="report-tab" data-tab="usage">Usage Reports</div>
+                <div class="report-tab" data-tab="waste">Waste Reports</div>
+            </div>
+
+            <!-- Date Range Selector -->
+            <div class="date-range">
+                <div class="range-selector">
+                    <span class="range-btn" data-range="today">Today</span>
+                    <span class="range-btn" data-range="week">This Week</span>
+                    <span class="range-btn active" data-range="month">This Month</span>
+                    <span class="range-btn" data-range="quarter">This Quarter</span>
+                    <span class="range-btn" data-range="year">This Year</span>
+                </div>
+                <div class="date-pickers">
+                    <div class="date-input">
+                        <label>From:</label>
+                        <input type="date" id="startDate">
+                    </div>
+                    <div class="date-input">
+                        <label>To:</label>
+                        <input type="date" id="endDate">
+                    </div>
+                    <button class="export-btn" onclick="exportReport()">
+                        <span>📥</span> Export
+                    </button>
+                </div>
+            </div>
+
+            <!-- Reports Grid -->
+            <div class="reports-grid" id="reportsGrid">
+                <!-- Dynamic content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CENTERED CAMERA FAB BUTTON -->
+<div class="camera-fab" id="cameraFabBtn">
+    <i class="fas fa-camera"></i>
+</div>
+
+<!-- Scanner Modal -->
+<div class="scanner-modal" id="scannerModal">
+    <div class="scanner-container">
+        <video id="scannerVideo" autoplay playsinline></video>
+        <div class="scanner-overlay">
+            <button class="scanner-close" id="closeScannerBtn">✕</button>
+            <div class="scan-guide"><i class="fas fa-camera"></i> Position QR code in frame</div>
+        </div>
+    </div>
+</div>
+
+<!-- Report Modal -->
+<div class="modal" id="reportModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalReportTitle">Report Title</h2>
+            <button class="close-btn" onclick="closeReportModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modalReportContent"></div>
+        <div class="modal-actions">
+            <button class="modal-btn export" onclick="exportReportDetail()">Export Report</button>
+            <button class="modal-btn close" onclick="closeReportModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<div class="custom-toast" id="toastMsg">Action completed</div>
+
+<script>
+    // Reports data
+    const reportsData = [
+        { id: 'inventory-summary', title: 'Inventory Summary', icon: '📋', desc: 'Current stock levels by category', badge: 'Updated Today', category: 'inventory' },
+        { id: 'expiration-status', title: 'Expiration Status', icon: '⏰', desc: 'Items nearing expiration', badge: '⚠️ 12 Expiring', category: 'inventory' },
+        { id: 'usage-trends', title: 'Monthly Usage Trends', icon: '📈', desc: 'Consumption patterns', badge: '↑ 8% vs last month', category: 'usage' },
+        { id: 'purchase-history', title: 'Purchase History', icon: '📦', desc: 'Procurement records', badge: '12 Orders', category: 'financial' },
+        { id: 'waste-report', title: 'Waste Report', icon: '⚠️', desc: 'Spoiled & discarded items', badge: '₱3.2k lost', category: 'waste' },
+        { id: 'cost-analysis', title: 'Cost Analysis', icon: '💰', desc: 'Financial breakdown', badge: 'This Month', category: 'financial' }
+    ];
+
+    const reportDetails = {
+        'inventory-summary': {
+            title: 'Inventory Summary Report',
+            data: {
+                totalItems: 156,
+                categories: 7,
+                totalValue: '₱24,500',
+                itemsByCategory: [
+                    { category: 'Vegetables', count: 45, value: '₱3,200' },
+                    { category: 'Meat', count: 32, value: '₱8,500' },
+                    { category: 'Dairy', count: 28, value: '₱4,200' },
+                    { category: 'Seafood', count: 18, value: '₱5,100' },
+                    { category: 'Grains', count: 22, value: '₱2,800' },
+                    { category: 'Spices', count: 11, value: '₱700' }
+                ]
+            }
+        },
+        'expiration-status': {
+            title: 'Expiration Status Report',
+            data: {
+                good: 120,
+                expiring: 12,
+                expired: 3,
+                expiringItems: [
+                    { name: 'Tomatoes', days: 3, category: 'Vegetables' },
+                    { name: 'Fresh Milk', days: 5, category: 'Dairy' },
+                    { name: 'Cheddar Cheese', days: 4, category: 'Dairy' },
+                    { name: 'Lettuce', days: 2, category: 'Vegetables' }
+                ]
+            }
+        },
+        'usage-trends': {
+            title: 'Monthly Usage Trends',
+            data: {
+                thisMonth: 1245,
+                lastMonth: 1153,
+                avgDaily: 41.5,
+                monthlyData: [980, 1050, 1153, 1245]
+            }
+        },
+        'purchase-history': {
+            title: 'Purchase History Report',
+            data: {
+                orders: 12,
+                totalSpent: '₱18,200',
+                avgOrder: '₱1,516',
+                suppliers: [
+                    { name: 'Fresh Farms', amount: '₱2,450' },
+                    { name: 'Meat Masters', amount: '₱3,800' },
+                    { name: 'Seafood Direct', amount: '₱2,800' }
+                ]
+            }
+        },
+        'waste-report': {
+            title: 'Waste Report',
+            data: {
+                totalWaste: '₱3,200',
+                vsLastMonth: '-8%',
+                topCategory: 'Meat',
+                wasteByCategory: [
+                    { category: 'Meat', percentage: 65 },
+                    { category: 'Dairy', percentage: 40 },
+                    { category: 'Vegetables', percentage: 25 },
+                    { category: 'Seafood', percentage: 50 }
+                ]
+            }
+        },
+        'cost-analysis': {
+            title: 'Cost Analysis Report',
+            data: {
+                foodCost: 45,
+                labor: 30,
+                overhead: 25
+            }
+        }
+    };
+
+    let activeTab = 'inventory';
+    let scannerStream = null;
+
+    function renderReportsGrid() {
+        const filtered = reportsData.filter(r => r.category === activeTab);
+        const grid = document.getElementById('reportsGrid');
+        
+        if (filtered.length === 0) {
+            grid.innerHTML = '<div style="text-align:center; padding:40px; color:#64748B; grid-column:1/-1;">No reports available for this category.</div>';
+            return;
+        }
+        
+        grid.innerHTML = filtered.map(report => `
+            <div class="report-card" onclick="viewReport('${report.id}')">
+                <div class="report-header">
+                    <div class="report-title">
+                        <div class="report-icon">${report.icon}</div>
+                        <div class="report-info">
+                            <h3>${report.title}</h3>
+                            <p>${report.desc}</p>
+                        </div>
+                    </div>
+                    <span class="report-badge">${report.badge}</span>
+                </div>
+                <div class="report-stats">
+                    <div class="stat-item">
+                        <div class="label">Total Items</div>
+                        <div class="value">156</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="label">Categories</div>
+                        <div class="value">7</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="label">Value</div>
+                        <div class="value">₱24.5k</div>
+                    </div>
+                </div>
+                <div class="report-footer">
+                    <button class="view-report-btn" onclick="event.stopPropagation(); viewReport('${report.id}')">
+                        <span>📊</span> View Full Report
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function viewReport(reportId) {
+        const report = reportDetails[reportId];
+        if (!report) return;
+        
+        document.getElementById('modalReportTitle').textContent = report.title;
+        
+        let content = '';
+        
+        if (reportId === 'inventory-summary') {
+            content = `
+                <div class="modal-stats">
+                    <div class="modal-stat-card"><div class="label">Total Items</div><div class="value">${report.data.totalItems}</div></div>
+                    <div class="modal-stat-card"><div class="label">Categories</div><div class="value">${report.data.categories}</div></div>
+                    <div class="modal-stat-card"><div class="label">Total Value</div><div class="value">${report.data.totalValue}</div></div>
+                    <div class="modal-stat-card"><div class="label">Low Stock</div><div class="value">8</div></div>
+                </div>
+                <div style="width:100%;">
+                    <h3 style="margin-bottom: 16px;">Items by Category</h3>
+                    <table class="modal-table">
+                        <thead><tr><th>Category</th><th>Item Count</th><th>Value</th></tr></thead>
+                        <tbody>${report.data.itemsByCategory.map(item => `<tr><td>${item.category}</td><td>${item.count}</td><td>${item.value}</td></tr>`).join('')}</tbody>
+                    </table>
+                </div>
+            `;
+        } else if (reportId === 'expiration-status') {
+            content = `
+                <div class="modal-stats">
+                    <div class="modal-stat-card"><div class="label">Good</div><div class="value">${report.data.good}</div></div>
+                    <div class="modal-stat-card"><div class="label">Expiring Soon</div><div class="value">${report.data.expiring}</div></div>
+                    <div class="modal-stat-card"><div class="label">Expired</div><div class="value">${report.data.expired}</div></div>
+                    <div class="modal-stat-card"><div class="label">At Risk Value</div><div class="value">₱1,250</div></div>
+                </div>
+                <div style="width:100%;">
+                    <h3 style="margin-bottom: 16px;">Expiring Items</h3>
+                    <table class="modal-table">
+                        <thead><tr><th>Item</th><th>Category</th><th>Days Left</th></tr></thead>
+                        <tbody>${report.data.expiringItems.map(item => `<tr><td>${item.name}</td><td>${item.category}</td><td>${item.days} days</td></tr>`).join('')}</tbody>
+                    </table>
+                </div>
+            `;
+        } else {
+            content = '<div style="padding: 40px; text-align: center; color: #64748B;">Detailed report view coming soon...</div>';
+        }
+        
+        document.getElementById('modalReportContent').innerHTML = content;
+        document.getElementById('reportModal').classList.add('show');
+    }
+
+    function closeReportModal() {
+        document.getElementById('reportModal').classList.remove('show');
+    }
+
+    function exportReport() {
+        showToast('📥 Exporting report...');
+    }
+
+    function exportReportDetail() {
+        showToast('📥 Exporting detailed report...');
+        closeReportModal();
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toastMsg');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // Format date
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    function setDateRange(range) {
+        const today = new Date();
+        const startDate = document.getElementById('startDate');
+        const endDate = document.getElementById('endDate');
+        
+        switch(range) {
+            case 'today':
+                startDate.value = formatDate(today);
+                endDate.value = formatDate(today);
+                break;
+            case 'week':
+                const weekStart = new Date(today);
+                weekStart.setDate(today.getDate() - today.getDay());
+                startDate.value = formatDate(weekStart);
+                endDate.value = formatDate(today);
+                break;
+            case 'month':
+                const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+                startDate.value = formatDate(monthStart);
+                endDate.value = formatDate(today);
+                break;
+            case 'quarter':
+                const quarterStart = new Date(today.getFullYear(), Math.floor(today.getMonth()/3)*3, 1);
+                startDate.value = formatDate(quarterStart);
+                endDate.value = formatDate(today);
+                break;
+            case 'year':
+                const yearStart = new Date(today.getFullYear(), 0, 1);
+                startDate.value = formatDate(yearStart);
+                endDate.value = formatDate(today);
+                break;
+        }
+    }
+
+    // Scanner functions
+    async function startScanner() {
+        try {
+            scannerStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+            scannerVideo.srcObject = scannerStream;
+            scannerVideo.play();
+            simulateQRScan();
+        } catch (err) {
+            showToast("Unable to access camera. Please grant camera permissions.");
+        }
+    }
+
+    function simulateQRScan() {
+        setTimeout(() => {
+            const reportIds = ['inventory-summary', 'expiration-status', 'usage-trends', 'purchase-history', 'waste-report', 'cost-analysis'];
+            const randomReport = reportIds[Math.floor(Math.random() * reportIds.length)];
+            handleScannedReport(randomReport);
+        }, 2000);
+    }
+
+    function handleScannedReport(reportId) {
+        const report = reportsData.find(r => r.id === reportId);
+        if (report) {
+            showToast(`📷 Scanned: ${report.title}`);
+            viewReport(reportId);
+            stopScanner();
+            scannerModal.classList.remove('active');
+        } else {
+            showToast("Report not found!");
+            stopScanner();
+            scannerModal.classList.remove('active');
+        }
+    }
+
+    function stopScanner() {
+        if (scannerStream) {
+            scannerStream.getTracks().forEach(track => track.stop());
+            scannerStream = null;
+        }
+        scannerVideo.srcObject = null;
+    }
+
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const page = item.getAttribute('data-page');
+            if (page === 'logout') { showToast('Logging out...'); setTimeout(() => window.location.href = 'login.html', 500); }
+            else if (page === 'activity') { showToast('📋 Activity logs: Report views recorded.'); }
+            else if (page === 'expiring') window.location.href = 'expiring.html';
+            else if (page === 'lowstock') window.location.href = 'lowstock.html';
+            else if (page === 'inventory') window.location.href = 'inventory.html';
+            else if (page === 'dashboard') window.location.href = 'dashboard.html';
+            else if (page === 'recipes') window.location.href = 'recipes.html';
+            else if (page === 'reports') { /* current */ }
+            else if (page === 'deliveries') window.location.href = 'deliveries.html';
+            if (window.innerWidth <= 1024) closeSidebar();
+        });
+    });
+
+    // Tab switching
+    document.querySelectorAll('.report-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.report-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            activeTab = tab.getAttribute('data-tab');
+            renderReportsGrid();
+        });
+    });
+
+    // Date range buttons
+    document.querySelectorAll('.range-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            setDateRange(btn.getAttribute('data-range'));
+        });
+    });
+
+    // Camera button
+    const cameraBtn = document.getElementById('cameraFabBtn');
+    if (cameraBtn) {
+        cameraBtn.addEventListener('click', () => {
+            scannerModal.classList.add('active');
+            startScanner();
+        });
+    }
+
+    document.getElementById('closeScannerBtn').addEventListener('click', () => {
+        stopScanner();
+        scannerModal.classList.remove('active');
+    });
+
+    // Mobile sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const burgerBtn = document.getElementById('burgerMenu');
+    
+    function openSidebar() {
+        sidebar.classList.add('open');
+        if (overlay) overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    if (burgerBtn) {
+        burgerBtn.addEventListener('click', openSidebar);
+    }
+    
+    if (overlay) {
+        overlay.addEventListener('click', closeSidebar);
+    }
+
+    function updateDate() {
+        const now = new Date();
+        document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    }
+
+    // Set default dates
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    document.getElementById('startDate').value = formatDate(firstDay);
+    document.getElementById('endDate').value = formatDate(today);
+    
+    updateDate();
+    renderReportsGrid();
+</script>
+</body>
+</html>

@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Lyceum Kitchen - Expiring Items | Loss Prevention & Recipe Matcher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #F8FAFC;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        .app {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background: #F8FAFC;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: #000000;
+            border-right: 1px solid #2C2C2C;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                z-index: 1000;
+                transition: left 0.3s ease;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            .sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+                display: none;
+            }
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+
+        .sidebar-header {
+            padding: 28px 24px;
+            border-bottom: 1px solid #2C2C2C;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .sidebar-logo {
+            font-size: 32px;
+            background: #8B0000;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            color: #FFFFFF;
+        }
+
+        .sidebar-title h2 {
+            font-size: 18px;
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+
+        .sidebar-title p {
+            font-size: 12px;
+            color: #A0A0A0;
+        }
+
+        .sidebar-profile {
+            padding: 20px 24px;
+            border-bottom: 1px solid #2C2C2C;
+        }
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 14px;
+            background: #141414;
+            border-radius: 16px;
+            border: 1px solid #2C2C2C;
+        }
+
+        .profile-avatar {
+            width: 44px;
+            height: 44px;
+            background: #8B0000;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .profile-details {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #FFFFFF;
+            margin-bottom: 2px;
+        }
+
+        .profile-role {
+            font-size: 11px;
+            color: #999999;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #A0A0A0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: #1A1A1A;
+            color: #FFFFFF;
+        }
+
+        .nav-item.active {
+            background: #8B0000;
+            color: #FFFFFF;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            min-width: 24px;
+        }
+
+        .logout-item {
+            margin-top: auto;
+            margin-bottom: 20px;
+            border-top: 1px solid #2C2C2C;
+            padding-top: 16px;
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background: #F8FAFC;
+            position: relative;
+        }
+
+        .top-bar {
+            background: white;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 32px;
+            flex-shrink: 0;
+        }
+
+        .burger-menu {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: #F8FAFC;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 1px solid #E5E7EB;
+            margin-right: 15px;
+        }
+
+        .hamburger-icon {
+            width: 22px;
+            height: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .hamburger-icon span {
+            display: block;
+            height: 2.5px;
+            background: #1A1A1A;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 1024px) {
+            .burger-menu {
+                display: flex;
+            }
+            .top-bar {
+                padding: 12px 16px;
+            }
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            color: #1A1A1A;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .page-title p {
+            font-size: 13px;
+            color: #64748B;
+        }
+
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .notification {
+            position: relative;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            background: #F8FAFC;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .notification span { font-size: 20px; }
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #8B0000;
+            color: white;
+            font-size: 10px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 2px solid white;
+            font-weight: 600;
+        }
+        .date-display {
+            background: #F8FAFC;
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid #E5E7EB;
+        }
+
+        .expiring-content {
+            flex: 1;
+            padding: 28px 32px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            padding-bottom: 100px;
+        }
+
+        @media (max-width: 1024px) {
+            .expiring-content {
+                padding: 16px;
+                padding-bottom: 100px;
+            }
+        }
+
+        /* Metric Cards */
+        .expiring-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 28px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .expiring-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .expiring-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .stat-card {
+            background: #8B0000;
+            border-radius: 20px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 16px rgba(139,0,0,0.15);
+            cursor: pointer;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            background: #9A0000;
+        }
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #FFFFFF;
+        }
+        .stat-badge {
+            background: rgba(255,255,255,0.2);
+            color: #FFFFFF;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #FFFFFF;
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            color: rgba(255,255,255,0.9);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .stat-footer {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.8);
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .filter-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .filter-tab {
+            padding: 8px 20px;
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #64748B;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-tab:hover, .filter-tab.active {
+            background: #8B0000;
+            color: white;
+            border-color: #8B0000;
+        }
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px 10px 10px 40px;
+            border: 1px solid #E5E7EB;
+            border-radius: 30px;
+            font-size: 13px;
+        }
+        .search-box input:focus {
+            border-color: #8B0000;
+            outline: none;
+        }
+        .search-box span {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            color: #8B0000;
+        }
+
+        .expiring-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+            overflow-y: visible;
+        }
+
+        @media (max-width: 768px) {
+            .expiring-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            padding: 18px;
+            border: 1px solid #E5E7EB;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: #F57C00;
+        }
+        .product-card.critical::before { background: #C62828; }
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(139,0,0,0.12);
+            border-color: #8B0000;
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .product-title {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex: 1;
+            min-width: 0;
+        }
+        .product-icon {
+            width: 52px;
+            height: 52px;
+            background: #F8FAFC;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #E5E7EB;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .product-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .product-name {
+            flex: 1;
+            min-width: 0;
+        }
+        .product-name h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .product-category {
+            font-size: 11px;
+            color: #8B0000;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .status-critical { background: #FFEBEE; color: #C62828; }
+        .status-soon { background: #FFF3E0; color: #F57C00; }
+        .status-week { background: #E8F0FE; color: #1976D2; }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #F8FAFC;
+            padding: 10px 12px;
+            border-radius: 14px;
+        }
+        .price-label { font-size: 12px; color: #64748B; font-weight: 500; }
+        .price-value { font-size: 16px; font-weight: 800; color: #2c3e66; }
+        .loss-row {
+            background: #FFEBEE;
+        }
+        .loss-value { color: #C62828; }
+
+        .expiry-details-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-top: 1px solid #F0F0F0;
+            border-bottom: 1px solid #F0F0F0;
+            gap: 8px;
+        }
+        .expiry-item {
+            text-align: center;
+            flex: 1;
+        }
+        .expiry-item-label {
+            font-size: 10px;
+            color: #64748B;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        .expiry-date-value {
+            font-size: 12px;
+            font-weight: 700;
+            color: #F57C00;
+        }
+        .expiry-date-value.critical { color: #C62828; }
+        .days-number-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #F57C00;
+        }
+        .days-number-value.critical { color: #C62828; }
+        .qty-number-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #8B0000;
+        }
+
+        .recipe-action-btn {
+            background: #8B0000;
+            color: white;
+            border: none;
+            padding: 11px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .recipe-action-btn:hover { background: #6d0000; transform: translateY(-2px); }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 28px;
+            padding: 28px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 { font-size: 22px; font-weight: 800; color: #1A1A1A; }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #64748B;
+            transition: 0.2s;
+        }
+        .close-btn:hover { color: #8B0000; }
+        .recipe-item {
+            padding: 18px;
+            background: #F8FAFC;
+            border-radius: 20px;
+            margin-bottom: 14px;
+            border: 1px solid #E5E7EB;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .recipe-item:hover {
+            background: #FFF5F5;
+            border-color: #8B0000;
+            transform: translateX(4px);
+        }
+        .recipe-item h4 { font-size: 18px; color: #8B0000; margin-bottom: 10px; font-weight: 700; }
+        .recipe-ingredients {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .ingredient-tag {
+            background: white;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            border: 1px solid #E5E7EB;
+        }
+        .goto-recipe-btn {
+            width: 100%;
+            padding: 10px;
+            background: #8B0000;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .goto-recipe-btn:hover { background: #6d0000; }
+        .toast-msg {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 40px;
+            z-index: 3000;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .toast-msg.show { opacity: 1; }
+
+        /* CENTERED CAMERA FAB BUTTON */
+        .camera-fab {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, #8B0000, #6B0000);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(139, 0, 0, 0.4);
+            z-index: 98;
+            transition: all 0.3s ease;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .camera-fab:active {
+            transform: translateX(-50%) scale(0.92);
+        }
+
+        .camera-fab i {
+            font-size: 28px;
+            color: white;
+        }
+
+        @media (max-width: 1024px) {
+            .camera-fab {
+                display: flex;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .camera-fab {
+                display: none !important;
+            }
+        }
+
+        /* Scanner Modal */
+        .scanner-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scanner-modal.active {
+            display: flex;
+        }
+
+        .scanner-container {
+            width: 100%;
+            max-width: 500px;
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #scannerVideo {
+            width: 100%;
+            height: auto;
+            background: #000;
+        }
+
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .scanner-close {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            font-size: 24px;
+            cursor: pointer;
+            align-self: flex-end;
+        }
+
+        .scan-guide {
+            color: white;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 14px;
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #F1F5F9; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #8B0000; border-radius: 10px; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="app">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">🍳</div>
+            <div class="sidebar-title"><h2>Lyceum Kitchen</h2><p>Inventory System</p></div>
+        </div>
+        <div class="sidebar-profile">
+            <div class="profile-card">
+                <div class="profile-avatar">JS</div>
+                <div class="profile-details">
+                    <div class="profile-name">Juan Santos</div>
+                    <div class="profile-role">Kitchen Staff</div>
+                </div>
+            </div>
+        </div>
+        <div class="nav-menu">
+            <div class="nav-item" data-page="dashboard"><span class="nav-icon">📊</span><span>Dashboard</span></div>
+            <div class="nav-item" data-page="inventory"><span class="nav-icon">📦</span><span>Inventory</span></div>
+            <div class="nav-item active" data-page="expiring"><span class="nav-icon">⏰</span><span>Expiring Items</span></div>
+            <div class="nav-item" data-page="stocks"><span class="nav-icon">📉</span><span>Low Stock</span></div>
+            <div class="nav-item" data-page="recipes"><span class="nav-icon">🍳</span><span>Recipes</span></div>
+            <div class="nav-item" data-page="deliveries"><span class="nav-icon">🚚</span><span>Deliveries</span></div>
+            <div class="nav-item" data-page="reports"><span class="nav-icon">📈</span><span>Reports</span></div>
+            <div class="nav-item" data-page="activity"><span class="nav-icon">📋</span><span>Activity Logs</span></div>
+            <div class="nav-item logout-item" data-page="logout"><span class="nav-icon">🚪</span><span>Logout</span></div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="burger-menu" id="burgerMenu">
+                <div class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            <div class="page-title"><h1>Expiring Items</h1><p>Click any product → find recipes & redirect to recipes.html</p></div>
+            <div class="top-right">
+                <div class="notification"><span>🔔</span><span class="notification-badge">3</span></div>
+                <div class="date-display" id="currentDate"></div>
+            </div>
+        </div>
+
+        <div class="expiring-content">
+            <div class="expiring-stats" id="statsContainer"></div>
+            <div class="filter-section">
+                <div class="filter-tabs">
+                    <span class="filter-tab active" data-filter="all">All</span>
+                    <span class="filter-tab" data-filter="critical">Critical (≤2d)</span>
+                    <span class="filter-tab" data-filter="soon">Soon (3-4d)</span>
+                    <span class="filter-tab" data-filter="week">This Week (≤7d)</span>
+                </div>
+                <div class="search-box"><span>🔍</span><input type="text" placeholder="Search items..." id="searchInput"></div>
+            </div>
+            <div class="expiring-grid" id="expiringGrid"></div>
+        </div>
+    </div>
+</div>
+
+<!-- CENTERED CAMERA FAB BUTTON -->
+<div class="camera-fab" id="cameraFabBtn">
+    <i class="fas fa-camera"></i>
+</div>
+
+<!-- Scanner Modal -->
+<div class="scanner-modal" id="scannerModal">
+    <div class="scanner-container">
+        <video id="scannerVideo" autoplay playsinline></video>
+        <div class="scanner-overlay">
+            <button class="scanner-close" id="closeScannerBtn">✕</button>
+            <div class="scan-guide"><i class="fas fa-camera"></i> Position QR code in frame</div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="recipeModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>🍽️ Suggested Recipes</h3>
+            <button class="close-btn" onclick="closeRecipeModal()">&times;</button>
+        </div>
+        <div id="recipeList"></div>
+    </div>
+</div>
+<div id="toastMsg" class="toast-msg"></div>
+
+<script>
+    // Helper function to get date X days from now
+    function getDateDaysFromNow(days) {
+        const date = new Date();
+        date.setDate(date.getDate() + days);
+        return date.toISOString().split('T')[0];
+    }
+
+    // Expiring items data with CURRENT dates
+    const expiringItems = [
+        { id:1, name:"Fresh Milk", category:"Dairy", unit:"pcs", pricePerUnit:65, qty:12, daysLeft:1, img:"https://images.unsplash.com/photo-1563636619-e9143da7973b?w=300&q=80" },
+        { id:2, name:"Tomatoes", category:"Vegetables", unit:"pcs", pricePerUnit:35, qty:24, daysLeft:2, img:"https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=300&q=80" },
+        { id:3, name:"Chicken Breast", category:"Meat", unit:"pcs", pricePerUnit:120, qty:8, daysLeft:3, img:"https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=300&q=80" },
+        { id:4, name:"Cheddar Cheese", category:"Dairy", unit:"pcs", pricePerUnit:95, qty:8, daysLeft:4, img:"https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=300&q=80" },
+        { id:5, name:"Salmon Fillet", category:"Seafood", unit:"pcs", pricePerUnit:210, qty:6, daysLeft:5, img:"https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=300&q=80" },
+        { id:6, name:"Lettuce", category:"Vegetables", unit:"pcs", pricePerUnit:28, qty:10, daysLeft:6, img:"https://images.unsplash.com/photo-1557844352-761f2565b576?w=300&q=80" },
+        { id:7, name:"Yogurt", category:"Dairy", unit:"pcs", pricePerUnit:45, qty:15, daysLeft:7, img:"https://images.unsplash.com/photo-1550583724-b2692b85b150?w=300&q=80" }
+    ];
+
+    // Add expiry dates based on daysLeft
+    expiringItems.forEach(item => {
+        item.expiryDate = getDateDaysFromNow(item.daysLeft);
+    });
+
+    let activeFilter = "all";
+    let searchTerm = "";
+    let scannerStream = null;
+
+    // Recipe database
+    const recipeDB = {
+        'Fresh Milk': [{ name:'Creamy Garlic Pasta', ingredients:['Fresh Milk','Pasta','Garlic','Parmesan'], anchor:'creamy-pasta' },{ name:'Classic Milkshake', ingredients:['Fresh Milk','Vanilla Ice Cream','Sugar'], anchor:'milkshake' }],
+        'Tomatoes': [{ name:'Tomato Basil Soup', ingredients:['Tomatoes','Onions','Garlic','Basil'], anchor:'tomato-soup' },{ name:'Caprese Bruschetta', ingredients:['Tomatoes','Mozzarella','Balsamic'], anchor:'caprese' }],
+        'Chicken Breast': [{ name:'Herb Grilled Chicken', ingredients:['Chicken Breast','Rosemary','Garlic','Olive Oil'], anchor:'grilled-chicken' },{ name:'Chicken Caesar Wrap', ingredients:['Chicken Breast','Lettuce','Caesar Dressing'], anchor:'caesar-wrap' }],
+        'Cheddar Cheese': [{ name:'Ultimate Grilled Cheese', ingredients:['Cheddar Cheese','Sourdough','Butter'], anchor:'grilled-cheese' },{ name:'Cheddar Mac & Cheese', ingredients:['Cheddar Cheese','Elbow Pasta','Milk'], anchor:'mac-cheese' }],
+        'Salmon Fillet': [{ name:'Lemon Dill Baked Salmon', ingredients:['Salmon Fillet','Lemon','Dill','Garlic'], anchor:'baked-salmon' },{ name:'Smoked Salmon Pasta', ingredients:['Salmon Fillet','Cream Cheese','Pasta'], anchor:'salmon-pasta' }],
+        'Lettuce': [{ name:'Classic Caesar Salad', ingredients:['Lettuce','Croutons','Parmesan','Caesar Dressing'], anchor:'caesar-salad' },{ name:'Asian Lettuce Wraps', ingredients:['Lettuce','Ground Chicken','Hoisin'], anchor:'lettuce-wraps' }],
+        'Yogurt': [{ name:'Berry Yogurt Bowl', ingredients:['Yogurt','Mixed Berries','Granola','Honey'], anchor:'yogurt-bowl' },{ name:'Cucumber Tzatziki', ingredients:['Yogurt','Cucumber','Garlic','Dill'], anchor:'tzatziki' }]
+    };
+
+    function showToast(msg) {
+        const toast = document.getElementById('toastMsg');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    function redirectToRecipePage(recipeName, anchorId) {
+        showToast(`🍳 Opening "${recipeName}" on Recipes Page`);
+        setTimeout(() => {
+            window.location.href = `recipes.html#${anchorId}`;
+        }, 150);
+        closeRecipeModal();
+    }
+
+    function showRecipesForProduct(productName) {
+        const recipes = recipeDB[productName] || [{ name:'Chef\'s Special Mix', ingredients:[productName,'Seasonings','Olive Oil'], anchor:'chef-special' }];
+        const listHtml = recipes.map(recipe => `
+            <div class="recipe-item">
+                <h4>🍲 ${recipe.name}</h4>
+                <div class="recipe-ingredients">
+                    ${recipe.ingredients.map(ing => `<span class="ingredient-tag">${ing}</span>`).join('')}
+                </div>
+                <button class="goto-recipe-btn" onclick="redirectToRecipePage('${recipe.name.replace(/'/g, "\\'")}', '${recipe.anchor}')">
+                    📖 Go to Recipe Page →
+                </button>
+            </div>
+        `).join('');
+        document.getElementById('recipeList').innerHTML = listHtml;
+        document.getElementById('recipeModal').classList.add('show');
+    }
+
+    function getItemLossValue(item) { return item.qty * item.pricePerUnit; }
+
+    function formatExpiryDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function renderStats() {
+        const criticalCount = expiringItems.filter(i => i.daysLeft <= 2).length;
+        const totalLoss = expiringItems.reduce((sum, i) => sum + (i.qty * i.pricePerUnit), 0);
+        const totalUnits = expiringItems.reduce((sum, i) => sum + i.qty, 0);
+        const categoryCount = new Set(expiringItems.map(i => i.category)).size;
+        
+        document.getElementById('statsContainer').innerHTML = `
+            <div class="stat-card">
+                <div class="stat-header"><div class="stat-icon">⏰</div><span class="stat-badge">Expiring</span></div>
+                <div class="stat-value">${expiringItems.length}</div>
+                <div class="stat-label">Items Expiring Soon</div>
+                <div class="stat-footer"><span>Needs attention</span><span>${criticalCount} critical</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header"><div class="stat-icon">⚠️</div><span class="stat-badge">Urgency</span></div>
+                <div class="stat-value">${criticalCount}</div>
+                <div class="stat-label">Critical Items (≤2d)</div>
+                <div class="stat-footer"><span>Act immediately</span><span>High waste risk</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header"><div class="stat-icon">💰</div><span class="stat-badge">Value</span></div>
+                <div class="stat-value">₱${totalLoss.toLocaleString()}</div>
+                <div class="stat-label">Total Inventory Value</div>
+                <div class="stat-footer"><span>${totalUnits} total units</span><span>${categoryCount} categories</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header"><div class="stat-icon">⚠️💰</div><span class="stat-badge">At Risk</span></div>
+                <div class="stat-value" style="color:#FFCDD2;">₱${totalLoss.toLocaleString()}</div>
+                <div class="stat-label">Potential Financial Loss</div>
+                <div class="stat-footer"><span>If all expired</span><span>Use recipes to save</span></div>
+            </div>
+        `;
+    }
+
+    function renderExpiringGrid() {
+        let filtered = expiringItems.filter(item => {
+            if (activeFilter === 'all') return true;
+            if (activeFilter === 'critical') return item.daysLeft <= 2;
+            if (activeFilter === 'soon') return item.daysLeft >= 3 && item.daysLeft <= 4;
+            if (activeFilter === 'week') return item.daysLeft <= 7;
+            return true;
+        });
+        if (searchTerm) {
+            filtered = filtered.filter(i => i.name.toLowerCase().includes(searchTerm) || i.category.toLowerCase().includes(searchTerm));
+        }
+
+        if (filtered.length === 0) {
+            document.getElementById('expiringGrid').innerHTML = '<div style="text-align:center; padding:40px; color:#64748B;">✨ No expiring items match the filter.</div>';
+            return;
+        }
+
+        const gridHtml = filtered.map(item => {
+            const isCritical = item.daysLeft <= 2;
+            const urgencyStatus = isCritical ? "Critical" : (item.daysLeft <= 4 ? "Soon" : "This Week");
+            const statusClass = isCritical ? "status-critical" : (item.daysLeft <= 4 ? "status-soon" : "status-week");
+            const lossValue = getItemLossValue(item);
+            const expiryFormatted = formatExpiryDate(item.expiryDate);
+            const cardCriticalClass = isCritical ? 'critical' : '';
+
+            return `
+                <div class="product-card ${cardCriticalClass}" onclick="showRecipesForProduct('${item.name}')">
+                    <div class="product-header">
+                        <div class="product-title">
+                            <div class="product-icon"><img src="${item.img}" alt="${item.name}" loading="lazy"></div>
+                            <div class="product-name">
+                                <h3>${item.name}</h3>
+                                <span class="product-category">${item.category}</span>
+                            </div>
+                        </div>
+                        <span class="status-badge ${statusClass}">${urgencyStatus}</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">Unit Price</span>
+                        <span class="price-value">₱${item.pricePerUnit} / ${item.unit}</span>
+                    </div>
+                    <div class="price-row loss-row">
+                        <span class="price-label">Potential Loss if Expired</span>
+                        <span class="price-value loss-value">₱${lossValue.toLocaleString()}</span>
+                    </div>
+                    <div class="expiry-details-row">
+                        <div class="expiry-item">
+                            <div class="expiry-item-label">Expires</div>
+                            <div class="expiry-date-value ${isCritical ? 'critical' : ''}">${expiryFormatted}</div>
+                        </div>
+                        <div class="expiry-item">
+                            <div class="expiry-item-label">Days Left</div>
+                            <div class="days-number-value ${isCritical ? 'critical' : ''}">${item.daysLeft}</div>
+                        </div>
+                        <div class="expiry-item">
+                            <div class="expiry-item-label">Quantity</div>
+                            <div class="qty-number-value">${item.qty} ${item.unit}</div>
+                        </div>
+                    </div>
+                    <button class="recipe-action-btn" onclick="event.stopPropagation(); showRecipesForProduct('${item.name}')">
+                        🍳 Find Recipes to Prevent Loss
+                    </button>
+                </div>
+            `;
+        }).join('');
+        document.getElementById('expiringGrid').innerHTML = gridHtml;
+    }
+
+    function updateAll() { renderStats(); renderExpiringGrid(); }
+
+    // Scanner functions
+    async function startScanner() {
+        try {
+            scannerStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+            scannerVideo.srcObject = scannerStream;
+            scannerVideo.play();
+            simulateQRScan();
+        } catch (err) {
+            showToast("Unable to access camera. Please grant camera permissions.");
+        }
+    }
+
+    function simulateQRScan() {
+        setTimeout(() => {
+            const products = ['Fresh Milk', 'Tomatoes', 'Chicken Breast', 'Cheddar Cheese', 'Salmon Fillet', 'Lettuce', 'Yogurt'];
+            const randomProduct = products[Math.floor(Math.random() * products.length)];
+            handleScannedProduct(randomProduct);
+        }, 2000);
+    }
+
+    function handleScannedProduct(productName) {
+        const product = expiringItems.find(p => p.name === productName);
+        if (product) {
+            showToast(`📷 Scanned: ${product.name}`);
+            showRecipesForProduct(product.name);
+            stopScanner();
+            scannerModal.classList.remove('active');
+        } else {
+            showToast("Product not found!");
+            stopScanner();
+            scannerModal.classList.remove('active');
+        }
+    }
+
+    function stopScanner() {
+        if (scannerStream) {
+            scannerStream.getTracks().forEach(track => track.stop());
+            scannerStream = null;
+        }
+        scannerVideo.srcObject = null;
+    }
+
+    // Event listeners
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            activeFilter = tab.getAttribute('data-filter');
+            updateAll();
+        });
+    });
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        searchTerm = e.target.value.toLowerCase();
+        renderExpiringGrid();
+    });
+
+    function closeRecipeModal() { document.getElementById('recipeModal').classList.remove('show'); }
+
+    // Camera button
+    const cameraBtn = document.getElementById('cameraFabBtn');
+    if (cameraBtn) {
+        cameraBtn.addEventListener('click', () => {
+            scannerModal.classList.add('active');
+            startScanner();
+        });
+    }
+
+    document.getElementById('closeScannerBtn').addEventListener('click', () => {
+        stopScanner();
+        scannerModal.classList.remove('active');
+    });
+
+    // Navigation handlers
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const page = item.getAttribute('data-page');
+            if (page === 'logout') { alert('Logged out. Redirecting to login...'); window.location.href = 'login.html'; }
+            else if (page === 'activity') alert('📋 Activity Logs: Inventory updates, quantity changes recorded.');
+            else if (page === 'dashboard') window.location.href = 'dashboard.html';
+            else if (page === 'inventory') window.location.href = 'inventory.html';
+            else if (page === 'expiring') { /* already here */ }
+            else if (page === 'recipes') window.location.href = 'recipes.html';
+            else window.location.href = page + '.html';
+            if (window.innerWidth <= 1024) closeSidebar();
+        });
+    });
+
+    // Mobile sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const burgerBtn = document.getElementById('burgerMenu');
+    
+    function openSidebar() {
+        sidebar.classList.add('open');
+        if (overlay) overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    if (burgerBtn) {
+        burgerBtn.addEventListener('click', openSidebar);
+    }
+    
+    if (overlay) {
+        overlay.addEventListener('click', closeSidebar);
+    }
+
+    function updateDate() {
+        const now = new Date();
+        document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    }
+    updateDate();
+    updateAll();
+</script>
+</body>
+</html>

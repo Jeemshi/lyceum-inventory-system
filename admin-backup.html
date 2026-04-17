@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyceum Kitchen - Admin Backup & Export</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #F8FAFC;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        /* Main Layout */
+        .app {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background: #F8FAFC;
+        }
+
+        /* Side Navigation - Black */
+        .sidebar {
+            width: 280px;
+            background: #000000;
+            border-right: 1px solid #333333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            padding: 28px 24px;
+            border-bottom: 1px solid #333333;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .sidebar-logo {
+            font-size: 32px;
+            background: #8B0000;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            color: #FFFFFF;
+            box-shadow: 0 8px 16px rgba(139,0,0,0.3);
+        }
+
+        .sidebar-title h2 {
+            font-size: 18px;
+            color: #FFFFFF;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar-title p {
+            font-size: 12px;
+            color: #B0B0B0;
+            font-weight: 400;
+        }
+
+        /* Profile Section */
+        .sidebar-profile {
+            padding: 20px 24px;
+            border-bottom: 1px solid #333333;
+            position: relative;
+        }
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: #1A1A1A;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #333333;
+        }
+
+        .profile-card:hover {
+            background: #222222;
+            border-color: #8B0000;
+        }
+
+        .profile-avatar {
+            width: 48px;
+            height: 48px;
+            background: #8B0000;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            font-weight: 600;
+            font-size: 18px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .profile-details {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 4px;
+            letter-spacing: -0.2px;
+        }
+
+        .profile-role {
+            font-size: 12px;
+            color: #8B0000;
+            font-weight: 600;
+        }
+
+        .hamburger-btn {
+            width: 36px;
+            height: 36px;
+            background: #1A1A1A;
+            border: 1px solid #333333;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #FFFFFF;
+        }
+
+        .hamburger-btn:hover {
+            background: #8B0000;
+            border-color: #8B0000;
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: absolute;
+            top: 100px;
+            left: 24px;
+            right: 24px;
+            background: #1A1A1A;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+            border: 1px solid #333333;
+        }
+
+        .profile-dropdown.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #FFFFFF;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 1px solid #333333;
+        }
+
+        .dropdown-item:hover {
+            background: #8B0000;
+        }
+
+        .dropdown-item span:first-child {
+            font-size: 18px;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #333333;
+            margin: 4px 0;
+        }
+
+        .badge {
+            margin-left: auto;
+            background: #8B0000;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 16px;
+            color: #B0B0B0;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: #1A1A1A;
+            color: #FFFFFF;
+        }
+
+        .nav-item.active {
+            background: #8B0000;
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-text {
+            font-size: 14px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background: #F8FAFC;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 80px;
+            background: white;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            flex-shrink: 0;
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            color: #1A1A1A;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .page-title p {
+            font-size: 13px;
+            color: #64748B;
+            font-weight: 400;
+        }
+
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .notification {
+            position: relative;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            background: #F8FAFC;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .notification:hover {
+            background: #FEE9E9;
+        }
+
+        .notification i {
+            font-size: 20px;
+            color: #4A5568;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #8B0000;
+            color: white;
+            font-size: 10px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 2px solid white;
+            font-weight: 600;
+        }
+
+        .date-display {
+            background: #F8FAFC;
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid #E5E7EB;
+        }
+
+        /* Backup Content */
+        .backup-content {
+            flex: 1;
+            padding: 24px 28px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(145deg, #8B0000, #4A0000);
+            border-radius: 20px;
+            padding: 18px 24px;
+            margin-bottom: 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .welcome-text h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .welcome-text p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .stats-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* Quick Stats */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 22px;
+            flex-shrink: 0;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 14px;
+            border: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            background: #FEE9E9;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #8B0000;
+            flex-shrink: 0;
+        }
+
+        .stat-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .stat-info h4 {
+            font-size: 12px;
+            color: #64748B;
+            font-weight: 500;
+            margin-bottom: 2px;
+            white-space: nowrap;
+        }
+
+        .stat-number {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1A1A1A;
+            line-height: 1.2;
+        }
+
+        /* Backup Options Grid */
+        .backup-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 22px;
+            flex-shrink: 0;
+        }
+
+        /* Backup Card */
+        .backup-card {
+            background: white;
+            border-radius: 18px;
+            padding: 20px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .backup-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(139,0,0,0.08);
+            border-color: #8B0000;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(145deg, #FEE9E9, #FFFFFF);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: #8B0000;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .card-title h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+
+        .card-title p {
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .backup-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: #F8FAFC;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .backup-option:hover {
+            background: #FEE9E9;
+        }
+
+        .backup-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #8B0000;
+        }
+
+        .backup-option label {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1A1A1A;
+            cursor: pointer;
+        }
+
+        .backup-option span {
+            font-size: 11px;
+            color: #64748B;
+        }
+
+        .select-all {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-bottom: 1px solid #F0F0F0;
+            margin-bottom: 8px;
+        }
+
+        .select-all input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #8B0000;
+        }
+
+        .select-all label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1A1A1A;
+            cursor: pointer;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: #8B0000;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary:hover {
+            background: #9A0000;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            flex: 1;
+            background: white;
+            color: #1A1A1A;
+            border: 1px solid #E5E7EB;
+            padding: 10px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-secondary:hover {
+            border-color: #8B0000;
+            color: #8B0000;
+        }
+
+        /* Backup History Section */
+        .history-section {
+            background: white;
+            border-radius: 18px;
+            border: 1px solid #E5E7EB;
+            overflow: hidden;
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            border-bottom: 1px solid #E5E7EB;
+            background: #F8FAFC;
+        }
+
+        .history-header h3 {
+            font-size: 15px;
+            color: #1A1A1A;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .history-header h3 span {
+            background: #8B0000;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-size: 11px;
+        }
+
+        .clear-btn {
+            padding: 6px 14px;
+            background: transparent;
+            color: #64748B;
+            border: 1px solid #E5E7EB;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .clear-btn:hover {
+            border-color: #C62828;
+            color: #C62828;
+        }
+
+        .history-list {
+            overflow-y: auto;
+            flex: 1;
+            min-height: 0;
+            padding: 8px 0;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            border-bottom: 1px solid #F0F0F0;
+            transition: all 0.2s;
+        }
+
+        .history-item:hover {
+            background: #F8FAFC;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .history-icon {
+            width: 40px;
+            height: 40px;
+            background: #FEE9E9;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #8B0000;
+            flex-shrink: 0;
+        }
+
+        .history-details {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .history-details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 11px;
+            color: #64748B;
+        }
+
+        .history-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .history-size {
+            font-weight: 600;
+            color: #8B0000;
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .history-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 8px;
+            background: #F8FAFC;
+            color: #64748B;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #E5E7EB;
+        }
+
+        .history-btn:hover {
+            background: #8B0000;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .history-btn.download:hover {
+            background: #1976D2;
+        }
+
+        .history-btn.restore:hover {
+            background: #2E7D32;
+        }
+
+        .history-btn.delete:hover {
+            background: #C62828;
+        }
+
+        /* Schedule Section */
+        .schedule-section {
+            margin-top: 18px;
+            background: white;
+            border-radius: 16px;
+            padding: 16px 20px;
+            border: 1px solid #E5E7EB;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .schedule-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .schedule-icon {
+            width: 44px;
+            height: 44px;
+            background: #FEE9E9;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #8B0000;
+        }
+
+        .schedule-text h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+
+        .schedule-text p {
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .schedule-badge {
+            padding: 4px 12px;
+            background: #E6F7E6;
+            color: #2E7D32;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .schedule-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .schedule-btn {
+            padding: 8px 16px;
+            background: white;
+            color: #1A1A1A;
+            border: 1px solid #E5E7EB;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .schedule-btn:hover {
+            border-color: #8B0000;
+            color: #8B0000;
+        }
+
+        .schedule-btn.primary {
+            background: #8B0000;
+            color: white;
+            border-color: #8B0000;
+        }
+
+        .schedule-btn.primary:hover {
+            background: #9A0000;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            max-width: 450px;
+            width: 90%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #8B0000;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            color: #8B0000;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748B;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+
+        .close-btn:hover {
+            background: #FEE9E9;
+            color: #8B0000;
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .progress-container {
+            margin: 16px 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #64748B;
+            margin-bottom: 6px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #E5E7EB;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #8B0000;
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+
+        .file-info {
+            background: #F8FAFC;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 13px;
+        }
+
+        .file-info p {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .file-info p:last-child {
+            margin-bottom: 0;
+        }
+
+        .file-info .label {
+            color: #64748B;
+        }
+
+        .file-info .value {
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.confirm {
+            background: #8B0000;
+            color: white;
+        }
+
+        .modal-btn.confirm:hover {
+            background: #9A0000;
+        }
+
+        .modal-btn.cancel {
+            background: #F0F0F0;
+            color: #666;
+        }
+
+        .modal-btn.cancel:hover {
+            background: #E0E0E0;
+        }
+
+        .modal-btn.delete {
+            background: #C62828;
+            color: white;
+        }
+
+        /* Schedule Modal */
+        .schedule-modal {
+            max-width: 500px;
+        }
+
+        .schedule-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+
+        .form-group select,
+        .form-group input {
+            padding: 10px 12px;
+            border: 2px solid #F0F0F0;
+            border-radius: 10px;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            border-color: #8B0000;
+            outline: none;
+        }
+
+        .time-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        /* Delete Modal */
+        .delete-modal {
+            max-width: 380px;
+            text-align: center;
+        }
+
+        .delete-icon {
+            font-size: 42px;
+            color: #C62828;
+            margin-bottom: 14px;
+        }
+
+        .delete-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 8px;
+        }
+
+        .delete-message {
+            font-size: 13px;
+            color: #64748B;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #8B0000;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(139,0,0,0.2);
+            z-index: 3000;
+            font-size: 13px;
+            font-weight: 500;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            border: 1px solid #FFFFFF;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: #2E7D32;
+        }
+
+        .toast.error {
+            background: #C62828;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #8B0000;
+            border-radius: 10px;
+        }
+
+        /* No scrolling on body */
+        html, body {
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Side Navigation - Black -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">🍳</div>
+                <div class="sidebar-title">
+                    <h2>Lyceum Kitchen</h2>
+                    <p>Admin Panel</p>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div class="sidebar-profile">
+                <div class="profile-card" onclick="toggleDropdown()">
+                    <div class="profile-avatar">MA</div>
+                    <div class="profile-details">
+                        <div class="profile-name">Maria Santos</div>
+                        <div class="profile-role">Administrator</div>
+                    </div>
+                    <div class="hamburger-btn">☰</div>
+                </div>
+
+                <!-- Profile Dropdown Menu -->
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-item" onclick="window.location.href='admin-profile.html'">
+                        <span>👤</span> My Profile
+                    </div>
+                    <div class="dropdown-item" onclick="window.location.href='admin-settings.html'">
+                        <span>⚙️</span> System Settings
+                    </div>
+                    <div class="dropdown-item" onclick="window.location.href='admin-audit.html'">
+                        <span>📋</span> Audit Trail
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="window.location.href='admin-backup.html'">
+                        <span>💾</span> Backup & Export
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="window.location.href='login.html'">
+                        <span>🚪</span> Logout
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <div class="nav-menu">
+                <div class="nav-item" onclick="window.location.href='admin-dashboard.html'">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-ingredients.html'">
+                    <span class="nav-icon">📦</span>
+                    <span class="nav-text">Ingredients</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-categories.html'">
+                    <span class="nav-icon">🏷️</span>
+                    <span class="nav-text">Categories</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-storage.html'">
+                    <span class="nav-icon">📍</span>
+                    <span class="nav-text">Storage</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-units.html'">
+                    <span class="nav-icon">⚖️</span>
+                    <span class="nav-text">Units</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-suppliers.html'">
+                    <span class="nav-icon">🏢</span>
+                    <span class="nav-text">Suppliers</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-purchases.html'">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">Purchases</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-users.html'">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-text">Users</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-reports.html'">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Reports</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-audit.html'">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-text">Audit</span>
+                </div>
+                <div class="nav-item active" onclick="window.location.href='admin-backup.html'">
+                    <span class="nav-icon">💾</span>
+                    <span class="nav-text">Backup</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1>Backup & Export</h1>
+                    <p>Data protection and recovery</p>
+                </div>
+                <div class="top-right">
+                    <div class="notification" onclick="window.location.href='admin-notifications.html'">
+                        <i>🔔</i>
+                        <span class="notification-badge">5</span>
+                    </div>
+                    <div class="date-display" id="currentDate"></div>
+                </div>
+            </div>
+
+            <!-- Backup Content -->
+            <div class="backup-content">
+                <!-- Welcome Banner -->
+                <div class="welcome-banner">
+                    <div class="welcome-text">
+                        <h3>Backup & Recovery</h3>
+                        <p>Secure your data with automated backups</p>
+                    </div>
+                    <div class="stats-badge" id="totalBackupsBadge">💾 8 Backups</div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">💾</div>
+                        <div class="stat-info">
+                            <h4>Total Backups</h4>
+                            <div class="stat-number" id="totalBackups">8</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-info">
+                            <h4>Total Size</h4>
+                            <div class="stat-number" id="totalSize">156 MB</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏰</div>
+                        <div class="stat-info">
+                            <h4>Last Backup</h4>
+                            <div class="stat-number" id="lastBackup">2h ago</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backup Options Grid -->
+                <div class="backup-grid">
+                    <!-- Manual Backup Card -->
+                    <div class="backup-card">
+                        <div class="card-header">
+                            <div class="card-icon">📀</div>
+                            <div class="card-title">
+                                <h3>Manual Backup</h3>
+                                <p>Create a backup now</p>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="select-all">
+                                <input type="checkbox" id="selectAllManual" checked onchange="toggleAllManual()">
+                                <label for="selectAllManual">Select All</label>
+                            </div>
+                            <div class="backup-option">
+                                <input type="checkbox" id="backupIngredients" class="manual-checkbox" checked>
+                                <label for="backupIngredients">Ingredients</label>
+                                <span>156 items</span>
+                            </div>
+                            <div class="backup-option">
+                                <input type="checkbox" id="backupCategories" class="manual-checkbox" checked>
+                                <label for="backupCategories">Categories</label>
+                                <span>6 categories</span>
+                            </div>
+                            <div class="backup-option">
+                                <input type="checkbox" id="backupSuppliers" class="manual-checkbox" checked>
+                                <label for="backupSuppliers">Suppliers</label>
+                                <span>4 suppliers</span>
+                            </div>
+                            <div class="backup-option">
+                                <input type="checkbox" id="backupPurchases" class="manual-checkbox" checked>
+                                <label for="backupPurchases">Purchase Orders</label>
+                                <span>12 orders</span>
+                            </div>
+                            <div class="backup-option">
+                                <input type="checkbox" id="backupUsers" class="manual-checkbox" checked>
+                                <label for="backupUsers">Users</label>
+                                <span>8 users</span>
+                            </div>
+                            <div class="backup-option">
+                                <input type="checkbox" id="backupAudit" class="manual-checkbox" checked>
+                                <label for="backupAudit">Audit Logs</label>
+                                <span>248 events</span>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn-primary" onclick="createBackup()">
+                                <span>💾</span> Create Backup
+                            </button>
+                            <button class="btn-secondary" onclick="downloadBackup('manual')">
+                                <span>📥</span> Download
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Export Data Card -->
+                    <div class="backup-card">
+                        <div class="card-header">
+                            <div class="card-icon">📤</div>
+                            <div class="card-title">
+                                <h3>Export Data</h3>
+                                <p>Export in various formats</p>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="select-all">
+                                <input type="checkbox" id="selectAllExport" checked onchange="toggleAllExport()">
+                                <label for="selectAllExport">Select All</label>
+                            </div>
+                            <div class="backup-option">
+                                <input type="checkbox" id="exportCSV" class="export-checkbox" checked>
+                                <label for="exportCSV">CSV Format</label>
+                                <span>Compatible with Excel</span>
+                            </div>
+                            <div class="backup-option">
+                                <input type="checkbox" id="exportJSON" class="export-checkbox" checked>
+                                <label for="exportJSON">JSON Format</label>
+                                <span>Raw data format</span>
+                            </div>
+                            <div class="backup-option">
+                                <input type="checkbox" id="exportPDF" class="export-checkbox">
+                                <label for="exportPDF">PDF Reports</label>
+                                <span>Printable reports</span>
+                            </div>
+                            <div class="backup-option">
+                                <input type="checkbox" id="exportExcel" class="export-checkbox">
+                                <label for="exportExcel">Excel Format</label>
+                                <span>.xlsx files</span>
+                            </div>
+                            <div class="backup-option">
+                                <input type="checkbox" id="exportXML" class="export-checkbox">
+                                <label for="exportXML">XML Format</label>
+                                <span>For other systems</span>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn-primary" onclick="exportData()">
+                                <span>📤</span> Export Now
+                            </button>
+                            <button class="btn-secondary" onclick="scheduleExport()">
+                                <span>⏰</span> Schedule
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backup History Section -->
+                <div class="history-section">
+                    <div class="history-header">
+                        <h3>
+                            <span>📋</span> Backup History
+                            <span id="backupCount">8</span>
+                        </h3>
+                        <button class="clear-btn" onclick="clearHistory()">Clear History</button>
+                    </div>
+                    <div class="history-list" id="backupHistoryList">
+                        <!-- Backup history items will be dynamically loaded here -->
+                    </div>
+                </div>
+
+                <!-- Scheduled Backup Section -->
+                <div class="schedule-section">
+                    <div class="schedule-info">
+                        <div class="schedule-icon">⏰</div>
+                        <div class="schedule-text">
+                            <h4>Automated Backups</h4>
+                            <p>Daily backup at 2:00 AM • Next backup in 8 hours</p>
+                        </div>
+                        <span class="schedule-badge">Active</span>
+                    </div>
+                    <div class="schedule-controls">
+                        <button class="schedule-btn" onclick="editSchedule()">
+                            <span>⚙️</span> Configure
+                        </button>
+                        <button class="schedule-btn primary" onclick="runScheduledNow()">
+                            <span>▶️</span> Run Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backup Progress Modal -->
+    <div class="modal" id="backupModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Creating Backup</h2>
+                <button class="close-btn" onclick="closeBackupModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>Progress</span>
+                        <span id="backupProgressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="backupProgressBar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="file-info">
+                    <p>
+                        <span class="label">File name:</span>
+                        <span class="value" id="backupFileName">backup_20240120_1430.zip</span>
+                    </p>
+                    <p>
+                        <span class="label">Estimated size:</span>
+                        <span class="value" id="backupFileSize">24.5 MB</span>
+                    </p>
+                    <p>
+                        <span class="label">Items:</span>
+                        <span class="value" id="backupItemCount">156 items</span>
+                    </p>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="cancelBackup()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Configuration Modal -->
+    <div class="modal" id="scheduleModal">
+        <div class="modal-content schedule-modal">
+            <div class="modal-header">
+                <h2>Backup Schedule</h2>
+                <button class="close-btn" onclick="closeScheduleModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="schedule-form">
+                    <div class="form-group">
+                        <label>Frequency</label>
+                        <select id="scheduleFrequency">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Time</label>
+                        <input type="time" id="scheduleTime" value="02:00">
+                    </div>
+                    <div class="form-group">
+                        <label>Day of Week (for weekly)</label>
+                        <select id="scheduleDay">
+                            <option value="monday">Monday</option>
+                            <option value="tuesday">Tuesday</option>
+                            <option value="wednesday">Wednesday</option>
+                            <option value="thursday">Thursday</option>
+                            <option value="friday">Friday</option>
+                            <option value="saturday">Saturday</option>
+                            <option value="sunday">Sunday</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Retention</label>
+                        <select id="scheduleRetention">
+                            <option value="7">Keep last 7 backups</option>
+                            <option value="14">Keep last 14 backups</option>
+                            <option value="30">Keep last 30 backups</option>
+                            <option value="0">Keep all backups</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeScheduleModal()">Cancel</button>
+                <button class="modal-btn confirm" onclick="saveSchedule()">Save Schedule</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content delete-modal">
+            <div class="delete-icon">⚠️</div>
+            <div class="delete-title">Delete Backup</div>
+            <div class="delete-message" id="deleteMessage">Are you sure you want to delete this backup? This action cannot be undone.</div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button class="modal-btn delete" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">Action completed successfully</div>
+
+    <script>
+        // ============================================
+        // BACKUP STATE MANAGEMENT
+        // ============================================
+        
+        let backupHistory = [];
+        let currentDeleteId = null;
+        let backupInterval = null;
+        let progressInterval = null;
+
+        // Initialize backup history
+        function initializeBackupHistory() {
+            backupHistory = [
+                {
+                    id: 1,
+                    name: 'backup_20240120_0200.zip',
+                    date: '2024-01-20T02:00:00',
+                    size: '24.5 MB',
+                    items: 156,
+                    type: 'automated'
+                },
+                {
+                    id: 2,
+                    name: 'backup_20240119_0200.zip',
+                    date: '2024-01-19T02:00:00',
+                    size: '24.2 MB',
+                    items: 154,
+                    type: 'automated'
+                },
+                {
+                    id: 3,
+                    name: 'backup_20240118_1430.zip',
+                    date: '2024-01-18T14:30:00',
+                    size: '23.8 MB',
+                    items: 152,
+                    type: 'manual'
+                },
+                {
+                    id: 4,
+                    name: 'backup_20240118_0200.zip',
+                    date: '2024-01-18T02:00:00',
+                    size: '23.5 MB',
+                    items: 150,
+                    type: 'automated'
+                },
+                {
+                    id: 5,
+                    name: 'backup_20240117_0200.zip',
+                    date: '2024-01-17T02:00:00',
+                    size: '23.1 MB',
+                    items: 148,
+                    type: 'automated'
+                },
+                {
+                    id: 6,
+                    name: 'backup_20240116_1530.zip',
+                    date: '2024-01-16T15:30:00',
+                    size: '22.8 MB',
+                    items: 146,
+                    type: 'manual'
+                },
+                {
+                    id: 7,
+                    name: 'backup_20240116_0200.zip',
+                    date: '2024-01-16T02:00:00',
+                    size: '22.5 MB',
+                    items: 144,
+                    type: 'automated'
+                },
+                {
+                    id: 8,
+                    name: 'backup_20240115_0200.zip',
+                    date: '2024-01-15T02:00:00',
+                    size: '22.1 MB',
+                    items: 142,
+                    type: 'automated'
+                }
+            ];
+            
+            renderBackupHistory();
+            updateStats();
+        }
+
+        // Render backup history
+        function renderBackupHistory() {
+            const list = document.getElementById('backupHistoryList');
+            
+            list.innerHTML = backupHistory.map(backup => {
+                const date = new Date(backup.date);
+                const now = new Date();
+                const diffMs = now - date;
+                const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                const diffDays = Math.floor(diffHours / 24);
+                
+                let timeAgo = '';
+                if (diffHours < 1) {
+                    timeAgo = 'Just now';
+                } else if (diffHours < 24) {
+                    timeAgo = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+                } else {
+                    timeAgo = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+                }
+                
+                return `
+                    <div class="history-item" data-id="${backup.id}">
+                        <div class="history-info">
+                            <div class="history-icon">${backup.type === 'automated' ? '⏰' : '👤'}</div>
+                            <div class="history-details">
+                                <h4>${backup.name}</h4>
+                                <div class="history-meta">
+                                    <span>📅 ${date.toLocaleDateString()} ${date.toLocaleTimeString()}</span>
+                                    <span>📦 ${backup.items} items</span>
+                                    <span class="history-size">${backup.size}</span>
+                                    <span>${timeAgo}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="history-actions">
+                            <button class="history-btn download" onclick="downloadBackup('${backup.id}')" title="Download">📥</button>
+                            <button class="history-btn restore" onclick="restoreBackup(${backup.id})" title="Restore">🔄</button>
+                            <button class="history-btn delete" onclick="deleteBackup(${backup.id})" title="Delete">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('backupCount').textContent = backupHistory.length;
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('totalBackups').textContent = backupHistory.length;
+            document.getElementById('totalBackupsBadge').textContent = `💾 ${backupHistory.length} Backups`;
+            
+            // Calculate total size
+            let totalMB = 0;
+            backupHistory.forEach(b => {
+                const size = parseFloat(b.size);
+                totalMB += size;
+            });
+            document.getElementById('totalSize').textContent = `${Math.round(totalMB)} MB`;
+            
+            // Last backup
+            if (backupHistory.length > 0) {
+                const lastBackup = new Date(backupHistory[0].date);
+                const now = new Date();
+                const diffHours = Math.floor((now - lastBackup) / (1000 * 60 * 60));
+                
+                if (diffHours < 1) {
+                    document.getElementById('lastBackup').textContent = 'Just now';
+                } else if (diffHours < 24) {
+                    document.getElementById('lastBackup').textContent = `${diffHours}h ago`;
+                } else {
+                    const diffDays = Math.floor(diffHours / 24);
+                    document.getElementById('lastBackup').textContent = `${diffDays}d ago`;
+                }
+            }
+        }
+
+        // Toggle all manual checkboxes
+        function toggleAllManual() {
+            const selectAll = document.getElementById('selectAllManual');
+            const checkboxes = document.querySelectorAll('.manual-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        }
+
+        // Toggle all export checkboxes
+        function toggleAllExport() {
+            const selectAll = document.getElementById('selectAllExport');
+            const checkboxes = document.querySelectorAll('.export-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        }
+
+        // Create backup
+        function createBackup() {
+            document.getElementById('backupModal').classList.add('show');
+            
+            const fileName = `backup_${new Date().toISOString().slice(0,10)}_${String(new Date().getHours()).padStart(2,'0')}${String(new Date().getMinutes()).padStart(2,'0')}.zip`;
+            document.getElementById('backupFileName').textContent = fileName;
+            
+            // Simulate progress
+            let progress = 0;
+            if (progressInterval) clearInterval(progressInterval);
+            
+            progressInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(progressInterval);
+                    
+                    // Add to history
+                    const newBackup = {
+                        id: backupHistory.length + 1,
+                        name: fileName,
+                        date: new Date().toISOString(),
+                        size: '25.1 MB',
+                        items: 158,
+                        type: 'manual'
+                    };
+                    backupHistory.unshift(newBackup);
+                    renderBackupHistory();
+                    updateStats();
+                    
+                    setTimeout(() => {
+                        closeBackupModal();
+                        showToast('Backup created successfully!', 'success');
+                    }, 500);
+                }
+                
+                document.getElementById('backupProgressBar').style.width = progress + '%';
+                document.getElementById('backupProgressPercent').textContent = Math.round(progress) + '%';
+            }, 200);
+        }
+
+        // Close backup modal
+        function closeBackupModal() {
+            document.getElementById('backupModal').classList.remove('show');
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+            }
+        }
+
+        // Cancel backup
+        function cancelBackup() {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+            }
+            closeBackupModal();
+            showToast('Backup cancelled', 'info');
+        }
+
+        // Download backup
+        function downloadBackup(id) {
+            if (id === 'manual') {
+                showToast('Preparing download...', 'info');
+                setTimeout(() => {
+                    showToast('Download started!', 'success');
+                }, 1500);
+            } else {
+                const backup = backupHistory.find(b => b.id == id);
+                if (backup) {
+                    showToast(`Downloading ${backup.name}...`, 'info');
+                }
+            }
+        }
+
+        // Restore backup
+        function restoreBackup(id) {
+            const backup = backupHistory.find(b => b.id === id);
+            if (backup) {
+                showToast(`Restoring from ${backup.name}...`, 'info');
+                setTimeout(() => {
+                    showToast('System restored successfully!', 'success');
+                }, 2000);
+            }
+        }
+
+        // Delete backup
+        function deleteBackup(id) {
+            const backup = backupHistory.find(b => b.id === id);
+            if (backup) {
+                document.getElementById('deleteMessage').textContent = 
+                    `Are you sure you want to delete "${backup.name}"? This action cannot be undone.`;
+                currentDeleteId = id;
+                document.getElementById('deleteModal').classList.add('show');
+            }
+        }
+
+        // Close delete modal
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('show');
+            currentDeleteId = null;
+        }
+
+        // Confirm delete
+        function confirmDelete() {
+            if (currentDeleteId) {
+                backupHistory = backupHistory.filter(b => b.id !== currentDeleteId);
+                renderBackupHistory();
+                updateStats();
+                showToast('Backup deleted successfully!', 'success');
+                closeDeleteModal();
+            }
+        }
+
+        // Clear all history
+        function clearHistory() {
+            if (backupHistory.length === 0) return;
+            
+            if (confirm('Are you sure you want to clear all backup history?')) {
+                backupHistory = [];
+                renderBackupHistory();
+                updateStats();
+                showToast('History cleared!', 'success');
+            }
+        }
+
+        // Export data
+        function exportData() {
+            showToast('Preparing export...', 'info');
+            setTimeout(() => {
+                showToast('Export completed! Check your downloads.', 'success');
+            }, 2000);
+        }
+
+        // Schedule export
+        function scheduleExport() {
+            showToast('Export scheduled for later', 'info');
+        }
+
+        // Edit schedule
+        function editSchedule() {
+            document.getElementById('scheduleModal').classList.add('show');
+        }
+
+        // Close schedule modal
+        function closeScheduleModal() {
+            document.getElementById('scheduleModal').classList.remove('show');
+        }
+
+        // Save schedule
+        function saveSchedule() {
+            const frequency = document.getElementById('scheduleFrequency').value;
+            const time = document.getElementById('scheduleTime').value;
+            showToast(`Backup schedule updated: ${frequency} at ${time}`, 'success');
+            closeScheduleModal();
+        }
+
+        // Run scheduled backup now
+        function runScheduledNow() {
+            showToast('Running scheduled backup...', 'info');
+            setTimeout(() => {
+                showToast('Scheduled backup completed!', 'success');
+            }, 2000);
+        }
+
+        // Toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            
+            if (type === 'success') {
+                toast.style.background = '#2E7D32';
+            } else if (type === 'error') {
+                toast.style.background = '#C62828';
+            } else {
+                toast.style.background = '#8B0000';
+            }
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Toggle profile dropdown
+        function toggleDropdown() {
+            document.getElementById('profileDropdown').classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.profile-card') && !event.target.matches('.profile-avatar') && !event.target.matches('.profile-details') && !event.target.matches('.profile-name') && !event.target.matches('.profile-role') && !event.target.matches('.hamburger-btn')) {
+                const dropdowns = document.getElementsByClassName('profile-dropdown');
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        };
+
+        // Display current date
+        function updateDate() {
+            const now = new Date();
+            const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeBackupHistory();
+            updateDate();
+        });
+    </script>
+</body>
+</html>

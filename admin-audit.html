@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyceum Kitchen - Admin Audit Trail</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #F8FAFC;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        /* Main Layout */
+        .app {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background: #F8FAFC;
+        }
+
+        /* Side Navigation - Black */
+        .sidebar {
+            width: 280px;
+            background: #000000;
+            border-right: 1px solid #333333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            padding: 28px 24px;
+            border-bottom: 1px solid #333333;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .sidebar-logo {
+            font-size: 32px;
+            background: #8B0000;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            color: #FFFFFF;
+            box-shadow: 0 8px 16px rgba(139,0,0,0.3);
+        }
+
+        .sidebar-title h2 {
+            font-size: 18px;
+            color: #FFFFFF;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar-title p {
+            font-size: 12px;
+            color: #B0B0B0;
+            font-weight: 400;
+        }
+
+        /* Profile Section */
+        .sidebar-profile {
+            padding: 20px 24px;
+            border-bottom: 1px solid #333333;
+            position: relative;
+        }
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: #1A1A1A;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #333333;
+        }
+
+        .profile-card:hover {
+            background: #222222;
+            border-color: #8B0000;
+        }
+
+        .profile-avatar {
+            width: 48px;
+            height: 48px;
+            background: #8B0000;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            font-weight: 600;
+            font-size: 18px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .profile-details {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 4px;
+            letter-spacing: -0.2px;
+        }
+
+        .profile-role {
+            font-size: 12px;
+            color: #8B0000;
+            font-weight: 600;
+        }
+
+        .hamburger-btn {
+            width: 36px;
+            height: 36px;
+            background: #1A1A1A;
+            border: 1px solid #333333;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #FFFFFF;
+        }
+
+        .hamburger-btn:hover {
+            background: #8B0000;
+            border-color: #8B0000;
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: absolute;
+            top: 100px;
+            left: 24px;
+            right: 24px;
+            background: #1A1A1A;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+            border: 1px solid #333333;
+        }
+
+        .profile-dropdown.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #FFFFFF;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 1px solid #333333;
+        }
+
+        .dropdown-item:hover {
+            background: #8B0000;
+        }
+
+        .dropdown-item span:first-child {
+            font-size: 18px;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #333333;
+            margin: 4px 0;
+        }
+
+        .badge {
+            margin-left: auto;
+            background: #8B0000;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 16px;
+            color: #B0B0B0;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: #1A1A1A;
+            color: #FFFFFF;
+        }
+
+        .nav-item.active {
+            background: #8B0000;
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-text {
+            font-size: 14px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background: #F8FAFC;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 80px;
+            background: white;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            flex-shrink: 0;
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            color: #1A1A1A;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .page-title p {
+            font-size: 13px;
+            color: #64748B;
+            font-weight: 400;
+        }
+
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .notification {
+            position: relative;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            background: #F8FAFC;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .notification:hover {
+            background: #FEE9E9;
+        }
+
+        .notification i {
+            font-size: 20px;
+            color: #4A5568;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #8B0000;
+            color: white;
+            font-size: 10px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 2px solid white;
+            font-weight: 600;
+        }
+
+        .date-display {
+            background: #F8FAFC;
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid #E5E7EB;
+        }
+
+        /* Audit Content */
+        .audit-content {
+            flex: 1;
+            padding: 24px 28px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(145deg, #8B0000, #4A0000);
+            border-radius: 20px;
+            padding: 18px 24px;
+            margin-bottom: 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .welcome-text h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .welcome-text p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .stats-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* Quick Stats */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 22px;
+            flex-shrink: 0;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 14px;
+            border: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            background: #FEE9E9;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #8B0000;
+            flex-shrink: 0;
+        }
+
+        .stat-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .stat-info h4 {
+            font-size: 12px;
+            color: #64748B;
+            font-weight: 500;
+            margin-bottom: 2px;
+            white-space: nowrap;
+        }
+
+        .stat-number {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1A1A1A;
+            line-height: 1.2;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            flex-shrink: 0;
+            background: white;
+            padding: 12px 18px;
+            border-radius: 16px;
+            border: 1px solid #E5E7EB;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            color: #64748B;
+            margin-right: 4px;
+        }
+
+        .filter-select {
+            padding: 6px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 30px;
+            font-size: 12px;
+            color: #1A1A1A;
+            background: white;
+            cursor: pointer;
+            min-width: 120px;
+        }
+
+        .filter-select:focus {
+            border-color: #8B0000;
+            outline: none;
+        }
+
+        .date-range {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .date-input-small {
+            padding: 6px 10px;
+            border: 1px solid #E5E7EB;
+            border-radius: 30px;
+            font-size: 12px;
+            width: 120px;
+        }
+
+        .date-input-small:focus {
+            border-color: #8B0000;
+            outline: none;
+        }
+
+        .search-box {
+            position: relative;
+            width: 220px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 6px 6px 6px 32px;
+            border: 1px solid #E5E7EB;
+            border-radius: 30px;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .search-box input:focus {
+            border-color: #8B0000;
+            outline: none;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: #8B0000;
+        }
+
+        .export-btn {
+            padding: 6px 16px;
+            background: #8B0000;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .export-btn:hover {
+            background: #9A0000;
+            transform: translateY(-2px);
+        }
+
+        /* Audit Table Container */
+        .table-container {
+            background: white;
+            border-radius: 18px;
+            border: 1px solid #E5E7EB;
+            overflow: hidden;
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            border-bottom: 1px solid #E5E7EB;
+            background: #F8FAFC;
+        }
+
+        .table-header h3 {
+            font-size: 15px;
+            color: #1A1A1A;
+            font-weight: 600;
+        }
+
+        .table-stats {
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .table-wrapper {
+            overflow-y: auto;
+            flex: 1;
+            min-height: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 16px;
+            background: #F8FAFC;
+            color: #64748B;
+            font-weight: 600;
+            font-size: 12px;
+            border-bottom: 1px solid #E5E7EB;
+            position: sticky;
+            top: 0;
+            background: #F8FAFC;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #F0F0F0;
+            font-size: 13px;
+            color: #1A1A1A;
+        }
+
+        tr:hover td {
+            background: #F8FAFC;
+        }
+
+        .action-badge {
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .action-create {
+            background: #E3F2FD;
+            color: #1976D2;
+        }
+
+        .action-update {
+            background: #FFF3E0;
+            color: #F57C00;
+        }
+
+        .action-delete {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .action-archive {
+            background: #F0F0F0;
+            color: #64748B;
+        }
+
+        .action-login {
+            background: #E6F7E6;
+            color: #2E7D32;
+        }
+
+        .action-export {
+            background: #E0F2FE;
+            color: #0284C7;
+        }
+
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-avatar-small {
+            width: 28px;
+            height: 28px;
+            background: #8B0000;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .details-cell {
+            max-width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #64748B;
+            font-size: 12px;
+        }
+
+        .time-cell {
+            white-space: nowrap;
+            color: #64748B;
+            font-size: 12px;
+        }
+
+        .ip-cell {
+            font-family: monospace;
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            border-top: 1px solid #E5E7EB;
+            background: white;
+        }
+
+        .pagination-info {
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 6px;
+        }
+
+        .page-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            background: white;
+            color: #64748B;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-btn:hover {
+            border-color: #8B0000;
+            color: #8B0000;
+        }
+
+        .page-btn.active {
+            background: #8B0000;
+            color: white;
+            border-color: #8B0000;
+        }
+
+        .page-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #8B0000;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            color: #8B0000;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748B;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+
+        .close-btn:hover {
+            background: #FEE9E9;
+            color: #8B0000;
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .detail-row {
+            display: flex;
+            padding: 8px 0;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .detail-label {
+            width: 100px;
+            font-size: 13px;
+            color: #64748B;
+        }
+
+        .detail-value {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+
+        .detail-value.json {
+            background: #F8FAFC;
+            padding: 8px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.close {
+            background: #F0F0F0;
+            color: #666;
+        }
+
+        .modal-btn.close:hover {
+            background: #E0E0E0;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #8B0000;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(139,0,0,0.2);
+            z-index: 3000;
+            font-size: 13px;
+            font-weight: 500;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            border: 1px solid #FFFFFF;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: #2E7D32;
+        }
+
+        .toast.error {
+            background: #C62828;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #8B0000;
+            border-radius: 10px;
+        }
+
+        /* No scrolling on body */
+        html, body {
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Side Navigation - Black -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">🍳</div>
+                <div class="sidebar-title">
+                    <h2>Lyceum Kitchen</h2>
+                    <p>Admin Panel</p>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div class="sidebar-profile">
+                <div class="profile-card" onclick="toggleDropdown()">
+                    <div class="profile-avatar">MA</div>
+                    <div class="profile-details">
+                        <div class="profile-name">Maria Santos</div>
+                        <div class="profile-role">Administrator</div>
+                    </div>
+                    <div class="hamburger-btn">☰</div>
+                </div>
+
+                <!-- Profile Dropdown Menu -->
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-item" onclick="window.location.href='admin-profile.html'">
+                        <span>👤</span> My Profile
+                    </div>
+                    <div class="dropdown-item" onclick="window.location.href='admin-settings.html'">
+                        <span⚙️</span> System Settings
+                    </div>
+                    <div class="dropdown-item" onclick="window.location.href='admin-audit.html'">
+                        <span>📋</span> Audit Trail
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="window.location.href='admin-backup.html'">
+                        <span>💾</span> Backup & Export
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="window.location.href='login.html'">
+                        <span>🚪</span> Logout
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <div class="nav-menu">
+                <div class="nav-item" onclick="window.location.href='admin-dashboard.html'">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-ingredients.html'">
+                    <span class="nav-icon">📦</span>
+                    <span class="nav-text">Ingredients</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-categories.html'">
+                    <span class="nav-icon">🏷️</span>
+                    <span class="nav-text">Categories</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-storage.html'">
+                    <span class="nav-icon">📍</span>
+                    <span class="nav-text">Storage</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-units.html'">
+                    <span class="nav-icon">⚖️</span>
+                    <span class="nav-text">Units</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-suppliers.html'">
+                    <span class="nav-icon">🏢</span>
+                    <span class="nav-text">Suppliers</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-purchases.html'">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">Purchases</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-users.html'">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-text">Users</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-reports.html'">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Reports</span>
+                </div>
+                <div class="nav-item active" onclick="window.location.href='admin-audit.html'">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-text">Audit</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-backup.html'">
+                    <span class="nav-icon">💾</span>
+                    <span class="nav-text">Backup</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1>Audit Trail</h1>
+                    <p>System activity and event logs</p>
+                </div>
+                <div class="top-right">
+                    <div class="notification" onclick="window.location.href='admin-notifications.html'">
+                        <i>🔔</i>
+                        <span class="notification-badge">5</span>
+                    </div>
+                    <div class="date-display" id="currentDate"></div>
+                </div>
+            </div>
+
+            <!-- Audit Content -->
+            <div class="audit-content">
+                <!-- Welcome Banner -->
+                <div class="welcome-banner">
+                    <div class="welcome-text">
+                        <h3>Audit Trail</h3>
+                        <p>Track all system activities and changes</p>
+                    </div>
+                    <div class="stats-badge" id="totalLogsBadge">📋 248 Events</div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">📋</div>
+                        <div class="stat-info">
+                            <h4>Total Events</h4>
+                            <div class="stat-number" id="totalEvents">248</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📝</div>
+                        <div class="stat-info">
+                            <h4>Today</h4>
+                            <div class="stat-number" id="todayEvents">24</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👤</div>
+                        <div class="stat-info">
+                            <h4>Active Users</h4>
+                            <div class="stat-number" id="activeUsers">6</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⚠️</div>
+                        <div class="stat-info">
+                            <h4>Critical</h4>
+                            <div class="stat-number" id="criticalEvents">2</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <div class="filter-group">
+                        <span class="filter-label">Action:</span>
+                        <select class="filter-select" id="actionFilter" onchange="applyFilters()">
+                            <option value="all">All Actions</option>
+                            <option value="create">Create</option>
+                            <option value="update">Update</option>
+                            <option value="delete">Delete</option>
+                            <option value="archive">Archive</option>
+                            <option value="login">Login</option>
+                            <option value="export">Export</option>
+                        </select>
+                        
+                        <span class="filter-label">User:</span>
+                        <select class="filter-select" id="userFilter" onchange="applyFilters()">
+                            <option value="all">All Users</option>
+                            <option value="maria">Maria Santos</option>
+                            <option value="juan">Juan Santos</option>
+                            <option value="ramon">Ramon Jimenez</option>
+                            <option value="carla">Carla Lopez</option>
+                        </select>
+                        
+                        <span class="filter-label">Module:</span>
+                        <select class="filter-select" id="moduleFilter" onchange="applyFilters()">
+                            <option value="all">All Modules</option>
+                            <option value="ingredients">Ingredients</option>
+                            <option value="categories">Categories</option>
+                            <option value="storage">Storage</option>
+                            <option value="suppliers">Suppliers</option>
+                            <option value="purchases">Purchases</option>
+                            <option value="users">Users</option>
+                            <option value="reports">Reports</option>
+                        </select>
+                    </div>
+                    
+                    <div class="date-range">
+                        <input type="date" class="date-input-small" id="startDate" value="2024-01-01">
+                        <span style="color: #64748B;">to</span>
+                        <input type="date" class="date-input-small" id="endDate" value="2024-01-31">
+                    </div>
+                    
+                    <div class="search-box">
+                        <i>🔍</i>
+                        <input type="text" placeholder="Search logs..." id="searchInput" onkeyup="applyFilters()">
+                    </div>
+                    
+                    <button class="export-btn" onclick="exportAuditLogs()">
+                        <span>📥</span> Export
+                    </button>
+                </div>
+
+                <!-- Audit Table -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Activity Logs</h3>
+                        <span class="table-stats" id="tableStats">Showing 1-20 of 248 events</span>
+                    </div>
+                    <div class="table-wrapper">
+                        <table id="auditTable">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Module</th>
+                                    <th>Description</th>
+                                    <th>IP Address</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditTableBody">
+                                <!-- Audit logs will be dynamically loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <div class="pagination-info" id="paginationInfo">Showing 1-20 of 248 events</div>
+                        <div class="pagination-controls">
+                            <button class="page-btn" onclick="changePage('prev')" id="prevPage">←</button>
+                            <button class="page-btn active" onclick="changePage(1)">1</button>
+                            <button class="page-btn" onclick="changePage(2)">2</button>
+                            <button class="page-btn" onclick="changePage(3)">3</button>
+                            <button class="page-btn" onclick="changePage(4)">4</button>
+                            <button class="page-btn" onclick="changePage(5)">5</button>
+                            <button class="page-btn" onclick="changePage('next')" id="nextPage">→</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Details Modal -->
+    <div class="modal" id="logModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Log Details</h2>
+                <button class="close-btn" onclick="closeLogModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="logModalBody">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn close" onclick="closeLogModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">Action completed successfully</div>
+
+    <script>
+        // ============================================
+        // AUDIT TRAIL STATE MANAGEMENT
+        // ============================================
+        
+        let auditLogs = [];
+        let filteredLogs = [];
+        let currentPage = 1;
+        let itemsPerPage = 20;
+        let currentFilters = {
+            action: 'all',
+            user: 'all',
+            module: 'all',
+            startDate: '2024-01-01',
+            endDate: '2024-01-31',
+            search: ''
+        };
+
+        // Initialize default audit logs
+        function initializeAuditLogs() {
+            auditLogs = [
+                {
+                    id: 1,
+                    timestamp: '2024-01-20T09:30:00',
+                    user: 'Maria Santos',
+                    userAvatar: 'MA',
+                    action: 'create',
+                    module: 'ingredients',
+                    description: 'Added new ingredient: Fresh Basil',
+                    details: {
+                        ingredient: 'Fresh Basil',
+                        category: 'Spices',
+                        quantity: 10,
+                        unit: 'pcs',
+                        threshold: 5
+                    },
+                    ip: '192.168.1.105'
+                },
+                {
+                    id: 2,
+                    timestamp: '2024-01-20T09:15:00',
+                    user: 'Juan Santos',
+                    userAvatar: 'JS',
+                    action: 'update',
+                    module: 'ingredients',
+                    description: 'Updated stock: Tomatoes (from 24 to 22)',
+                    details: {
+                        ingredient: 'Tomatoes',
+                        oldValue: 24,
+                        newValue: 22,
+                        reason: 'Usage logged'
+                    },
+                    ip: '192.168.1.110'
+                },
+                {
+                    id: 3,
+                    timestamp: '2024-01-20T08:45:00',
+                    user: 'Ramon Jimenez',
+                    userAvatar: 'RJ',
+                    action: 'login',
+                    module: 'auth',
+                    description: 'User logged in successfully',
+                    details: {
+                        device: 'Chrome on Windows',
+                        location: 'Kitchen Terminal 2'
+                    },
+                    ip: '192.168.1.115'
+                },
+                {
+                    id: 4,
+                    timestamp: '2024-01-19T16:30:00',
+                    user: 'Carla Lopez',
+                    userAvatar: 'CL',
+                    action: 'create',
+                    module: 'purchases',
+                    description: 'Created purchase order PO-2024-007',
+                    details: {
+                        orderNumber: 'PO-2024-007',
+                        supplier: 'Fresh Farms',
+                        total: 2450,
+                        items: ['Tomatoes', 'Onions', 'Lettuce']
+                    },
+                    ip: '192.168.1.120'
+                },
+                {
+                    id: 5,
+                    timestamp: '2024-01-19T14:20:00',
+                    user: 'Maria Santos',
+                    userAvatar: 'MA',
+                    action: 'delete',
+                    module: 'users',
+                    description: 'Deleted user account: Mark Torres',
+                    details: {
+                        username: 'mark.torres',
+                        role: 'staff',
+                        reason: 'Employee resigned'
+                    },
+                    ip: '192.168.1.105'
+                },
+                {
+                    id: 6,
+                    timestamp: '2024-01-19T11:10:00',
+                    user: 'Juan Santos',
+                    userAvatar: 'JS',
+                    action: 'update',
+                    module: 'thresholds',
+                    description: 'Updated minimum threshold: Onions (from 5 to 10)',
+                    details: {
+                        ingredient: 'Onions',
+                        oldThreshold: 5,
+                        newThreshold: 10
+                    },
+                    ip: '192.168.1.110'
+                },
+                {
+                    id: 7,
+                    timestamp: '2024-01-19T10:05:00',
+                    user: 'Ramon Jimenez',
+                    userAvatar: 'RJ',
+                    action: 'export',
+                    module: 'reports',
+                    description: 'Exported inventory summary report',
+                    details: {
+                        reportType: 'Inventory Summary',
+                        dateRange: 'Jan 1-31, 2024',
+                        format: 'PDF'
+                    },
+                    ip: '192.168.1.115'
+                },
+                {
+                    id: 8,
+                    timestamp: '2024-01-19T09:30:00',
+                    user: 'Carla Lopez',
+                    userAvatar: 'CL',
+                    action: 'archive',
+                    module: 'ingredients',
+                    description: 'Archived ingredient: Seasonal Item',
+                    details: {
+                        ingredient: 'Pumpkin',
+                        reason: 'End of season'
+                    },
+                    ip: '192.168.1.120'
+                },
+                {
+                    id: 9,
+                    timestamp: '2024-01-18T15:45:00',
+                    user: 'Maria Santos',
+                    userAvatar: 'MA',
+                    action: 'update',
+                    module: 'suppliers',
+                    description: 'Updated supplier information: Meat Masters',
+                    details: {
+                        supplier: 'Meat Masters',
+                        changes: ['Contact person', 'Phone number']
+                    },
+                    ip: '192.168.1.105'
+                },
+                {
+                    id: 10,
+                    timestamp: '2024-01-18T13:20:00',
+                    user: 'Juan Santos',
+                    userAvatar: 'JS',
+                    action: 'create',
+                    module: 'categories',
+                    description: 'Added new category: Frozen Foods',
+                    details: {
+                        category: 'Frozen Foods',
+                        icon: '🧊'
+                    },
+                    ip: '192.168.1.110'
+                },
+                {
+                    id: 11,
+                    timestamp: '2024-01-18T11:30:00',
+                    user: 'Ramon Jimenez',
+                    userAvatar: 'RJ',
+                    action: 'login',
+                    module: 'auth',
+                    description: 'User logged in successfully',
+                    details: {
+                        device: 'iPad Safari',
+                        location: 'Office'
+                    },
+                    ip: '192.168.1.115'
+                },
+                {
+                    id: 12,
+                    timestamp: '2024-01-18T09:15:00',
+                    user: 'Carla Lopez',
+                    userAvatar: 'CL',
+                    action: 'update',
+                    module: 'storage',
+                    description: 'Updated storage location: Fridge A',
+                    details: {
+                        location: 'Fridge A',
+                        capacity: '75%',
+                        items: 38
+                    },
+                    ip: '192.168.1.120'
+                },
+                {
+                    id: 13,
+                    timestamp: '2024-01-17T16:00:00',
+                    user: 'Maria Santos',
+                    userAvatar: 'MA',
+                    action: 'delete',
+                    module: 'categories',
+                    description: 'Deleted category: Canned Goods',
+                    details: {
+                        category: 'Canned Goods',
+                        itemsAffected: 3
+                    },
+                    ip: '192.168.1.105'
+                },
+                {
+                    id: 14,
+                    timestamp: '2024-01-17T14:30:00',
+                    user: 'Juan Santos',
+                    userAvatar: 'JS',
+                    action: 'update',
+                    module: 'ingredients',
+                    description: 'Updated expiry date: Fresh Milk',
+                    details: {
+                        ingredient: 'Fresh Milk',
+                        oldExpiry: '2024-01-20',
+                        newExpiry: '2024-01-25'
+                    },
+                    ip: '192.168.1.110'
+                },
+                {
+                    id: 15,
+                    timestamp: '2024-01-17T10:45:00',
+                    user: 'Ramon Jimenez',
+                    userAvatar: 'RJ',
+                    action: 'export',
+                    module: 'reports',
+                    description: 'Exported waste report',
+                    details: {
+                        reportType: 'Waste Analysis',
+                        dateRange: 'Q4 2023'
+                    },
+                    ip: '192.168.1.115'
+                }
+            ];
+
+            // Add more logs to reach 248
+            for (let i = 16; i <= 248; i++) {
+                const actions = ['create', 'update', 'delete', 'archive', 'login', 'export'];
+                const modules = ['ingredients', 'categories', 'storage', 'suppliers', 'purchases', 'users', 'reports', 'auth'];
+                const users = [
+                    { name: 'Maria Santos', avatar: 'MA' },
+                    { name: 'Juan Santos', avatar: 'JS' },
+                    { name: 'Ramon Jimenez', avatar: 'RJ' },
+                    { name: 'Carla Lopez', avatar: 'CL' }
+                ];
+                
+                const randomUser = users[Math.floor(Math.random() * users.length)];
+                const randomAction = actions[Math.floor(Math.random() * actions.length)];
+                const randomModule = modules[Math.floor(Math.random() * modules.length)];
+                
+                const date = new Date('2024-01-17');
+                date.setHours(date.getHours() - i);
+                
+                auditLogs.push({
+                    id: i,
+                    timestamp: date.toISOString(),
+                    user: randomUser.name,
+                    userAvatar: randomUser.avatar,
+                    action: randomAction,
+                    module: randomModule,
+                    description: `${randomAction} operation on ${randomModule}`,
+                    details: {
+                        placeholder: 'Sample log entry'
+                    },
+                    ip: `192.168.1.${Math.floor(Math.random() * 255)}`
+                });
+            }
+            
+            // Sort by timestamp (newest first)
+            auditLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            applyFilters();
+        }
+
+        // Apply filters
+        function applyFilters() {
+            currentFilters.action = document.getElementById('actionFilter').value;
+            currentFilters.user = document.getElementById('userFilter').value;
+            currentFilters.module = document.getElementById('moduleFilter').value;
+            currentFilters.startDate = document.getElementById('startDate').value;
+            currentFilters.endDate = document.getElementById('endDate').value;
+            currentFilters.search = document.getElementById('searchInput').value.toLowerCase();
+            
+            filteredLogs = auditLogs.filter(log => {
+                // Action filter
+                if (currentFilters.action !== 'all' && log.action !== currentFilters.action) {
+                    return false;
+                }
+                
+                // User filter
+                if (currentFilters.user !== 'all') {
+                    const userMap = {
+                        'maria': 'Maria Santos',
+                        'juan': 'Juan Santos',
+                        'ramon': 'Ramon Jimenez',
+                        'carla': 'Carla Lopez'
+                    };
+                    if (log.user !== userMap[currentFilters.user]) {
+                        return false;
+                    }
+                }
+                
+                // Module filter
+                if (currentFilters.module !== 'all' && log.module !== currentFilters.module) {
+                    return false;
+                }
+                
+                // Date range filter
+                const logDate = new Date(log.timestamp).toISOString().split('T')[0];
+                if (logDate < currentFilters.startDate || logDate > currentFilters.endDate) {
+                    return false;
+                }
+                
+                // Search filter
+                if (currentFilters.search) {
+                    const searchStr = `${log.user} ${log.action} ${log.module} ${log.description}`.toLowerCase();
+                    if (!searchStr.includes(currentFilters.search)) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            });
+            
+            currentPage = 1;
+            renderAuditTable();
+            updatePagination();
+        }
+
+        // Render audit table
+        function renderAuditTable() {
+            const tbody = document.getElementById('auditTableBody');
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageLogs = filteredLogs.slice(start, end);
+            
+            tbody.innerHTML = pageLogs.map(log => {
+                const actionClass = getActionClass(log.action);
+                const actionDisplay = log.action.charAt(0).toUpperCase() + log.action.slice(1);
+                
+                return `
+                    <tr onclick="viewLogDetails(${log.id})" style="cursor: pointer;">
+                        <td class="time-cell">${formatDateTime(log.timestamp)}</td>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar-small">${log.userAvatar}</div>
+                                <span>${log.user}</span>
+                            </div>
+                        </td>
+                        <td><span class="action-badge ${actionClass}">${actionDisplay}</span></td>
+                        <td>${log.module}</td>
+                        <td class="details-cell" title="${log.description}">${log.description}</td>
+                        <td class="ip-cell">${log.ip}</td>
+                        <td><button class="action-btn edit" onclick="event.stopPropagation(); viewLogDetails(${log.id})" style="width: 28px; height: 28px;">👁️</button></td>
+                    </tr>
+                `;
+            }).join('');
+            
+            document.getElementById('tableStats').textContent = 
+                `Showing ${start + 1}-${Math.min(end, filteredLogs.length)} of ${filteredLogs.length} events`;
+            document.getElementById('paginationInfo').textContent = 
+                `Showing ${start + 1}-${Math.min(end, filteredLogs.length)} of ${filteredLogs.length} events`;
+        }
+
+        // Get action class for badge
+        function getActionClass(action) {
+            switch(action) {
+                case 'create': return 'action-create';
+                case 'update': return 'action-update';
+                case 'delete': return 'action-delete';
+                case 'archive': return 'action-archive';
+                case 'login': return 'action-login';
+                case 'export': return 'action-export';
+                default: return 'action-update';
+            }
+        }
+
+        // Format date time
+        function formatDateTime(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins} min ago`;
+            if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+            if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Change page
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
+            
+            if (page === 'prev') {
+                if (currentPage > 1) currentPage--;
+            } else if (page === 'next') {
+                if (currentPage < totalPages) currentPage++;
+            } else {
+                currentPage = page;
+            }
+            
+            renderAuditTable();
+            updatePagination();
+        }
+
+        // Update pagination buttons
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
+            const paginationControls = document.querySelector('.pagination-controls');
+            
+            let buttons = '<button class="page-btn" onclick="changePage(\'prev\')" ' + 
+                (currentPage === 1 ? 'disabled' : '') + '>←</button>';
+            
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, startPage + 4);
+            
+            for (let i = startPage; i <= endPage; i++) {
+                buttons += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+            }
+            
+            buttons += '<button class="page-btn" onclick="changePage(\'next\')" ' + 
+                (currentPage === totalPages ? 'disabled' : '') + '>→</button>';
+            
+            document.querySelector('.pagination-controls').innerHTML = buttons;
+        }
+
+        // View log details
+        function viewLogDetails(id) {
+            const log = auditLogs.find(l => l.id === id);
+            if (!log) return;
+            
+            const detailsHtml = `
+                <div class="detail-row">
+                    <div class="detail-label">Timestamp:</div>
+                    <div class="detail-value">${new Date(log.timestamp).toLocaleString()}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">User:</div>
+                    <div class="detail-value">${log.user}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Action:</div>
+                    <div class="detail-value"><span class="action-badge ${getActionClass(log.action)}">${log.action}</span></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Module:</div>
+                    <div class="detail-value">${log.module}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Description:</div>
+                    <div class="detail-value">${log.description}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">IP Address:</div>
+                    <div class="detail-value">${log.ip}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Details:</div>
+                    <div class="detail-value json">${JSON.stringify(log.details, null, 2)}</div>
+                </div>
+            `;
+            
+            document.getElementById('logModalBody').innerHTML = detailsHtml;
+            document.getElementById('logModal').classList.add('show');
+        }
+
+        // Close log modal
+        function closeLogModal() {
+            document.getElementById('logModal').classList.remove('show');
+        }
+
+        // Export audit logs
+        function exportAuditLogs() {
+            const dataStr = JSON.stringify(filteredLogs, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = `audit_logs_${new Date().toISOString().slice(0,10)}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showToast('Audit logs exported successfully!', 'success');
+        }
+
+        // Toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            
+            if (type === 'success') {
+                toast.style.background = '#2E7D32';
+            } else if (type === 'error') {
+                toast.style.background = '#C62828';
+            } else {
+                toast.style.background = '#8B0000';
+            }
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Toggle profile dropdown
+        function toggleDropdown() {
+            document.getElementById('profileDropdown').classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.profile-card') && !event.target.matches('.profile-avatar') && !event.target.matches('.profile-details') && !event.target.matches('.profile-name') && !event.target.matches('.profile-role') && !event.target.matches('.hamburger-btn')) {
+                const dropdowns = document.getElementsByClassName('profile-dropdown');
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        };
+
+        // Display current date
+        function updateDate() {
+            const now = new Date();
+            const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAuditLogs();
+            updateDate();
+            
+            // Set default dates
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            document.getElementById('startDate').value = formatDateForInput(firstDay);
+            document.getElementById('endDate').value = formatDateForInput(today);
+        });
+
+        // Format date for input
+        function formatDateForInput(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+    </script>
+</body>
+</html>

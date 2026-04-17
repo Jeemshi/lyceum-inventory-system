@@ -1,0 +1,1806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyceum Kitchen - Admin Units of Measure</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #F8FAFC;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        /* Main Layout */
+        .app {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background: #F8FAFC;
+        }
+
+        /* Side Navigation - Black */
+        .sidebar {
+            width: 280px;
+            background: #000000;
+            border-right: 1px solid #333333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            padding: 28px 24px;
+            border-bottom: 1px solid #333333;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .sidebar-logo {
+            font-size: 32px;
+            background: #8B0000;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            color: #FFFFFF;
+            box-shadow: 0 8px 16px rgba(139,0,0,0.3);
+        }
+
+        .sidebar-title h2 {
+            font-size: 18px;
+            color: #FFFFFF;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar-title p {
+            font-size: 12px;
+            color: #B0B0B0;
+            font-weight: 400;
+        }
+
+        /* Profile Section */
+        .sidebar-profile {
+            padding: 20px 24px;
+            border-bottom: 1px solid #333333;
+            position: relative;
+        }
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: #1A1A1A;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #333333;
+        }
+
+        .profile-card:hover {
+            background: #222222;
+            border-color: #8B0000;
+        }
+
+        .profile-avatar {
+            width: 48px;
+            height: 48px;
+            background: #8B0000;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            font-weight: 600;
+            font-size: 18px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .profile-details {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 4px;
+            letter-spacing: -0.2px;
+        }
+
+        .profile-role {
+            font-size: 12px;
+            color: #8B0000;
+            font-weight: 600;
+        }
+
+        .hamburger-btn {
+            width: 36px;
+            height: 36px;
+            background: #1A1A1A;
+            border: 1px solid #333333;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #FFFFFF;
+        }
+
+        .hamburger-btn:hover {
+            background: #8B0000;
+            border-color: #8B0000;
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: absolute;
+            top: 100px;
+            left: 24px;
+            right: 24px;
+            background: #1A1A1A;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+            border: 1px solid #333333;
+        }
+
+        .profile-dropdown.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #FFFFFF;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 1px solid #333333;
+        }
+
+        .dropdown-item:hover {
+            background: #8B0000;
+        }
+
+        .dropdown-item span:first-child {
+            font-size: 18px;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #333333;
+            margin: 4px 0;
+        }
+
+        .badge {
+            margin-left: auto;
+            background: #8B0000;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 16px;
+            color: #B0B0B0;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: #1A1A1A;
+            color: #FFFFFF;
+        }
+
+        .nav-item.active {
+            background: #8B0000;
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-text {
+            font-size: 14px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background: #F8FAFC;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 80px;
+            background: white;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            flex-shrink: 0;
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            color: #1A1A1A;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .page-title p {
+            font-size: 13px;
+            color: #64748B;
+            font-weight: 400;
+        }
+
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .notification {
+            position: relative;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            background: #F8FAFC;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .notification:hover {
+            background: #FEE9E9;
+        }
+
+        .notification i {
+            font-size: 20px;
+            color: #4A5568;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #8B0000;
+            color: white;
+            font-size: 10px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 2px solid white;
+            font-weight: 600;
+        }
+
+        .date-display {
+            background: #F8FAFC;
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid #E5E7EB;
+        }
+
+        /* Units Content */
+        .units-content {
+            flex: 1;
+            padding: 24px 28px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(145deg, #8B0000, #4A0000);
+            border-radius: 20px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .welcome-text h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .welcome-text p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .stats-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Quick Stats */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 24px;
+            flex-shrink: 0;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 18px;
+            padding: 16px;
+            border: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            background: #FEE9E9;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #8B0000;
+        }
+
+        .stat-info h4 {
+            font-size: 13px;
+            color: #64748B;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .stat-number {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        /* Header Actions */
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            flex-shrink: 0;
+        }
+
+        .header-actions h2 {
+            font-size: 20px;
+            color: #1A1A1A;
+            font-weight: 700;
+            position: relative;
+            padding-left: 12px;
+        }
+
+        .header-actions h2::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(to bottom, #8B0000, #D4AF37);
+            border-radius: 4px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            background: #8B0000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #9A0000;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #1A1A1A;
+            border: 1px solid #E5E7EB;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary:hover {
+            border-color: #8B0000;
+            color: #8B0000;
+        }
+
+        /* Units Grid */
+        .units-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 8px;
+            min-height: 0;
+        }
+
+        /* Unit Card */
+        .unit-card {
+            background: white;
+            border-radius: 18px;
+            padding: 20px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .unit-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(139,0,0,0.08);
+            border-color: #8B0000;
+        }
+
+        .unit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .unit-icon-large {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(145deg, #FEE9E9, #FFFFFF);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: #8B0000;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .unit-info {
+            flex: 1;
+            margin-left: 16px;
+        }
+
+        .unit-info h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+
+        .unit-symbol {
+            font-size: 14px;
+            color: #8B0000;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .unit-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .unit-type-badge {
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .unit-type-badge.countable {
+            background: #E3F2FD;
+            color: #1976D2;
+        }
+
+        .unit-type-badge.weight {
+            background: #E6F7E6;
+            color: #2E7D32;
+        }
+
+        .unit-type-badge.volume {
+            background: #FFF3E0;
+            color: #F57C00;
+        }
+
+        .unit-type-badge.other {
+            background: #F0F0F0;
+            color: #64748B;
+        }
+
+        .unit-stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-top: 1px solid #F0F0F0;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-item .label {
+            font-size: 11px;
+            color: #64748B;
+            margin-bottom: 4px;
+        }
+
+        .stat-item .value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .stat-item .value small {
+            font-size: 11px;
+            color: #8B0000;
+        }
+
+        .conversion-info {
+            background: #F8FAFC;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .conversion-arrow {
+            color: #8B0000;
+            font-size: 16px;
+        }
+
+        .conversion-value {
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+
+        .conversion-unit {
+            color: #64748B;
+        }
+
+        .unit-items {
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .item-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .item-pill {
+            background: #F8FAFC;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            color: #4A5568;
+            border: 1px solid #E5E7EB;
+        }
+
+        .item-pill .item-quantity {
+            color: #8B0000;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .action-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 10px;
+            background: #F8FAFC;
+            color: #64748B;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #E5E7EB;
+        }
+
+        .action-btn:hover {
+            background: #8B0000;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .action-btn.edit:hover {
+            background: #1976D2;
+        }
+
+        .action-btn.delete:hover {
+            background: #C62828;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 28px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #8B0000;
+        }
+
+        .modal-header h2 {
+            font-size: 22px;
+            color: #8B0000;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #64748B;
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1A1A1A;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .form-group label i {
+            color: #8B0000;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 16px;
+            border: 2px solid #F0F0F0;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #8B0000;
+            outline: none;
+        }
+
+        .unit-type-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .type-option {
+            padding: 12px;
+            border: 2px solid #F0F0F0;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .type-option span:first-child {
+            font-size: 20px;
+        }
+
+        .type-option:hover {
+            border-color: #8B0000;
+            background: #FEE9E9;
+        }
+
+        .type-option.selected {
+            background: #8B0000;
+            color: white;
+            border-color: #8B0000;
+        }
+
+        .type-option.selected span:first-child {
+            color: white;
+        }
+
+        .conversion-group {
+            background: #F8FAFC;
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 8px;
+        }
+
+        .conversion-group h4 {
+            font-size: 14px;
+            color: #1A1A1A;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.save {
+            background: #8B0000;
+            color: white;
+        }
+
+        .modal-btn.save:hover {
+            background: #9A0000;
+        }
+
+        .modal-btn.cancel {
+            background: #F0F0F0;
+            color: #666;
+        }
+
+        .modal-btn.cancel:hover {
+            background: #E0E0E0;
+        }
+
+        .modal-btn.delete {
+            background: #C62828;
+            color: white;
+        }
+
+        /* Delete Modal */
+        .delete-modal {
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .delete-icon {
+            font-size: 48px;
+            color: #C62828;
+            margin-bottom: 16px;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-2px); }
+        }
+
+        .delete-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 8px;
+        }
+
+        .delete-message {
+            font-size: 14px;
+            color: #64748B;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #8B0000;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(139,0,0,0.2);
+            z-index: 3000;
+            font-size: 14px;
+            font-weight: 500;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            border: 1px solid #FFFFFF;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: #2E7D32;
+        }
+
+        .toast.error {
+            background: #C62828;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #8B0000;
+            border-radius: 10px;
+        }
+
+        /* No scrolling on body */
+        html, body {
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Side Navigation - Black -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">🍳</div>
+                <div class="sidebar-title">
+                    <h2>Lyceum Kitchen</h2>
+                    <p>Admin Panel</p>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div class="sidebar-profile">
+                <div class="profile-card" onclick="toggleDropdown()">
+                    <div class="profile-avatar">MA</div>
+                    <div class="profile-details">
+                        <div class="profile-name">Maria Santos</div>
+                        <div class="profile-role">Administrator</div>
+                    </div>
+                    <div class="hamburger-btn">☰</div>
+                </div>
+
+                <!-- Profile Dropdown Menu -->
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-item" onclick="window.location.href='admin-profile.html'">
+                        <span>👤</span> My Profile
+                    </div>
+                    <div class="dropdown-item" onclick="window.location.href='admin-settings.html'">
+                        <span>⚙️</span> System Settings
+                    </div>
+                    <div class="dropdown-item" onclick="window.location.href='admin-audit.html'">
+                        <span>📋</span> Audit Trail
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="window.location.href='admin-backup.html'">
+                        <span>💾</span> Backup & Export
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="window.location.href='login.html'">
+                        <span>🚪</span> Logout
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <div class="nav-menu">
+                <div class="nav-item" onclick="window.location.href='admin-dashboard.html'">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-ingredients.html'">
+                    <span class="nav-icon">📦</span>
+                    <span class="nav-text">Ingredients</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-categories.html'">
+                    <span class="nav-icon">🏷️</span>
+                    <span class="nav-text">Categories</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-storage.html'">
+                    <span class="nav-icon">📍</span>
+                    <span class="nav-text">Storage</span>
+                </div>
+                <div class="nav-item active" onclick="window.location.href='admin-units.html'">
+                    <span class="nav-icon">⚖️</span>
+                    <span class="nav-text">Units</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-suppliers.html'">
+                    <span class="nav-icon">🏢</span>
+                    <span class="nav-text">Suppliers</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-purchases.html'">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">Purchases</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-users.html'">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-text">Users</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-reports.html'">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Reports</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-audit.html'">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-text">Audit</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-backup.html'">
+                    <span class="nav-icon">💾</span>
+                    <span class="nav-text">Backup</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1>Units of Measure</h1>
+                    <p>Manage measurement units</p>
+                </div>
+                <div class="top-right">
+                    <div class="notification" onclick="window.location.href='admin-notifications.html'">
+                        <i>🔔</i>
+                        <span class="notification-badge">5</span>
+                    </div>
+                    <div class="date-display" id="currentDate"></div>
+                </div>
+            </div>
+
+            <!-- Units Content -->
+            <div class="units-content">
+                <!-- Welcome Banner -->
+                <div class="welcome-banner">
+                    <div class="welcome-text">
+                        <h3>Units Management</h3>
+                        <p>Define and organize measurement units</p>
+                    </div>
+                    <div class="stats-badge" id="totalUnitsBadge">⚖️ 8 Units</div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">⚖️</div>
+                        <div class="stat-info">
+                            <h4>Total Units</h4>
+                            <div class="stat-number" id="totalUnits">8</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-info">
+                            <h4>Items Using</h4>
+                            <div class="stat-number" id="itemsUsing">156</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🔄</div>
+                        <div class="stat-info">
+                            <h4>Most Used</h4>
+                            <div class="stat-number" id="mostUsed">pcs</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Header Actions -->
+                <div class="header-actions">
+                    <h2>Measurement Units</h2>
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="openAddModal()">
+                            <span>➕</span> Add Unit
+                        </button>
+                        <button class="btn-secondary" onclick="exportUnits()">
+                            <span>📥</span> Export
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Units Grid -->
+                <div class="units-grid" id="unitsGrid">
+                    <!-- Units will be dynamically loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Unit Modal -->
+    <div class="modal" id="unitModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Unit of Measure</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i>📝</i> Unit Name</label>
+                        <input type="text" id="unitName" placeholder="e.g., Pieces">
+                    </div>
+                    <div class="form-group">
+                        <label><i>🔣</i> Symbol</label>
+                        <input type="text" id="unitSymbol" placeholder="e.g., pcs">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i>🏷️</i> Unit Type</label>
+                    <div class="unit-type-options" id="unitTypeOptions">
+                        <div class="type-option" onclick="selectUnitType('countable', this)">
+                            <span>🔢</span>
+                            <span>Countable</span>
+                            <small style="font-size: 10px;">pcs, pieces</small>
+                        </div>
+                        <div class="type-option" onclick="selectUnitType('weight', this)">
+                            <span>⚖️</span>
+                            <span>Weight</span>
+                            <small style="font-size: 10px;">kg, g, lb</small>
+                        </div>
+                        <div class="type-option" onclick="selectUnitType('volume', this)">
+                            <span>🧪</span>
+                            <span>Volume</span>
+                            <small style="font-size: 10px;">L, ml, gal</small>
+                        </div>
+                        <div class="type-option" onclick="selectUnitType('other', this)">
+                            <span>📏</span>
+                            <span>Other</span>
+                            <small style="font-size: 10px;">bags, bulbs</small>
+                        </div>
+                    </div>
+                    <input type="hidden" id="unitType" value="countable">
+                </div>
+
+                <div class="conversion-group" id="conversionGroup">
+                    <h4><i>🔄</i> Conversion to Base Unit</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>1 Unit =</label>
+                            <input type="number" id="conversionValue" value="1" min="0.001" step="0.001">
+                        </div>
+                        <div class="form-group">
+                            <label>Base Unit</label>
+                            <select id="baseUnit">
+                                <option value="pcs">Pieces (pcs)</option>
+                                <option value="kg">Kilograms (kg)</option>
+                                <option value="g">Grams (g)</option>
+                                <option value="L">Liters (L)</option>
+                                <option value="ml">Milliliters (ml)</option>
+                                <option value="unit">Unit</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i>📝</i> Description (Optional)</label>
+                    <textarea id="unitDesc" rows="2" placeholder="e.g., Standard unit for countable items"></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
+                <button class="modal-btn save" onclick="saveUnit()">Save Unit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content delete-modal">
+            <div class="delete-icon">⚠️</div>
+            <div class="delete-title">Delete Unit</div>
+            <div class="delete-message" id="deleteMessage">Are you sure you want to delete this unit? Items using this unit will need to be reassigned.</div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button class="modal-btn delete" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">Action completed successfully</div>
+
+    <script>
+        // ============================================
+        // UNITS OF MEASURE STATE MANAGEMENT
+        // ============================================
+        
+        let inventoryData = null;
+        let units = [];
+        let currentEditId = null;
+        let currentDeleteId = null;
+        let selectedUnitType = 'countable';
+
+        // Load inventory data
+        function loadInventoryData() {
+            const saved = localStorage.getItem('lyceum_inventory');
+            if (saved) {
+                try {
+                    inventoryData = JSON.parse(saved);
+                    // Initialize units if not present
+                    if (!inventoryData.units) {
+                        initializeDefaultUnits();
+                    } else {
+                        units = inventoryData.units;
+                    }
+                    updateUI();
+                } catch (e) {
+                    console.error('Error loading inventory:', e);
+                    initializeDefaultUnits();
+                }
+            } else {
+                initializeDefaultUnits();
+            }
+        }
+
+        // Initialize default units
+        function initializeDefaultUnits() {
+            units = [
+                { 
+                    id: 1, 
+                    name: 'Pieces', 
+                    symbol: 'pcs',
+                    type: 'countable',
+                    conversion: { value: 1, baseUnit: 'pcs' },
+                    description: 'Standard unit for countable items',
+                    icon: '🔢',
+                    itemCount: 45
+                },
+                { 
+                    id: 2, 
+                    name: 'Kilograms', 
+                    symbol: 'kg',
+                    type: 'weight',
+                    conversion: { value: 1, baseUnit: 'kg' },
+                    description: 'Metric weight unit',
+                    icon: '⚖️',
+                    itemCount: 32
+                },
+                { 
+                    id: 3, 
+                    name: 'Grams', 
+                    symbol: 'g',
+                    type: 'weight',
+                    conversion: { value: 1000, baseUnit: 'kg' },
+                    description: '1 kg = 1000 g',
+                    icon: '⚖️',
+                    itemCount: 18
+                },
+                { 
+                    id: 4, 
+                    name: 'Liters', 
+                    symbol: 'L',
+                    type: 'volume',
+                    conversion: { value: 1, baseUnit: 'L' },
+                    description: 'Metric volume unit',
+                    icon: '🧪',
+                    itemCount: 24
+                },
+                { 
+                    id: 5, 
+                    name: 'Milliliters', 
+                    symbol: 'ml',
+                    type: 'volume',
+                    conversion: { value: 1000, baseUnit: 'L' },
+                    description: '1 L = 1000 ml',
+                    icon: '🧪',
+                    itemCount: 15
+                },
+                { 
+                    id: 6, 
+                    name: 'Bags', 
+                    symbol: 'bags',
+                    type: 'other',
+                    conversion: { value: 1, baseUnit: 'bag' },
+                    description: 'For bulk items like rice',
+                    icon: '📦',
+                    itemCount: 12
+                },
+                { 
+                    id: 7, 
+                    name: 'Bulbs', 
+                    symbol: 'bulbs',
+                    type: 'other',
+                    conversion: { value: 1, baseUnit: 'bulb' },
+                    description: 'For garlic, onions',
+                    icon: '🧄',
+                    itemCount: 8
+                },
+                { 
+                    id: 8, 
+                    name: 'Bunches', 
+                    symbol: 'bunch',
+                    type: 'other',
+                    conversion: { value: 1, baseUnit: 'bunch' },
+                    description: 'For herbs, greens',
+                    icon: '🌿',
+                    itemCount: 2
+                }
+            ];
+            
+            if (!inventoryData) {
+                inventoryData = { units: units, ingredients: [] };
+            } else {
+                inventoryData.units = units;
+            }
+            saveToLocalStorage();
+        }
+
+        // Save to localStorage
+        function saveToLocalStorage() {
+            if (!inventoryData) {
+                inventoryData = { units: units, ingredients: [] };
+            } else {
+                inventoryData.units = units;
+            }
+            localStorage.setItem('lyceum_inventory', JSON.stringify(inventoryData));
+            
+            // Dispatch event for other pages
+            window.dispatchEvent(new CustomEvent('inventoryUpdated', { 
+                detail: inventoryData 
+            }));
+        }
+
+        // Update UI
+        function updateUI() {
+            updateStats();
+            renderUnits();
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('totalUnits').textContent = units.length;
+            document.getElementById('totalUnitsBadge').textContent = `⚖️ ${units.length} Units`;
+            
+            // Calculate total items from inventory
+            const totalItems = inventoryData?.ingredients?.filter(i => !i.archived)?.length || 156;
+            document.getElementById('itemsUsing').textContent = totalItems;
+            
+            // Find most used unit
+            const unitUsage = {};
+            inventoryData?.ingredients?.forEach(ing => {
+                if (ing.unit && !ing.archived) {
+                    unitUsage[ing.unit] = (unitUsage[ing.unit] || 0) + 1;
+                }
+            });
+            
+            let mostUsedUnit = 'pcs';
+            let maxCount = 0;
+            for (const [unit, count] of Object.entries(unitUsage)) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    mostUsedUnit = unit;
+                }
+            }
+            document.getElementById('mostUsed').textContent = mostUsedUnit;
+        }
+
+        // Get unit type class
+        function getUnitTypeClass(type) {
+            switch(type) {
+                case 'countable': return 'countable';
+                case 'weight': return 'weight';
+                case 'volume': return 'volume';
+                default: return 'other';
+            }
+        }
+
+        // Get unit type icon
+        function getUnitTypeIcon(type) {
+            switch(type) {
+                case 'countable': return '🔢';
+                case 'weight': return '⚖️';
+                case 'volume': return '🧪';
+                default: return '📏';
+            }
+        }
+
+        // Render units
+        function renderUnits() {
+            const grid = document.getElementById('unitsGrid');
+            
+            grid.innerHTML = units.map(unit => {
+                // Get items using this unit
+                const items = inventoryData?.ingredients?.filter(i => 
+                    i.unit === unit.symbol && !i.archived
+                ) || [];
+                
+                // Update item count
+                unit.itemCount = items.length;
+                
+                // Get preview items (first 5)
+                const previewItems = items.slice(0, 5);
+                
+                // Format conversion string
+                let conversionText = '';
+                if (unit.conversion.value !== 1 || unit.conversion.baseUnit !== unit.symbol) {
+                    conversionText = `1 ${unit.symbol} = ${unit.conversion.value} ${unit.conversion.baseUnit}`;
+                }
+                
+                return `
+                    <div class="unit-card" data-id="${unit.id}">
+                        <div class="unit-header">
+                            <div class="unit-icon-large">${unit.icon || getUnitTypeIcon(unit.type)}</div>
+                            <div class="unit-info">
+                                <h3>${unit.name}</h3>
+                                <div class="unit-symbol">${unit.symbol}</div>
+                                <div class="unit-meta">
+                                    <span class="unit-type-badge ${getUnitTypeClass(unit.type)}">${unit.type.charAt(0).toUpperCase() + unit.type.slice(1)}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="unit-stats">
+                            <div class="stat-item">
+                                <div class="label">Items Using</div>
+                                <div class="value">${items.length}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="label">Total Qty</div>
+                                <div class="value">${items.reduce((sum, i) => sum + i.currentStock, 0)} <small>${unit.symbol}</small></div>
+                            </div>
+                        </div>
+
+                        ${conversionText ? `
+                            <div class="conversion-info">
+                                <span class="conversion-value">1</span>
+                                <span class="conversion-unit">${unit.symbol}</span>
+                                <span class="conversion-arrow">→</span>
+                                <span class="conversion-value">${unit.conversion.value}</span>
+                                <span class="conversion-unit">${unit.conversion.baseUnit}</span>
+                            </div>
+                        ` : ''}
+
+                        ${previewItems.length > 0 ? `
+                            <div class="unit-items">
+                                <div class="item-preview">
+                                    ${previewItems.map(item => `
+                                        <span class="item-pill">
+                                            ${item.name}
+                                            <span class="item-quantity">${item.currentStock}</span>
+                                        </span>
+                                    `).join('')}
+                                    ${items.length > 5 ? `<span class="item-pill">+${items.length - 5} more</span>` : ''}
+                                </div>
+                            </div>
+                        ` : `
+                            <div class="unit-items">
+                                <p style="color: #A0AEC0; font-size: 12px; text-align: center; padding: 10px;">No items using this unit</p>
+                            </div>
+                        `}
+
+                        <div class="action-group">
+                            <button class="action-btn edit" onclick="editUnit(${unit.id})" title="Edit">✏️</button>
+                            <button class="action-btn delete" onclick="deleteUnit(${unit.id})" title="Delete">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================
+        // UNIT CRUD OPERATIONS
+        // ============================================
+
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add Unit of Measure';
+            document.getElementById('unitName').value = '';
+            document.getElementById('unitSymbol').value = '';
+            document.getElementById('unitDesc').value = '';
+            document.getElementById('conversionValue').value = '1';
+            
+            // Reset unit type selection
+            document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector('.type-option').classList.add('selected');
+            selectedUnitType = 'countable';
+            document.getElementById('unitType').value = 'countable';
+            
+            currentEditId = null;
+            document.getElementById('unitModal').classList.add('show');
+        }
+
+        function editUnit(id) {
+            const unit = units.find(u => u.id === id);
+            if (!unit) return;
+            
+            document.getElementById('modalTitle').textContent = 'Edit Unit of Measure';
+            document.getElementById('unitName').value = unit.name;
+            document.getElementById('unitSymbol').value = unit.symbol;
+            document.getElementById('unitDesc').value = unit.description || '';
+            document.getElementById('conversionValue').value = unit.conversion.value;
+            document.getElementById('baseUnit').value = unit.conversion.baseUnit;
+            
+            // Set unit type selection
+            document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('selected'));
+            const typeOption = Array.from(document.querySelectorAll('.type-option')).find(
+                opt => opt.innerText.includes(unit.type.charAt(0).toUpperCase() + unit.type.slice(1))
+            );
+            if (typeOption) typeOption.classList.add('selected');
+            selectedUnitType = unit.type;
+            document.getElementById('unitType').value = unit.type;
+            
+            currentEditId = id;
+            document.getElementById('unitModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('unitModal').classList.remove('show');
+        }
+
+        function selectUnitType(type, element) {
+            document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            document.getElementById('unitType').value = type;
+            selectedUnitType = type;
+            
+            // Update base unit options based on type
+            const baseUnitSelect = document.getElementById('baseUnit');
+            baseUnitSelect.innerHTML = '';
+            
+            if (type === 'countable') {
+                baseUnitSelect.innerHTML = '<option value="pcs">Pieces (pcs)</option><option value="unit">Unit</option>';
+            } else if (type === 'weight') {
+                baseUnitSelect.innerHTML = '<option value="kg">Kilograms (kg)</option><option value="g">Grams (g)</option><option value="lb">Pounds (lb)</option>';
+            } else if (type === 'volume') {
+                baseUnitSelect.innerHTML = '<option value="L">Liters (L)</option><option value="ml">Milliliters (ml)</option><option value="gal">Gallons (gal)</option>';
+            } else {
+                baseUnitSelect.innerHTML = '<option value="unit">Unit</option><option value="bag">Bag</option><option value="bulb">Bulb</option>';
+            }
+        }
+
+        function saveUnit() {
+            const name = document.getElementById('unitName').value.trim();
+            const symbol = document.getElementById('unitSymbol').value.trim();
+            
+            if (!name) {
+                showToast('Please enter a unit name', 'error');
+                return;
+            }
+            
+            if (!symbol) {
+                showToast('Please enter a unit symbol', 'error');
+                return;
+            }
+            
+            const conversionValue = parseFloat(document.getElementById('conversionValue').value) || 1;
+            const baseUnit = document.getElementById('baseUnit').value;
+            
+            const unitData = {
+                name: name,
+                symbol: symbol,
+                type: selectedUnitType,
+                conversion: {
+                    value: conversionValue,
+                    baseUnit: baseUnit
+                },
+                description: document.getElementById('unitDesc').value.trim(),
+                icon: getUnitTypeIcon(selectedUnitType),
+                itemCount: 0
+            };
+            
+            if (currentEditId) {
+                // Update existing unit
+                const index = units.findIndex(u => u.id === currentEditId);
+                if (index !== -1) {
+                    units[index] = { ...units[index], ...unitData };
+                    showToast('Unit updated successfully!', 'success');
+                }
+            } else {
+                // Add new unit
+                unitData.id = Date.now();
+                units.push(unitData);
+                showToast('Unit added successfully!', 'success');
+            }
+            
+            saveToLocalStorage();
+            updateUI();
+            closeModal();
+        }
+
+        function deleteUnit(id) {
+            const unit = units.find(u => u.id === id);
+            if (!unit) return;
+            
+            // Check if unit has items
+            const itemsUsingUnit = inventoryData?.ingredients?.filter(i => 
+                i.unit === unit.symbol && !i.archived
+            ) || [];
+            
+            if (itemsUsingUnit.length > 0) {
+                document.getElementById('deleteMessage').textContent = 
+                    `"${unit.name}" is used by ${itemsUsingUnit.length} items. Deleting this unit will require reassigning these items.`;
+            } else {
+                document.getElementById('deleteMessage').textContent = 
+                    `Are you sure you want to delete "${unit.name}"?`;
+            }
+            
+            currentDeleteId = id;
+            document.getElementById('deleteModal').classList.add('show');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('show');
+            currentDeleteId = null;
+        }
+
+        function confirmDelete() {
+            if (currentDeleteId) {
+                units = units.filter(u => u.id !== currentDeleteId);
+                saveToLocalStorage();
+                updateUI();
+                showToast('Unit deleted successfully!', 'success');
+                closeDeleteModal();
+            }
+        }
+
+        // Export units
+        function exportUnits() {
+            const dataStr = JSON.stringify(units, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = `units_export_${new Date().toISOString().slice(0,10)}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showToast('Units exported successfully!', 'success');
+        }
+
+        // Toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            
+            if (type === 'success') {
+                toast.style.background = '#2E7D32';
+            } else if (type === 'error') {
+                toast.style.background = '#C62828';
+            } else {
+                toast.style.background = '#8B0000';
+            }
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Toggle profile dropdown
+        function toggleDropdown() {
+            document.getElementById('profileDropdown').classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.profile-card') && !event.target.matches('.profile-avatar') && !event.target.matches('.profile-details') && !event.target.matches('.profile-name') && !event.target.matches('.profile-role') && !event.target.matches('.hamburger-btn')) {
+                const dropdowns = document.getElementsByClassName('profile-dropdown');
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        };
+
+        // Display current date
+        function updateDate() {
+            const now = new Date();
+            const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        // Listen for updates from other pages
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'lyceum_inventory') {
+                loadInventoryData();
+                showToast('Inventory updated from another page', 'info');
+            }
+        });
+
+        window.addEventListener('inventoryUpdated', function(e) {
+            inventoryData = e.detail;
+            units = inventoryData.units || units;
+            updateUI();
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInventoryData();
+            updateDate();
+        });
+    </script>
+</body>
+</html>

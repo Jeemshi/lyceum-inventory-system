@@ -1,0 +1,2128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyceum Kitchen - Admin Ingredients</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #F8FAFC;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        /* Main Layout */
+        .app {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background: #F8FAFC;
+        }
+
+        /* Side Navigation - Black */
+        .sidebar {
+            width: 280px;
+            background: #000000;
+            border-right: 1px solid #333333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            padding: 28px 24px;
+            border-bottom: 1px solid #333333;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .sidebar-logo {
+            font-size: 32px;
+            background: #8B0000;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            color: #FFFFFF;
+            box-shadow: 0 8px 16px rgba(139,0,0,0.3);
+        }
+
+        .sidebar-title h2 {
+            font-size: 18px;
+            color: #FFFFFF;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar-title p {
+            font-size: 12px;
+            color: #B0B0B0;
+            font-weight: 400;
+        }
+
+        /* Profile Section */
+        .sidebar-profile {
+            padding: 20px 24px;
+            border-bottom: 1px solid #333333;
+            position: relative;
+        }
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: #1A1A1A;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #333333;
+        }
+
+        .profile-card:hover {
+            background: #222222;
+            border-color: #8B0000;
+        }
+
+        .profile-avatar {
+            width: 48px;
+            height: 48px;
+            background: #8B0000;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            font-weight: 600;
+            font-size: 18px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .profile-details {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 4px;
+            letter-spacing: -0.2px;
+        }
+
+        .profile-role {
+            font-size: 12px;
+            color: #8B0000;
+            font-weight: 600;
+        }
+
+        .hamburger-btn {
+            width: 36px;
+            height: 36px;
+            background: #1A1A1A;
+            border: 1px solid #333333;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #FFFFFF;
+        }
+
+        .hamburger-btn:hover {
+            background: #8B0000;
+            border-color: #8B0000;
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: absolute;
+            top: 100px;
+            left: 24px;
+            right: 24px;
+            background: #1A1A1A;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+            border: 1px solid #333333;
+        }
+
+        .profile-dropdown.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #FFFFFF;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 1px solid #333333;
+        }
+
+        .dropdown-item:hover {
+            background: #8B0000;
+        }
+
+        .dropdown-item span:first-child {
+            font-size: 18px;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #333333;
+            margin: 4px 0;
+        }
+
+        .badge {
+            margin-left: auto;
+            background: #8B0000;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 16px;
+            color: #B0B0B0;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: #1A1A1A;
+            color: #FFFFFF;
+        }
+
+        .nav-item.active {
+            background: #8B0000;
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-text {
+            font-size: 14px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background: #F8FAFC;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 80px;
+            background: white;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            flex-shrink: 0;
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            color: #1A1A1A;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .page-title p {
+            font-size: 13px;
+            color: #64748B;
+            font-weight: 400;
+        }
+
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .notification {
+            position: relative;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            background: #F8FAFC;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .notification:hover {
+            background: #FEE9E9;
+        }
+
+        .notification i {
+            font-size: 20px;
+            color: #4A5568;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #8B0000;
+            color: white;
+            font-size: 10px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 2px solid white;
+            font-weight: 600;
+        }
+
+        .date-display {
+            background: #F8FAFC;
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid #E5E7EB;
+        }
+
+        /* Ingredients Content */
+        .ingredients-content {
+            flex: 1;
+            padding: 24px 28px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(145deg, #8B0000, #4A0000);
+            border-radius: 20px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .welcome-text h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .welcome-text p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .stats-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Quick Stats */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 24px;
+            flex-shrink: 0;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 18px;
+            padding: 16px;
+            border: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            background: #FEE9E9;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #8B0000;
+        }
+
+        .stat-info h4 {
+            font-size: 13px;
+            color: #64748B;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .stat-number {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        /* Header Actions */
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            flex-shrink: 0;
+        }
+
+        .header-actions h2 {
+            font-size: 20px;
+            color: #1A1A1A;
+            font-weight: 700;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            background: #8B0000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #9A0000;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #1A1A1A;
+            border: 1px solid #E5E7EB;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary:hover {
+            border-color: #8B0000;
+            color: #8B0000;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            background: white;
+            padding: 4px;
+            border-radius: 40px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .filter-tab {
+            padding: 8px 18px;
+            background: transparent;
+            border: none;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #64748B;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-tab:hover {
+            color: #8B0000;
+        }
+
+        .filter-tab.active {
+            background: #8B0000;
+            color: white;
+        }
+
+        .search-box {
+            position: relative;
+            width: 280px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 10px 10px 38px;
+            border: 1px solid #E5E7EB;
+            border-radius: 30px;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .search-box input:focus {
+            border-color: #8B0000;
+            outline: none;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 15px;
+            color: #8B0000;
+        }
+
+        /* Category Cards */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-card:hover {
+            border-color: #8B0000;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(139,0,0,0.05);
+        }
+
+        .category-icon {
+            width: 44px;
+            height: 44px;
+            background: #F8FAFC;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .category-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .category-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+
+        .category-info p {
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .item-count {
+            background: #FEE9E9;
+            color: #8B0000;
+            padding: 4px 8px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* Ingredients Table */
+        .table-container {
+            background: white;
+            border-radius: 18px;
+            border: 1px solid #E5E7EB;
+            overflow: hidden;
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #E5E7EB;
+            background: #F8FAFC;
+        }
+
+        .table-header h3 {
+            font-size: 15px;
+            color: #1A1A1A;
+            font-weight: 600;
+        }
+
+        .table-stats {
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .table-wrapper {
+            overflow-y: auto;
+            flex: 1;
+            min-height: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 14px 20px;
+            background: #F8FAFC;
+            color: #64748B;
+            font-weight: 600;
+            font-size: 12px;
+            border-bottom: 1px solid #E5E7EB;
+            position: sticky;
+            top: 0;
+            background: #F8FAFC;
+        }
+
+        td {
+            padding: 14px 20px;
+            border-bottom: 1px solid #F0F0F0;
+            font-size: 13px;
+            color: #1A1A1A;
+        }
+
+        tr:hover td {
+            background: #F8FAFC;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-good {
+            background: #E6F7E6;
+            color: #2E7D32;
+        }
+
+        .status-warning {
+            background: #FFF3E0;
+            color: #F57C00;
+        }
+
+        .status-expired {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .status-low {
+            background: #E3F2FD;
+            color: #1976D2;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 6px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 8px;
+            background: #F8FAFC;
+            color: #64748B;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #E5E7EB;
+        }
+
+        .action-btn:hover {
+            background: #8B0000;
+            color: white;
+            border-color: #8B0000;
+        }
+
+        .action-btn.edit:hover {
+            background: #1976D2;
+            border-color: #1976D2;
+        }
+
+        .action-btn.archive:hover {
+            background: #F57C00;
+            border-color: #F57C00;
+        }
+
+        .action-btn.delete:hover {
+            background: #C62828;
+            border-color: #C62828;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 28px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #8B0000;
+        }
+
+        .modal-header h2 {
+            font-size: 22px;
+            color: #8B0000;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #64748B;
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #8B0000;
+            outline: none;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .checkbox-group input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #8B0000;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn.save {
+            background: #8B0000;
+            color: white;
+        }
+
+        .modal-btn.save:hover {
+            background: #9A0000;
+        }
+
+        .modal-btn.cancel {
+            background: #F0F0F0;
+            color: #666;
+        }
+
+        .modal-btn.cancel:hover {
+            background: #E0E0E0;
+        }
+
+        .modal-btn.delete {
+            background: #C62828;
+            color: white;
+        }
+
+        .delete-modal {
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .delete-icon {
+            font-size: 48px;
+            color: #C62828;
+            margin-bottom: 16px;
+        }
+
+        .delete-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 8px;
+        }
+
+        .delete-message {
+            font-size: 14px;
+            color: #64748B;
+            margin-bottom: 24px;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #8B0000;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(139,0,0,0.2);
+            z-index: 3000;
+            font-size: 14px;
+            font-weight: 500;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            border: 1px solid #FFFFFF;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: #2E7D32;
+        }
+
+        .toast.error {
+            background: #C62828;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #8B0000;
+            border-radius: 10px;
+        }
+
+        /* No scrolling on body */
+        html, body {
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Side Navigation - Black -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">🍳</div>
+                <div class="sidebar-title">
+                    <h2>Lyceum Kitchen</h2>
+                    <p>Admin Panel</p>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div class="sidebar-profile">
+                <div class="profile-card" onclick="toggleDropdown()">
+                    <div class="profile-avatar">MA</div>
+                    <div class="profile-details">
+                        <div class="profile-name">Maria Santos</div>
+                        <div class="profile-role">Administrator</div>
+                    </div>
+                    <div class="hamburger-btn">☰</div>
+                </div>
+
+                <!-- Profile Dropdown Menu -->
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-item" onclick="window.location.href='admin-profile.html'">
+                        <span>👤</span> My Profile
+                    </div>
+                    <div class="dropdown-item" onclick="window.location.href='admin-settings.html'">
+                        <span>⚙️</span> System Settings
+                    </div>
+                    <div class="dropdown-item" onclick="window.location.href='admin-audit.html'">
+                        <span>📋</span> Audit Trail
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="window.location.href='admin-backup.html'">
+                        <span>💾</span> Backup & Export
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="window.location.href='login.html'">
+                        <span>🚪</span> Logout
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <div class="nav-menu">
+                <div class="nav-item" onclick="window.location.href='admin-dashboard.html'">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </div>
+                <div class="nav-item active" onclick="window.location.href='admin-ingredients.html'">
+                    <span class="nav-icon">📦</span>
+                    <span class="nav-text">Ingredients</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-categories.html'">
+                    <span class="nav-icon">🏷️</span>
+                    <span class="nav-text">Categories</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-storage.html'">
+                    <span class="nav-icon">📍</span>
+                    <span class="nav-text">Storage</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-units.html'">
+                    <span class="nav-icon">⚖️</span>
+                    <span class="nav-text">Units</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-suppliers.html'">
+                    <span class="nav-icon">🏢</span>
+                    <span class="nav-text">Suppliers</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-purchases.html'">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">Purchases</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-users.html'">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-text">Users</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-reports.html'">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Reports</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-audit.html'">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-text">Audit</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin-backup.html'">
+                    <span class="nav-icon">💾</span>
+                    <span class="nav-text">Backup</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1>Ingredients</h1>
+                    <p>Manage your ingredient inventory</p>
+                </div>
+                <div class="top-right">
+                    <div class="notification" onclick="window.location.href='admin-notifications.html'">
+                        <i>🔔</i>
+                        <span class="notification-badge">5</span>
+                    </div>
+                    <div class="date-display" id="currentDate"></div>
+                </div>
+            </div>
+
+            <!-- Ingredients Content -->
+            <div class="ingredients-content">
+                <!-- Welcome Banner -->
+                <div class="welcome-banner">
+                    <div class="welcome-text">
+                        <h3>Ingredient Management</h3>
+                        <p>Add, edit, archive, or delete ingredient records</p>
+                    </div>
+                    <div class="stats-badge" id="totalItemsBadge">📦 156 Total Items</div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-info">
+                            <h4>Active</h4>
+                            <div class="stat-number" id="activeCount">142</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⚠️</div>
+                        <div class="stat-info">
+                            <h4>Low Stock</h4>
+                            <div class="stat-number" id="lowStockCount">12</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏰</div>
+                        <div class="stat-info">
+                            <h4>Expiring</h4>
+                            <div class="stat-number" id="expiringCount">8</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-info">
+                            <h4>Archived</h4>
+                            <div class="stat-number" id="archivedCount">14</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Header Actions -->
+                <div class="header-actions">
+                    <h2>Ingredient Records</h2>
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="openAddModal()">
+                            <span>➕</span> Add New
+                        </button>
+                        <button class="btn-secondary" onclick="exportIngredients()">
+                            <span>📥</span> Export
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <div class="filter-tabs">
+                        <span class="filter-tab active" onclick="filterIngredients('all', this)">All</span>
+                        <span class="filter-tab" onclick="filterIngredients('active', this)">Active</span>
+                        <span class="filter-tab" onclick="filterIngredients('archived', this)">Archived</span>
+                        <span class="filter-tab" onclick="filterIngredients('low', this)">Low Stock</span>
+                        <span class="filter-tab" onclick="filterIngredients('expiring', this)">Expiring</span>
+                    </div>
+                    <div class="search-box">
+                        <i>🔍</i>
+                        <input type="text" placeholder="Search ingredients..." id="searchInput" onkeyup="searchIngredients()">
+                    </div>
+                </div>
+
+                <!-- Category Cards -->
+                <div class="category-grid" id="categoryGrid">
+                    <div class="category-card" onclick="filterByCategory('vegetables', this)">
+                        <div class="category-icon">🥕</div>
+                        <div class="category-info">
+                            <h4>Vegetables</h4>
+                            <p id="vegCount">32 items</p>
+                        </div>
+                        <span class="item-count" id="vegBadge">32</span>
+                    </div>
+                    <div class="category-card" onclick="filterByCategory('meat', this)">
+                        <div class="category-icon">🥩</div>
+                        <div class="category-info">
+                            <h4>Meat</h4>
+                            <p id="meatCount">28 items</p>
+                        </div>
+                        <span class="item-count" id="meatBadge">28</span>
+                    </div>
+                    <div class="category-card" onclick="filterByCategory('dairy', this)">
+                        <div class="category-icon">🧀</div>
+                        <div class="category-info">
+                            <h4>Dairy</h4>
+                            <p id="dairyCount">24 items</p>
+                        </div>
+                        <span class="item-count" id="dairyBadge">24</span>
+                    </div>
+                    <div class="category-card" onclick="filterByCategory('seafood', this)">
+                        <div class="category-icon">🐟</div>
+                        <div class="category-info">
+                            <h4>Seafood</h4>
+                            <p id="seafoodCount">18 items</p>
+                        </div>
+                        <span class="item-count" id="seafoodBadge">18</span>
+                    </div>
+                    <div class="category-card" onclick="filterByCategory('grains', this)">
+                        <div class="category-icon">🌾</div>
+                        <div class="category-info">
+                            <h4>Grains</h4>
+                            <p id="grainsCount">22 items</p>
+                        </div>
+                        <span class="item-count" id="grainsBadge">22</span>
+                    </div>
+                </div>
+
+                <!-- Ingredients Table -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>All Ingredients</h3>
+                        <span class="table-stats" id="tableStats">Showing 1-15 of 156 items</span>
+                    </div>
+                    <div class="table-wrapper">
+                        <table id="ingredientsTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Stock</th>
+                                    <th>Unit</th>
+                                    <th>Min</th>
+                                    <th>Expiry</th>
+                                    <th>Storage</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <!-- Dynamic content will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Ingredient Modal -->
+    <div class="modal" id="ingredientModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Ingredient</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ingredient Name</label>
+                        <input type="text" id="ingredientName" placeholder="e.g., Tomatoes">
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="ingredientCategory">
+                            <option value="">Select Category</option>
+                            <option value="vegetables">Vegetables</option>
+                            <option value="meat">Meat</option>
+                            <option value="dairy">Dairy</option>
+                            <option value="seafood">Seafood</option>
+                            <option value="grains">Grains</option>
+                            <option value="spices">Spices</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Current Stock</label>
+                        <input type="number" id="currentStock" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Unit</label>
+                        <select id="unitMeasure">
+                            <option value="pcs">Pieces (pcs)</option>
+                            <option value="kg">Kilograms (kg)</option>
+                            <option value="g">Grams (g)</option>
+                            <option value="L">Liters (L)</option>
+                            <option value="ml">Milliliters (ml)</option>
+                            <option value="bags">Bags</option>
+                            <option value="bulbs">Bulbs</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Min Threshold</label>
+                        <input type="number" id="minThreshold" placeholder="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Storage</label>
+                        <select id="storageLocation">
+                            <option value="">Select Location</option>
+                            <option value="Fridge A">Fridge A</option>
+                            <option value="Fridge B">Fridge B</option>
+                            <option value="Freezer">Freezer</option>
+                            <option value="Dry Storage">Dry Storage</option>
+                            <option value="Pantry">Pantry</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Expiry Date</label>
+                        <input type="date" id="expiryDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Supplier</label>
+                        <select id="supplier">
+                            <option value="">Select Supplier</option>
+                            <option value="Fresh Farms">Fresh Farms</option>
+                            <option value="Meat Masters">Meat Masters</option>
+                            <option value="Dairy Delights">Dairy Delights</option>
+                            <option value="Seafood Direct">Seafood Direct</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cost per Unit (₱)</label>
+                        <input type="number" id="cost" placeholder="0" min="0" step="0.01">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="notes" rows="3" placeholder="Additional information..."></textarea>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="active" checked>
+                    <label for="active">Active (visible in inventory)</label>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
+                <button class="modal-btn save" onclick="saveIngredient()">Save Ingredient</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content delete-modal">
+            <div class="delete-icon">⚠️</div>
+            <div class="delete-title">Delete Ingredient</div>
+            <div class="delete-message" id="deleteMessage">Are you sure you want to delete this ingredient? This action cannot be undone.</div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button class="modal-btn delete" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Archive Confirmation Modal -->
+    <div class="modal" id="archiveModal">
+        <div class="modal-content delete-modal">
+            <div class="delete-icon">📦</div>
+            <div class="delete-title">Archive Ingredient</div>
+            <div class="delete-message" id="archiveMessage">Are you sure you want to archive this ingredient? It will be hidden from regular inventory views.</div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeArchiveModal()">Cancel</button>
+                <button class="modal-btn save" onclick="confirmArchive()">Archive</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">Action completed successfully</div>
+
+    <script>
+        // ============================================
+        // INVENTORY STATE MANAGEMENT
+        // ============================================
+        
+        // Global inventory data structure
+        let inventoryData = {
+            ingredients: [],
+            categories: [],
+            suppliers: [],
+            stats: {
+                totalItems: 0,
+                activeItems: 0,
+                lowStock: 0,
+                expiringSoon: 0,
+                expired: 0,
+                totalValue: 0
+            },
+            lastUpdated: new Date().toISOString()
+        };
+
+        let currentEditId = null;
+        let currentDeleteId = null;
+        let currentArchiveId = null;
+        let currentFilter = 'all';
+        let currentCategory = 'all';
+        let searchTerm = '';
+
+        // Load inventory from localStorage on page load
+        function loadInventory() {
+            const saved = localStorage.getItem('lyceum_inventory');
+            if (saved) {
+                try {
+                    inventoryData = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Error loading inventory:', e);
+                    initializeDefaultData();
+                }
+            } else {
+                initializeDefaultData();
+            }
+            updateUIFromData();
+        }
+
+        // Initialize with default data if none exists
+        function initializeDefaultData() {
+            inventoryData.ingredients = [
+                {
+                    id: 1,
+                    name: 'Tomatoes',
+                    category: 'vegetables',
+                    currentStock: 24,
+                    unit: 'pcs',
+                    minThreshold: 10,
+                    expiryDate: '2024-01-20',
+                    storage: 'Fridge A',
+                    supplier: 'Fresh Farms',
+                    notes: 'Roma tomatoes, best for sauces',
+                    active: true,
+                    archived: false,
+                    cost: 25,
+                    lastUpdated: new Date().toISOString()
+                },
+                {
+                    id: 2,
+                    name: 'Chicken Breast',
+                    category: 'meat',
+                    currentStock: 8,
+                    unit: 'pcs',
+                    minThreshold: 15,
+                    expiryDate: '2024-01-15',
+                    storage: 'Freezer',
+                    supplier: 'Meat Masters',
+                    notes: 'Boneless, skinless',
+                    active: true,
+                    archived: false,
+                    cost: 120,
+                    lastUpdated: new Date().toISOString()
+                },
+                {
+                    id: 3,
+                    name: 'Fresh Milk',
+                    category: 'dairy',
+                    currentStock: 12,
+                    unit: 'pcs',
+                    minThreshold: 20,
+                    expiryDate: '2024-01-25',
+                    storage: 'Fridge B',
+                    supplier: 'Dairy Delights',
+                    notes: 'Whole milk, 1L cartons',
+                    active: true,
+                    archived: false,
+                    cost: 65,
+                    lastUpdated: new Date().toISOString()
+                },
+                {
+                    id: 4,
+                    name: 'White Rice',
+                    category: 'grains',
+                    currentStock: 25,
+                    unit: 'bags',
+                    minThreshold: 10,
+                    expiryDate: '2024-06-30',
+                    storage: 'Dry Storage',
+                    supplier: 'Fresh Farms',
+                    notes: 'Jasmine rice, 5kg bags',
+                    active: true,
+                    archived: false,
+                    cost: 250,
+                    lastUpdated: new Date().toISOString()
+                },
+                {
+                    id: 5,
+                    name: 'Onions',
+                    category: 'vegetables',
+                    currentStock: 3,
+                    unit: 'pcs',
+                    minThreshold: 10,
+                    expiryDate: '2024-02-10',
+                    storage: 'Dry Storage',
+                    supplier: 'Fresh Farms',
+                    notes: 'Yellow onions',
+                    active: true,
+                    archived: false,
+                    cost: 25,
+                    lastUpdated: new Date().toISOString()
+                },
+                {
+                    id: 6,
+                    name: 'Salmon Fillet',
+                    category: 'seafood',
+                    currentStock: 6,
+                    unit: 'pcs',
+                    minThreshold: 10,
+                    expiryDate: '2024-01-22',
+                    storage: 'Freezer',
+                    supplier: 'Seafood Direct',
+                    notes: 'Atlantic salmon, portion-cut',
+                    active: true,
+                    archived: false,
+                    cost: 180,
+                    lastUpdated: new Date().toISOString()
+                },
+                {
+                    id: 7,
+                    name: 'Cheddar Cheese',
+                    category: 'dairy',
+                    currentStock: 8,
+                    unit: 'pcs',
+                    minThreshold: 12,
+                    expiryDate: '2024-01-18',
+                    storage: 'Fridge A',
+                    supplier: 'Dairy Delights',
+                    notes: 'Sharp cheddar',
+                    active: true,
+                    archived: false,
+                    cost: 120,
+                    lastUpdated: new Date().toISOString()
+                },
+                {
+                    id: 8,
+                    name: 'Garlic',
+                    category: 'spices',
+                    currentStock: 2,
+                    unit: 'bulbs',
+                    minThreshold: 5,
+                    expiryDate: '2024-03-15',
+                    storage: 'Pantry',
+                    supplier: 'Fresh Farms',
+                    notes: 'Fresh garlic bulbs',
+                    active: true,
+                    archived: false,
+                    cost: 15,
+                    lastUpdated: new Date().toISOString()
+                },
+                {
+                    id: 9,
+                    name: 'Bell Peppers',
+                    category: 'vegetables',
+                    currentStock: 15,
+                    unit: 'pcs',
+                    minThreshold: 8,
+                    expiryDate: '2024-01-28',
+                    storage: 'Fridge A',
+                    supplier: 'Fresh Farms',
+                    notes: 'Mixed colors',
+                    active: true,
+                    archived: false,
+                    cost: 30,
+                    lastUpdated: new Date().toISOString()
+                },
+                {
+                    id: 10,
+                    name: 'Ground Beef',
+                    category: 'meat',
+                    currentStock: 5,
+                    unit: 'kg',
+                    minThreshold: 8,
+                    expiryDate: '2024-01-19',
+                    storage: 'Freezer',
+                    supplier: 'Meat Masters',
+                    notes: '80/20 lean',
+                    active: true,
+                    archived: false,
+                    cost: 280,
+                    lastUpdated: new Date().toISOString()
+                },
+                {
+                    id: 11,
+                    name: 'Yogurt',
+                    category: 'dairy',
+                    currentStock: 7,
+                    unit: 'pcs',
+                    minThreshold: 10,
+                    expiryDate: '2024-01-21',
+                    storage: 'Fridge B',
+                    supplier: 'Dairy Delights',
+                    notes: 'Greek yogurt',
+                    active: true,
+                    archived: false,
+                    cost: 55,
+                    lastUpdated: new Date().toISOString()
+                },
+                {
+                    id: 12,
+                    name: 'Brown Rice',
+                    category: 'grains',
+                    currentStock: 8,
+                    unit: 'bags',
+                    minThreshold: 5,
+                    expiryDate: '2024-05-20',
+                    storage: 'Dry Storage',
+                    supplier: 'Fresh Farms',
+                    notes: '5kg bags',
+                    active: true,
+                    archived: false,
+                    cost: 220,
+                    lastUpdated: new Date().toISOString()
+                },
+                {
+                    id: 13,
+                    name: 'Shrimp',
+                    category: 'seafood',
+                    currentStock: 4,
+                    unit: 'kg',
+                    minThreshold: 6,
+                    expiryDate: '2024-01-16',
+                    storage: 'Freezer',
+                    supplier: 'Seafood Direct',
+                    notes: 'Medium size, peeled',
+                    active: true,
+                    archived: false,
+                    cost: 320,
+                    lastUpdated: new Date().toISOString()
+                },
+                {
+                    id: 14,
+                    name: 'Potatoes',
+                    category: 'vegetables',
+                    currentStock: 30,
+                    unit: 'pcs',
+                    minThreshold: 15,
+                    expiryDate: '2024-02-15',
+                    storage: 'Dry Storage',
+                    supplier: 'Fresh Farms',
+                    notes: 'Russet potatoes',
+                    active: true,
+                    archived: false,
+                    cost: 20,
+                    lastUpdated: new Date().toISOString()
+                },
+                {
+                    id: 15,
+                    name: 'Oregano',
+                    category: 'spices',
+                    currentStock: 12,
+                    unit: 'pcs',
+                    minThreshold: 5,
+                    expiryDate: '2024-08-10',
+                    storage: 'Pantry',
+                    supplier: 'Fresh Farms',
+                    notes: 'Dried',
+                    active: true,
+                    archived: false,
+                    cost: 12,
+                    lastUpdated: new Date().toISOString()
+                }
+            ];
+
+            inventoryData.categories = [
+                { id: 1, name: 'vegetables', display: 'Vegetables', icon: '🥕', count: 0 },
+                { id: 2, name: 'meat', display: 'Meat', icon: '🥩', count: 0 },
+                { id: 3, name: 'dairy', display: 'Dairy', icon: '🧀', count: 0 },
+                { id: 4, name: 'seafood', display: 'Seafood', icon: '🐟', count: 0 },
+                { id: 5, name: 'grains', display: 'Grains', icon: '🌾', count: 0 },
+                { id: 6, name: 'spices', display: 'Spices', icon: '🧂', count: 0 }
+            ];
+
+            inventoryData.suppliers = [
+                { id: 1, name: 'Fresh Farms', orders: 0 },
+                { id: 2, name: 'Meat Masters', orders: 0 },
+                { id: 3, name: 'Dairy Delights', orders: 0 },
+                { id: 4, name: 'Seafood Direct', orders: 0 }
+            ];
+
+            updateInventoryStats();
+            saveInventory();
+        }
+
+        // Update all statistics
+        function updateInventoryStats() {
+            const ingredients = inventoryData.ingredients.filter(i => !i.archived);
+            const today = new Date();
+            const sevenDaysFromNow = new Date();
+            sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
+            
+            inventoryData.stats.totalItems = ingredients.length;
+            inventoryData.stats.activeItems = ingredients.filter(i => i.active).length;
+            
+            // Calculate low stock
+            inventoryData.stats.lowStock = ingredients.filter(i => 
+                i.currentStock <= i.minThreshold
+            ).length;
+            
+            // Calculate expiring soon (within 7 days)
+            inventoryData.stats.expiringSoon = ingredients.filter(i => {
+                const expiry = new Date(i.expiryDate);
+                return expiry > today && expiry <= sevenDaysFromNow;
+            }).length;
+            
+            // Calculate expired
+            inventoryData.stats.expired = ingredients.filter(i => {
+                const expiry = new Date(i.expiryDate);
+                return expiry < today;
+            }).length;
+            
+            // Calculate total value
+            inventoryData.stats.totalValue = ingredients.reduce((sum, i) => 
+                sum + (i.currentStock * (i.cost || 0)), 0
+            );
+            
+            // Update category counts
+            inventoryData.categories.forEach(cat => {
+                cat.count = ingredients.filter(i => 
+                    i.category === cat.name
+                ).length;
+            });
+            
+            // Update supplier order counts
+            inventoryData.suppliers.forEach(sup => {
+                sup.orders = ingredients.filter(i => 
+                    i.supplier === sup.name
+                ).length;
+            });
+            
+            inventoryData.lastUpdated = new Date().toISOString();
+        }
+
+        // Save inventory to localStorage and dispatch events
+        function saveInventory() {
+            updateInventoryStats();
+            localStorage.setItem('lyceum_inventory', JSON.stringify(inventoryData));
+            
+            // Dispatch custom event for other pages to listen
+            window.dispatchEvent(new CustomEvent('inventoryUpdated', { 
+                detail: inventoryData 
+            }));
+        }
+
+        // Update UI from current data
+        function updateUIFromData() {
+            updateStatsCards();
+            updateCategoryCards();
+            filterAndDisplayIngredients();
+        }
+
+        // Update stats cards
+        function updateStatsCards() {
+            const stats = inventoryData.stats;
+            const archivedCount = inventoryData.ingredients.filter(i => i.archived).length;
+            
+            document.getElementById('activeCount').textContent = stats.activeItems;
+            document.getElementById('lowStockCount').textContent = stats.lowStock;
+            document.getElementById('expiringCount').textContent = stats.expiringSoon;
+            document.getElementById('archivedCount').textContent = archivedCount;
+            document.getElementById('totalItemsBadge').textContent = `📦 ${stats.totalItems} Total Items`;
+        }
+
+        // Update category cards with counts
+        function updateCategoryCards() {
+            const categories = {
+                'vegetables': { countEl: document.getElementById('vegCount'), badgeEl: document.getElementById('vegBadge') },
+                'meat': { countEl: document.getElementById('meatCount'), badgeEl: document.getElementById('meatBadge') },
+                'dairy': { countEl: document.getElementById('dairyCount'), badgeEl: document.getElementById('dairyBadge') },
+                'seafood': { countEl: document.getElementById('seafoodCount'), badgeEl: document.getElementById('seafoodBadge') },
+                'grains': { countEl: document.getElementById('grainsCount'), badgeEl: document.getElementById('grainsBadge') }
+            };
+            
+            inventoryData.categories.forEach(cat => {
+                if (categories[cat.name]) {
+                    categories[cat.name].countEl.textContent = `${cat.count} items`;
+                    categories[cat.name].badgeEl.textContent = cat.count;
+                }
+            });
+        }
+
+        // Filter and display ingredients based on current filters
+        function filterAndDisplayIngredients() {
+            let filtered = inventoryData.ingredients;
+            
+            // Apply archive filter
+            if (currentFilter === 'active') {
+                filtered = filtered.filter(i => i.active && !i.archived);
+            } else if (currentFilter === 'archived') {
+                filtered = filtered.filter(i => i.archived);
+            } else if (currentFilter === 'low') {
+                filtered = filtered.filter(i => !i.archived && i.currentStock <= i.minThreshold);
+            } else if (currentFilter === 'expiring') {
+                const today = new Date();
+                const sevenDaysFromNow = new Date();
+                sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
+                filtered = filtered.filter(i => {
+                    if (i.archived) return false;
+                    const expiry = new Date(i.expiryDate);
+                    return expiry > today && expiry <= sevenDaysFromNow;
+                });
+            } else {
+                filtered = filtered.filter(i => !i.archived);
+            }
+            
+            // Apply category filter
+            if (currentCategory !== 'all') {
+                filtered = filtered.filter(i => i.category === currentCategory);
+            }
+            
+            // Apply search
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                filtered = filtered.filter(i => 
+                    i.name.toLowerCase().includes(term) || 
+                    i.category.toLowerCase().includes(term) ||
+                    i.supplier?.toLowerCase().includes(term)
+                );
+            }
+            
+            displayIngredients(filtered);
+            updateTableStats(filtered.length);
+        }
+
+        // Display ingredients in table
+        function displayIngredients(ingredients) {
+            const tbody = document.getElementById('tableBody');
+            const today = new Date();
+            const sevenDaysFromNow = new Date();
+            sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
+            
+            tbody.innerHTML = ingredients.map(ing => {
+                let statusClass = 'status-good';
+                let statusText = 'Good';
+                
+                const expiry = new Date(ing.expiryDate);
+                
+                if (expiry < today) {
+                    statusClass = 'status-expired';
+                    statusText = 'Expired';
+                } else if (expiry <= sevenDaysFromNow) {
+                    statusClass = 'status-warning';
+                    statusText = 'Expiring';
+                } else if (ing.currentStock <= ing.minThreshold) {
+                    statusClass = 'status-low';
+                    statusText = 'Low Stock';
+                }
+                
+                return `
+                    <tr data-id="${ing.id}">
+                        <td><strong>${ing.name}</strong></td>
+                        <td>${ing.category.charAt(0).toUpperCase() + ing.category.slice(1)}</td>
+                        <td>${ing.currentStock}</td>
+                        <td>${ing.unit}</td>
+                        <td>${ing.minThreshold}</td>
+                        <td>${ing.expiryDate}</td>
+                        <td>${ing.storage}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <div class="action-group">
+                                <button class="action-btn edit" onclick="editIngredient(${ing.id})" title="Edit">✏️</button>
+                                <button class="action-btn archive" onclick="archiveIngredient(${ing.id})" title="Archive">📦</button>
+                                <button class="action-btn delete" onclick="deleteIngredient(${ing.id})" title="Delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Update table stats
+        function updateTableStats(count) {
+            document.getElementById('tableStats').textContent = `Showing ${count} of ${inventoryData.stats.totalItems} items`;
+        }
+
+        // ============================================
+        // FILTER FUNCTIONS
+        // ============================================
+
+        function filterIngredients(filter, element) {
+            document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+            currentFilter = filter;
+            filterAndDisplayIngredients();
+        }
+
+        function filterByCategory(category, element) {
+            document.querySelectorAll('.category-card').forEach(c => c.style.borderColor = '#E5E7EB');
+            element.style.borderColor = '#8B0000';
+            currentCategory = category;
+            filterAndDisplayIngredients();
+        }
+
+        function searchIngredients() {
+            searchTerm = document.getElementById('searchInput').value;
+            filterAndDisplayIngredients();
+        }
+
+        // ============================================
+        // CRUD OPERATIONS
+        // ============================================
+
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add New Ingredient';
+            
+            // Clear form
+            document.getElementById('ingredientName').value = '';
+            document.getElementById('ingredientCategory').value = '';
+            document.getElementById('currentStock').value = '';
+            document.getElementById('unitMeasure').value = 'pcs';
+            document.getElementById('minThreshold').value = '';
+            document.getElementById('expiryDate').value = '';
+            document.getElementById('storageLocation').value = '';
+            document.getElementById('supplier').value = '';
+            document.getElementById('cost').value = '';
+            document.getElementById('notes').value = '';
+            document.getElementById('active').checked = true;
+            
+            currentEditId = null;
+            document.getElementById('ingredientModal').classList.add('show');
+        }
+
+        function editIngredient(id) {
+            const ingredient = inventoryData.ingredients.find(i => i.id === id);
+            if (!ingredient) return;
+            
+            document.getElementById('modalTitle').textContent = 'Edit Ingredient';
+            
+            // Fill form with ingredient data
+            document.getElementById('ingredientName').value = ingredient.name;
+            document.getElementById('ingredientCategory').value = ingredient.category;
+            document.getElementById('currentStock').value = ingredient.currentStock;
+            document.getElementById('unitMeasure').value = ingredient.unit;
+            document.getElementById('minThreshold').value = ingredient.minThreshold;
+            document.getElementById('expiryDate').value = ingredient.expiryDate;
+            document.getElementById('storageLocation').value = ingredient.storage;
+            document.getElementById('supplier').value = ingredient.supplier;
+            document.getElementById('cost').value = ingredient.cost || '';
+            document.getElementById('notes').value = ingredient.notes || '';
+            document.getElementById('active').checked = ingredient.active;
+            
+            currentEditId = id;
+            document.getElementById('ingredientModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('ingredientModal').classList.remove('show');
+        }
+
+        function saveIngredient() {
+            // Validate form
+            if (!document.getElementById('ingredientName').value) {
+                showToast('Please enter ingredient name', 'error');
+                return;
+            }
+            
+            const ingredientData = {
+                name: document.getElementById('ingredientName').value,
+                category: document.getElementById('ingredientCategory').value,
+                currentStock: parseFloat(document.getElementById('currentStock').value) || 0,
+                unit: document.getElementById('unitMeasure').value,
+                minThreshold: parseFloat(document.getElementById('minThreshold').value) || 0,
+                expiryDate: document.getElementById('expiryDate').value,
+                storage: document.getElementById('storageLocation').value,
+                supplier: document.getElementById('supplier').value,
+                cost: parseFloat(document.getElementById('cost').value) || 0,
+                notes: document.getElementById('notes').value,
+                active: document.getElementById('active').checked,
+                archived: false,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            if (currentEditId) {
+                // Update existing ingredient
+                const index = inventoryData.ingredients.findIndex(i => i.id === currentEditId);
+                if (index !== -1) {
+                    inventoryData.ingredients[index] = {
+                        ...inventoryData.ingredients[index],
+                        ...ingredientData
+                    };
+                    showToast('Ingredient updated successfully!', 'success');
+                }
+            } else {
+                // Add new ingredient
+                ingredientData.id = Date.now(); // Simple unique ID
+                inventoryData.ingredients.push(ingredientData);
+                showToast('Ingredient added successfully!', 'success');
+            }
+            
+            saveInventory();
+            updateUIFromData();
+            closeModal();
+        }
+
+        // Delete functions
+        function deleteIngredient(id) {
+            currentDeleteId = id;
+            const ingredient = inventoryData.ingredients.find(i => i.id === id);
+            document.getElementById('deleteMessage').textContent = `Are you sure you want to delete "${ingredient.name}"? This action cannot be undone.`;
+            document.getElementById('deleteModal').classList.add('show');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('show');
+            currentDeleteId = null;
+        }
+
+        function confirmDelete() {
+            if (currentDeleteId) {
+                inventoryData.ingredients = inventoryData.ingredients.filter(i => i.id !== currentDeleteId);
+                saveInventory();
+                updateUIFromData();
+                showToast('Ingredient deleted successfully!', 'success');
+                closeDeleteModal();
+            }
+        }
+
+        // Archive functions
+        function archiveIngredient(id) {
+            currentArchiveId = id;
+            const ingredient = inventoryData.ingredients.find(i => i.id === id);
+            document.getElementById('archiveMessage').textContent = `Are you sure you want to archive "${ingredient.name}"?`;
+            document.getElementById('archiveModal').classList.add('show');
+        }
+
+        function closeArchiveModal() {
+            document.getElementById('archiveModal').classList.remove('show');
+            currentArchiveId = null;
+        }
+
+        function confirmArchive() {
+            if (currentArchiveId) {
+                const index = inventoryData.ingredients.findIndex(i => i.id === currentArchiveId);
+                if (index !== -1) {
+                    inventoryData.ingredients[index].archived = true;
+                    inventoryData.ingredients[index].active = false;
+                    saveInventory();
+                    updateUIFromData();
+                    showToast('Ingredient archived successfully!', 'success');
+                }
+                closeArchiveModal();
+            }
+        }
+
+        // Export function
+        function exportIngredients() {
+            const dataStr = JSON.stringify(inventoryData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = `ingredients_export_${new Date().toISOString().slice(0,10)}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showToast('Ingredients exported successfully!', 'success');
+        }
+
+        // Toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            
+            if (type === 'success') {
+                toast.style.background = '#2E7D32';
+            } else if (type === 'error') {
+                toast.style.background = '#C62828';
+            } else {
+                toast.style.background = '#8B0000';
+            }
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Toggle profile dropdown
+        function toggleDropdown() {
+            document.getElementById('profileDropdown').classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.profile-card') && !event.target.matches('.profile-avatar') && !event.target.matches('.profile-details') && !event.target.matches('.profile-name') && !event.target.matches('.profile-role') && !event.target.matches('.hamburger-btn')) {
+                const dropdowns = document.getElementsByClassName('profile-dropdown');
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+
+        // Display current date
+        function updateDate() {
+            const now = new Date();
+            const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        // ============================================
+        // REAL-TIME SYNC WITH OTHER PAGES
+        // ============================================
+
+        // Listen for updates from other tabs/windows
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'lyceum_inventory') {
+                loadInventory();
+                showToast('Inventory updated from another window', 'info');
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInventory();
+            updateDate();
+        });
+    </script>
+</body>
+</html>

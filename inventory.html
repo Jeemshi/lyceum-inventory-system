@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Lyceum Kitchen | Inventory Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #F8FAFC;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        .app {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background: #F8FAFC;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: #000000;
+            border-right: 1px solid #2C2C2C;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                z-index: 1000;
+                transition: left 0.3s ease;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            .sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+                display: none;
+            }
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+
+        .sidebar-header {
+            padding: 28px 24px;
+            border-bottom: 1px solid #2C2C2C;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .sidebar-logo {
+            font-size: 32px;
+            background: #8B0000;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            color: #FFFFFF;
+        }
+
+        .sidebar-title h2 {
+            font-size: 18px;
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+
+        .sidebar-title p {
+            font-size: 12px;
+            color: #A0A0A0;
+        }
+
+        .sidebar-profile {
+            padding: 20px 24px;
+            border-bottom: 1px solid #2C2C2C;
+        }
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 14px;
+            background: #141414;
+            border-radius: 16px;
+            border: 1px solid #2C2C2C;
+        }
+
+        .profile-avatar {
+            width: 44px;
+            height: 44px;
+            background: #8B0000;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .profile-details {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #FFFFFF;
+            margin-bottom: 2px;
+        }
+
+        .profile-role {
+            font-size: 11px;
+            color: #999999;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #A0A0A0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: #1A1A1A;
+            color: #FFFFFF;
+        }
+
+        .nav-item.active {
+            background: #8B0000;
+            color: #FFFFFF;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            min-width: 24px;
+        }
+
+        .logout-item {
+            margin-top: auto;
+            margin-bottom: 20px;
+            border-top: 1px solid #2C2C2C;
+            padding-top: 16px;
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background: #F8FAFC;
+            position: relative;
+        }
+
+        .top-bar {
+            background: white;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 32px;
+            flex-shrink: 0;
+        }
+
+        .burger-menu {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: #F8FAFC;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 1px solid #E5E7EB;
+            margin-right: 15px;
+        }
+
+        .hamburger-icon {
+            width: 22px;
+            height: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .hamburger-icon span {
+            display: block;
+            height: 2.5px;
+            background: #1A1A1A;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 1024px) {
+            .burger-menu {
+                display: flex;
+            }
+            .top-bar {
+                padding: 12px 16px;
+            }
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            color: #1A1A1A;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .page-title p {
+            font-size: 13px;
+            color: #64748B;
+        }
+
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .notification {
+            position: relative;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            background: #F8FAFC;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification span {
+            font-size: 20px;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #8B0000;
+            color: white;
+            font-size: 10px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 2px solid white;
+            font-weight: 600;
+        }
+
+        .date-display {
+            background: #F8FAFC;
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid #E5E7EB;
+        }
+
+        .inventory-content {
+            flex: 1;
+            padding: 24px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
+            padding-bottom: 100px;
+        }
+
+        @media (max-width: 1024px) {
+            .inventory-content {
+                padding: 16px;
+            }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .stat-card {
+            background: #8B0000;
+            border-radius: 20px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 8px 16px rgba(139,0,0,0.15);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            background: #9A0000;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #FFFFFF;
+        }
+
+        .stat-badge {
+            background: rgba(255,255,255,0.2);
+            color: #FFFFFF;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #FFFFFF;
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: rgba(255,255,255,0.9);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .stat-footer {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.8);
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .search-section {
+            flex-shrink: 0;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 12px 12px 44px;
+            border: 1px solid #E5E7EB;
+            border-radius: 30px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            background: white;
+        }
+
+        .search-box input:focus {
+            border-color: #8B0000;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(139,0,0,0.1);
+        }
+
+        .search-box span {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+        }
+
+        .category-pills {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .category-pill {
+            padding: 8px 20px;
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #64748B;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-pill:hover {
+            border-color: #8B0000;
+            color: #8B0000;
+            background: #FEE9E9;
+        }
+
+        .category-pill.active {
+            background: #8B0000;
+            color: white;
+            border-color: #8B0000;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+            overflow-y: visible;
+        }
+
+        @media (max-width: 768px) {
+            .inventory-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .inventory-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #E5E7EB;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(139,0,0,0.08);
+            border-color: #8B0000;
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .product-title {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .product-icon {
+            width: 50px;
+            height: 50px;
+            background: #F8FAFC;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .product-name h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+
+        .product-category {
+            font-size: 11px;
+            color: #8B0000;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-good { background: #E6F7E6; color: #2E7D32; }
+        .status-warning { background: #FFF3E0; color: #F57C00; }
+        .status-expired { background: #FFEBEE; color: #C62828; }
+        .status-low { background: #E3F2FD; color: #1976D2; }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            background: #FEF9E6;
+            padding: 10px 12px;
+            border-radius: 14px;
+            margin: 12px 0;
+        }
+
+        .price-label { font-size: 12px; color: #64748B; font-weight: 500; }
+        .price-value { font-size: 18px; font-weight: 800; color: #2c3e66; }
+
+        .expiry-section {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-top: 1px solid #F0F0F0;
+            border-bottom: 1px solid #F0F0F0;
+            margin-bottom: 10px;
+        }
+
+        .expiry-label { font-size: 12px; color: #64748B; }
+        .expiry-date { font-size: 13px; font-weight: 600; color: #F57C00; }
+        .expiry-date.expired { color: #C62828; }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #F8FAFC;
+            border-radius: 50px;
+            padding: 6px;
+            margin-top: 12px;
+        }
+
+        .qty-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: white;
+            color: #8B0000;
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .qty-btn:hover { background: #8B0000; color: white; }
+        .qty-display { font-size: 18px; font-weight: 700; color: #1A1A1A; min-width: 80px; text-align: center; }
+
+        .update-btn {
+            background: #8B0000;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .update-btn:disabled { background: #CCCCCC; cursor: not-allowed; opacity: 0.6; }
+
+        /* CENTERED CAMERA FAB BUTTON - ONLY ON MOBILE & TABLET (max-width: 1024px) */
+        .camera-fab {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, #8B0000, #6B0000);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(139, 0, 0, 0.4);
+            z-index: 98;
+            transition: all 0.3s ease;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .camera-fab:active {
+            transform: translateX(-50%) scale(0.92);
+        }
+
+        .camera-fab i {
+            font-size: 28px;
+            color: white;
+        }
+
+        /* Show camera button only on mobile and tablet (max-width: 1024px) */
+        @media (max-width: 1024px) {
+            .camera-fab {
+                display: flex;
+            }
+        }
+
+        /* Hide camera button on desktop (min-width: 1025px) */
+        @media (min-width: 1025px) {
+            .camera-fab {
+                display: none !important;
+            }
+        }
+
+        /* Scanner Modal */
+        .scanner-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scanner-modal.active {
+            display: flex;
+        }
+
+        .scanner-container {
+            width: 100%;
+            max-width: 500px;
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #scannerVideo {
+            width: 100%;
+            height: auto;
+            background: #000;
+        }
+
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .scanner-close {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            font-size: 24px;
+            cursor: pointer;
+            align-self: flex-end;
+        }
+
+        .scan-guide {
+            color: white;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 14px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 28px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+        .modal-message { font-size: 14px; color: #64748B; margin-bottom: 24px; }
+        .modal-actions { display: flex; gap: 12px; }
+        .modal-btn { flex: 1; padding: 12px; border: none; border-radius: 30px; font-weight: 600; cursor: pointer; }
+        .modal-btn.confirm { background: #8B0000; color: white; }
+        .modal-btn.cancel { background: #F0F0F0; color: #666; }
+
+        /* TOAST - Positioned ABOVE the camera button */
+        .toast {
+            position: fixed;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            z-index: 999;
+            font-size: 14px;
+            transition: transform 0.3s ease;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* On desktop, move toast higher since no camera button */
+        @media (min-width: 1025px) {
+            .toast {
+                bottom: 30px;
+            }
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #F1F5F9; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #8B0000; border-radius: 10px; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="app">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">🍳</div>
+            <div class="sidebar-title"><h2>Lyceum Kitchen</h2><p>Inventory System</p></div>
+        </div>
+        <div class="sidebar-profile">
+            <div class="profile-card">
+                <div class="profile-avatar">JS</div>
+                <div class="profile-details">
+                    <div class="profile-name">Juan Santos</div>
+                    <div class="profile-role">Kitchen Staff</div>
+                </div>
+            </div>
+        </div>
+        <div class="nav-menu">
+            <div class="nav-item" data-page="dashboard"><span class="nav-icon">📊</span><span>Dashboard</span></div>
+            <div class="nav-item active" data-page="inventory"><span class="nav-icon">📦</span><span>Inventory</span></div>
+            <div class="nav-item" data-page="expiring"><span class="nav-icon">⏰</span><span>Expiring Items</span></div>
+            <div class="nav-item" data-page="stocks"><span class="nav-icon">📉</span><span>Low Stock</span></div>
+            <div class="nav-item" data-page="recipes"><span class="nav-icon">🍳</span><span>Recipes</span></div>
+            <div class="nav-item" data-page="deliveries"><span class="nav-icon">🚚</span><span>Deliveries</span></div>
+            <div class="nav-item" data-page="reports"><span class="nav-icon">📈</span><span>Reports</span></div>
+            <div class="nav-item" data-page="activity"><span class="nav-icon">📋</span><span>Activity Logs</span></div>
+            <div class="nav-item logout-item" data-page="logout"><span class="nav-icon">🚪</span><span>Logout</span></div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="burger-menu" id="burgerMenu">
+                <div class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            <div class="page-title"><h1>Inventory</h1><p>Manage ingredients & track stock</p></div>
+            <div class="top-right">
+                <div class="notification"><span>🔔</span><span class="notification-badge">3</span></div>
+                <div class="date-display" id="currentDate"></div>
+            </div>
+        </div>
+
+        <div class="inventory-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header"><div class="stat-icon">📦</div><span class="stat-badge">Total</span></div>
+                    <div class="stat-value" id="totalUnitsCount">0</div>
+                    <div class="stat-label">Total Units</div>
+                    <div class="stat-footer"><span>All items</span><span>in stock</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header"><div class="stat-icon">💰</div><span class="stat-badge">Value</span></div>
+                    <div class="stat-value" id="totalValueDisplay">₱0</div>
+                    <div class="stat-label">Inventory Value</div>
+                    <div class="stat-footer"><span>Total asset</span><span>cost basis</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header"><div class="stat-icon">📊</div><span class="stat-badge">Variety</span></div>
+                    <div class="stat-value" id="categoryCount">0</div>
+                    <div class="stat-label">Categories</div>
+                    <div class="stat-footer"><span>Active types</span><span>monitored</span></div>
+                </div>
+            </div>
+
+            <div class="search-section">
+                <div class="search-box"><span>🔍</span><input type="text" placeholder="Search ingredients..." id="searchInput"></div>
+            </div>
+
+            <div class="category-pills" id="categoryPills"></div>
+
+            <div class="inventory-grid" id="inventoryGrid"></div>
+        </div>
+    </div>
+</div>
+
+<!-- CENTERED CAMERA FAB BUTTON - ONLY visible on mobile & tablet -->
+<div class="camera-fab" id="cameraFabBtn">
+    <i class="fas fa-camera"></i>
+</div>
+
+<!-- Scanner Modal -->
+<div class="scanner-modal" id="scannerModal">
+    <div class="scanner-container">
+        <video id="scannerVideo" autoplay playsinline></video>
+        <div class="scanner-overlay">
+            <button class="scanner-close" id="closeScannerBtn">✕</button>
+            <div class="scan-guide"><i class="fas fa-camera"></i> Position QR code in frame</div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="confirmModal"><div class="modal-content"><div class="modal-title">Confirm Update</div><div class="modal-message" id="modalMessage"></div><div class="modal-actions"><button class="modal-btn cancel" onclick="closeModal()">Cancel</button><button class="modal-btn confirm" onclick="confirmUpdate()">Update</button></div></div></div>
+<div class="toast" id="toast">Updated!</div>
+
+<script>
+    // Inventory Data
+    let inventoryItems = [
+        { id: 1, name: "Tomatoes", category: "vegetables", unit: "pcs", price: 35, qty: 24, expiry: "Jan 20, 2025", icon: "🍅", status: "good" },
+        { id: 2, name: "Chicken Breast", category: "meat", unit: "pcs", price: 120, qty: 8, expiry: "Jan 15, 2025", icon: "🍗", status: "warning" },
+        { id: 3, name: "Fresh Milk", category: "dairy", unit: "pcs", price: 65, qty: 12, expiry: "Jan 25, 2025", icon: "🥛", status: "good" },
+        { id: 4, name: "White Rice", category: "grains", unit: "kg", price: 56, qty: 5, expiry: "Jun 30, 2025", icon: "🍚", status: "good" },
+        { id: 5, name: "Onions", category: "vegetables", unit: "pcs", price: 25, qty: 3, expiry: "Feb 10, 2025", icon: "🧅", status: "low" },
+        { id: 6, name: "Salmon Fillet", category: "seafood", unit: "pcs", price: 210, qty: 6, expiry: "Jan 22, 2025", icon: "🐟", status: "warning" },
+        { id: 7, name: "Garlic", category: "spices", unit: "bulb", price: 18, qty: 2, expiry: "Mar 15, 2025", icon: "🧄", status: "low" },
+        { id: 8, name: "Cheddar Cheese", category: "dairy", unit: "pcs", price: 85, qty: 4, expiry: "Jan 28, 2025", icon: "🧀", status: "warning" }
+    ];
+
+    // QR Code to Product mapping
+    const qrDatabase = {
+        "PROD-TOMATO-001": 1,
+        "PROD-CHICKEN-002": 2,
+        "PROD-MILK-003": 3,
+        "PROD-RICE-004": 4,
+        "PROD-ONION-005": 5,
+        "PROD-SALMON-006": 6,
+        "PROD-GARLIC-007": 7,
+        "PROD-CHEESE-008": 8
+    };
+
+    let pendingUpdates = {};
+    let currentItemId = null;
+    let activeFilter = "all";
+    let searchTerm = "";
+    let scannerStream = null;
+    let toastTimeout = null;
+
+    function getStatusClass(status) {
+        const map = { good: "status-good", warning: "status-warning", expired: "status-expired", low: "status-low" };
+        return map[status] || "status-good";
+    }
+
+    function getStatusText(status) {
+        const map = { good: "Good", warning: "Expiring Soon", expired: "Expired", low: "Low Stock" };
+        return map[status] || "Good";
+    }
+
+    function updateMetrics() {
+        let totalUnits = 0;
+        let totalValue = 0;
+        let categories = new Set();
+        
+        inventoryItems.forEach(item => {
+            totalUnits += item.qty;
+            totalValue += item.qty * item.price;
+            categories.add(item.category);
+        });
+        
+        document.getElementById('totalUnitsCount').innerText = totalUnits;
+        document.getElementById('totalValueDisplay').innerHTML = `₱${totalValue.toLocaleString()}`;
+        document.getElementById('categoryCount').innerText = categories.size;
+    }
+
+    function renderCategoryPills() {
+        const categories = ['all', ...new Set(inventoryItems.map(i => i.category))];
+        const container = document.getElementById('categoryPills');
+        container.innerHTML = categories.map(cat => 
+            `<span class="category-pill ${activeFilter === cat ? 'active' : ''}" onclick="filterCategory('${cat}')">${cat.charAt(0).toUpperCase() + cat.slice(1)}</span>`
+        ).join('');
+    }
+
+    function renderInventory() {
+        let filtered = inventoryItems.filter(item => activeFilter === 'all' || item.category === activeFilter);
+        if (searchTerm) {
+            filtered = filtered.filter(item => item.name.toLowerCase().includes(searchTerm) || item.category.includes(searchTerm));
+        }
+        
+        const grid = document.getElementById('inventoryGrid');
+        if (filtered.length === 0) {
+            grid.innerHTML = '<div style="text-align:center; padding:40px; color:#64748B; grid-column:1/-1;">No products found</div>';
+            return;
+        }
+        
+        grid.innerHTML = filtered.map(item => {
+            const expiryDate = new Date(item.expiry);
+            const today = new Date();
+            const isExpired = expiryDate < today;
+            const totalItemValue = item.qty * item.price;
+            const pendingQty = pendingUpdates[item.id] !== undefined ? pendingUpdates[item.id] : item.qty;
+            
+            return `
+                <div class="product-card">
+                    <div class="product-header">
+                        <div class="product-title">
+                            <div class="product-icon">${item.icon}</div>
+                            <div class="product-name">
+                                <h3>${item.name}</h3>
+                                <span class="product-category">${item.category}</span>
+                            </div>
+                        </div>
+                        <span class="status-badge ${getStatusClass(item.status)}">${getStatusText(item.status)}</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">Unit Price</span>
+                        <span class="price-value">₱${item.price} / ${item.unit}</span>
+                    </div>
+                    <div class="expiry-section">
+                        <span class="expiry-label">Expiry Date</span>
+                        <span class="expiry-date ${isExpired ? 'expired' : ''}">${item.expiry}</span>
+                    </div>
+                    <div class="price-row" style="background:#EFF6FF; margin-top:0;">
+                        <span class="price-label">Subtotal Value</span>
+                        <span class="price-value">₱${totalItemValue.toLocaleString()}</span>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="qty-btn minus" onclick="adjustQuantity(${item.id}, -1)">−</button>
+                        <span class="qty-display" id="display-${item.id}">${pendingQty} ${item.unit}</span>
+                        <button class="qty-btn plus" onclick="adjustQuantity(${item.id}, 1)">+</button>
+                    </div>
+                    <button class="update-btn" id="update-${item.id}" onclick="showUpdateModal(${item.id})" ${pendingUpdates[item.id] === undefined ? 'disabled' : ''}>Update Quantity</button>
+                </div>
+            `;
+        }).join('');
+        updateMetrics();
+    }
+
+    function adjustQuantity(id, change) {
+        const item = inventoryItems.find(i => i.id === id);
+        if (!item) return;
+        let currentDisplay = pendingUpdates[id] !== undefined ? pendingUpdates[id] : item.qty;
+        let newQty = currentDisplay + change;
+        if (newQty < 0) { showToast('Quantity cannot be negative'); return; }
+        pendingUpdates[id] = newQty;
+        document.getElementById(`display-${id}`).innerHTML = `${newQty} ${item.unit}`;
+        const updateBtn = document.getElementById(`update-${id}`);
+        if (updateBtn) updateBtn.disabled = false;
+    }
+
+    function showUpdateModal(id) {
+        const item = inventoryItems.find(i => i.id === id);
+        if (!item || pendingUpdates[id] === undefined) return;
+        currentItemId = id;
+        const newQty = pendingUpdates[id];
+        const newValue = newQty * item.price;
+        document.getElementById('modalMessage').innerHTML = `Update <strong>${item.name}</strong> from ${item.qty} to <strong>${newQty}</strong> ${item.unit}?<br><br>New value: <strong>₱${newValue.toLocaleString()}</strong>`;
+        document.getElementById('confirmModal').classList.add('show');
+    }
+
+    function closeModal() {
+        document.getElementById('confirmModal').classList.remove('show');
+        currentItemId = null;
+    }
+
+    function confirmUpdate() {
+        if (currentItemId && pendingUpdates[currentItemId] !== undefined) {
+            const id = currentItemId;
+            const newQty = pendingUpdates[id];
+            const itemIndex = inventoryItems.findIndex(i => i.id === id);
+            if (itemIndex !== -1) {
+                inventoryItems[itemIndex].qty = newQty;
+                if (newQty <= 3) inventoryItems[itemIndex].status = "low";
+                else if (newQty <= 8) inventoryItems[itemIndex].status = "warning";
+                else inventoryItems[itemIndex].status = "good";
+                delete pendingUpdates[id];
+                renderInventory();
+                showToast(`${inventoryItems[itemIndex].name} updated to ${newQty} units`);
+            }
+            closeModal();
+        }
+    }
+
+    function filterCategory(category) {
+        activeFilter = category;
+        renderCategoryPills();
+        renderInventory();
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        
+        if (toastTimeout) {
+            clearTimeout(toastTimeout);
+            toastTimeout = null;
+        }
+        
+        toast.classList.remove('show');
+        void toast.offsetWidth;
+        
+        toast.textContent = msg;
+        toast.classList.add('show');
+        
+        toastTimeout = setTimeout(() => {
+            toast.classList.remove('show');
+            toastTimeout = null;
+        }, 2500);
+    }
+
+    function updateDate() {
+        const now = new Date();
+        const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+        document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+    }
+
+    // Scanner functions
+    async function startScanner() {
+        try {
+            scannerStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+            scannerVideo.srcObject = scannerStream;
+            scannerVideo.play();
+            simulateQRScan();
+        } catch (err) {
+            showToast("Unable to access camera. Please grant camera permissions.");
+        }
+    }
+
+    function simulateQRScan() {
+        setTimeout(() => {
+            const qrCodes = Object.keys(qrDatabase);
+            const randomQR = qrCodes[Math.floor(Math.random() * qrCodes.length)];
+            handleScannedQR(randomQR);
+        }, 2000);
+    }
+
+    function handleScannedQR(qrCode) {
+        const productId = qrDatabase[qrCode];
+        if (productId) {
+            const product = inventoryItems.find(p => p.id === productId);
+            if (product) {
+                pendingUpdates[productId] = product.qty;
+                renderInventory();
+                showUpdateModal(productId);
+            }
+            stopScanner();
+            scannerModal.classList.remove('active');
+        } else {
+            showToast("Product not found for this QR code!");
+            stopScanner();
+            scannerModal.classList.remove('active');
+        }
+    }
+
+    function stopScanner() {
+        if (scannerStream) {
+            scannerStream.getTracks().forEach(track => track.stop());
+            scannerStream = null;
+        }
+        scannerVideo.srcObject = null;
+    }
+
+    // Event listeners
+    const cameraBtn = document.getElementById('cameraFabBtn');
+    if (cameraBtn) {
+        cameraBtn.addEventListener('click', () => {
+            scannerModal.classList.add('active');
+            startScanner();
+        });
+    }
+
+    document.getElementById('closeScannerBtn').addEventListener('click', () => {
+        stopScanner();
+        scannerModal.classList.remove('active');
+    });
+
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const page = item.getAttribute('data-page');
+            if (page === 'logout') {
+                alert('Logged out. Redirecting to login...');
+                window.location.href = 'login.html';
+            } else if (page === 'activity') {
+                alert('📋 Activity Logs: Inventory updates, quantity changes recorded.');
+            } else if (page === 'dashboard') {
+                window.location.href = 'dashboard.html';
+            } else if (page === 'inventory') {
+                // already here
+            } else {
+                window.location.href = page + '.html';
+            }
+        });
+    });
+
+    // Search
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        searchTerm = e.target.value.toLowerCase();
+        renderInventory();
+    });
+
+    // Mobile sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const burgerBtn = document.getElementById('burgerMenu');
+    
+    function openSidebar() {
+        sidebar.classList.add('open');
+        if (overlay) overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    if (burgerBtn) {
+        burgerBtn.addEventListener('click', openSidebar);
+    }
+    
+    if (overlay) {
+        overlay.addEventListener('click', closeSidebar);
+    }
+    
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            if (window.innerWidth <= 1024) {
+                closeSidebar();
+            }
+        });
+    });
+
+    // Initial render
+    updateDate();
+    renderCategoryPills();
+    renderInventory();
+</script>
+</body>
+</html>

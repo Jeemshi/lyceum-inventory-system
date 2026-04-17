@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Lyceum Kitchen | Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #FFFFFF;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 24px 16px;
+        }
+
+        /* Import Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        /* Floating Orbs - Responsive scaling */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            animation: orbFloat 20s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .orb-1 {
+            width: min(600px, 80vw);
+            height: min(600px, 80vw);
+            background: #8B0000;
+            top: -20%;
+            right: -20%;
+            opacity: 0.05;
+            animation-duration: 25s;
+        }
+
+        .orb-2 {
+            width: min(500px, 70vw);
+            height: min(500px, 70vw);
+            background: #D4AF37;
+            bottom: -15%;
+            left: -20%;
+            opacity: 0.04;
+            animation-duration: 22s;
+            animation-delay: 2s;
+        }
+
+        .orb-3 {
+            width: min(400px, 60vw);
+            height: min(400px, 60vw);
+            background: #8B0000;
+            top: 40%;
+            right: 30%;
+            opacity: 0.03;
+            animation-duration: 18s;
+            animation-delay: 4s;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, 30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+
+        /* Floating Food Icons - responsive size & reduced on mobile */
+        .floating-icon {
+            position: fixed;
+            font-size: clamp(40px, 8vw, 60px);
+            opacity: 0.06;
+            color: #8B0000;
+            pointer-events: none;
+            animation: floatIcon 20s infinite ease-in-out;
+            filter: drop-shadow(0 5px 15px rgba(139, 0, 0, 0.05));
+            z-index: 0;
+        }
+
+        @keyframes floatIcon {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            25% { transform: translate(20px, -20px) rotate(5deg) scale(1.1); }
+            50% { transform: translate(-15px, -35px) rotate(-5deg) scale(0.95); }
+            75% { transform: translate(-25px, -15px) rotate(3deg) scale(1.05); }
+            100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+        }
+
+        .icon-1 { top: 12%; left: 3%; animation-duration: 22s; }
+        .icon-2 { top: 20%; right: 5%; animation-duration: 25s; animation-delay: 1s; color: #D4AF37; }
+        .icon-3 { bottom: 18%; left: 6%; animation-duration: 28s; animation-delay: 2.5s; }
+        .icon-4 { bottom: 25%; right: 7%; animation-duration: 24s; animation-delay: 0.5s; color: #D4AF37; }
+        .icon-5 { top: 55%; left: 2%; animation-duration: 26s; animation-delay: 3s; }
+        .icon-6 { top: 35%; right: 8%; animation-duration: 23s; animation-delay: 1.8s; color: #D4AF37; }
+        .icon-7 { bottom: 10%; right: 15%; animation-duration: 27s; animation-delay: 2.2s; }
+        .icon-8 { top: 70%; left: 8%; animation-duration: 29s; animation-delay: 0.8s; color: #D4AF37; }
+
+        /* Particles */
+        .particle {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #8B0000;
+            opacity: 0.06;
+            pointer-events: none;
+            animation: particleFloat 15s infinite linear;
+        }
+
+        @keyframes particleFloat {
+            0% { transform: translateY(100vh) translateX(0) scale(1); opacity: 0.06; }
+            50% { transform: translateY(50vh) translateX(40px) scale(1.5); opacity: 0.1; }
+            100% { transform: translateY(-100px) translateX(-40px) scale(0); opacity: 0; }
+        }
+
+        .particle-1 { left: 15%; background: #8B0000; animation-duration: 18s; }
+        .particle-2 { left: 35%; background: #D4AF37; animation-duration: 22s; animation-delay: 2s; }
+        .particle-3 { left: 55%; background: #8B0000; animation-duration: 20s; animation-delay: 4s; }
+        .particle-4 { left: 75%; background: #D4AF37; animation-duration: 24s; animation-delay: 1s; }
+        .particle-5 { left: 25%; background: #8B0000; animation-duration: 19s; animation-delay: 3s; }
+        .particle-6 { left: 65%; background: #D4AF37; animation-duration: 21s; animation-delay: 5s; }
+
+        /* Floating Lines - hidden on small screens for performance */
+        .line {
+            position: fixed;
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #8B0000, #D4AF37, transparent);
+            opacity: 0.05;
+            animation: lineFloat 25s infinite linear;
+        }
+
+        @keyframes lineFloat {
+            0% { transform: translateX(-200px) rotate(0deg); opacity: 0.05; }
+            50% { transform: translateX(calc(100vw + 200px)) rotate(180deg); opacity: 0.1; }
+            100% { transform: translateX(calc(100vw + 200px)) rotate(360deg); opacity: 0.05; }
+        }
+
+        .line-1 { top: 20%; display: block; }
+        .line-2 { top: 50%; display: block; }
+        .line-3 { top: 80%; display: block; }
+
+        /* Responsive: hide lines on narrow screens to avoid clutter */
+        @media (max-width: 768px) {
+            .line { display: none; }
+            .floating-icon { opacity: 0.05; }
+            .particle { opacity: 0.04; }
+        }
+
+        /* Main Container - fully responsive */
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            z-index: 10;
+        }
+
+        /* Login Card - White with responsive padding */
+        .login-card {
+            background: #FFFFFF;
+            border-radius: 40px;
+            padding: clamp(28px, 6vw, 48px) clamp(20px, 5vw, 40px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+            backdrop-filter: blur(0px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: clamp(24px, 5vw, 40px);
+        }
+
+        .logo-wrapper {
+            width: clamp(70px, 18vw, 90px);
+            height: clamp(70px, 18vw, 90px);
+            background: #8B0000;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            box-shadow: 0 15px 30px -12px rgba(139, 0, 0, 0.25);
+            transition: transform 0.2s;
+        }
+
+        .logo {
+            font-size: clamp(36px, 9vw, 48px);
+            color: #FFFFFF;
+        }
+
+        .header h1 {
+            color: #000000;
+            font-size: clamp(24px, 6vw, 28px);
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+        }
+
+        .header p {
+            color: #8B0000;
+            font-size: clamp(11px, 3vw, 13px);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.8px;
+        }
+
+        /* Role Toggle - responsive flex wrap */
+        .role-toggle {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            background: transparent;
+        }
+
+        .role-btn {
+            flex: 1;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 40px;
+            font-size: clamp(14px, 4vw, 15px);
+            font-weight: 600;
+            color: #FFFFFF;
+            transition: all 0.25s ease;
+            border: none;
+            background: #E2E2E2;
+            color: #555;
+        }
+
+        .role-btn.active {
+            background: #000000;
+            color: white;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+        }
+
+        .role-btn:not(.active):hover {
+            background: #D0D0D0;
+            color: #222;
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1A1A1A;
+            font-size: 13px;
+            letter-spacing: 0.2px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            font-size: 18px;
+            color: #8B0000;
+            opacity: 0.7;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 14px 18px 14px 48px;
+            border: 1.5px solid #EAEAEA;
+            border-radius: 44px;
+            font-size: 15px;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            background: #FEFEFE;
+            color: #111;
+            font-weight: 500;
+        }
+
+        .input-wrapper input:focus {
+            border-color: #8B0000;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(139, 0, 0, 0.08);
+            background: #FFFFFF;
+        }
+
+        .input-wrapper input:hover {
+            border-color: #AAAAAA;
+        }
+
+        .input-wrapper input::placeholder {
+            color: #B0B0B0;
+            font-weight: 400;
+        }
+
+        /* Password Toggle */
+        .password-toggle {
+            position: absolute;
+            right: 18px;
+            cursor: pointer;
+            color: #777;
+            font-size: 20px;
+            transition: color 0.2s;
+            user-select: none;
+        }
+
+        .password-toggle:active {
+            color: #8B0000;
+        }
+
+        /* Options - responsive row */
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .remember {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: #333;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .remember input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #8B0000;
+            margin: 0;
+        }
+
+        .forgot {
+            color: #8B0000;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: color 0.2s;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .forgot:hover {
+            color: #000000;
+            text-decoration: underline;
+        }
+
+        /* Login Button */
+        .login-btn {
+            width: 100%;
+            padding: 15px 20px;
+            background: #8B0000;
+            color: white;
+            border: none;
+            border-radius: 44px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 12px 22px -12px rgba(139, 0, 0, 0.35);
+            margin-bottom: 28px;
+            letter-spacing: 0.3px;
+        }
+
+        .login-btn:hover {
+            background: #A01212;
+            transform: translateY(-2px);
+            box-shadow: 0 18px 28px -12px rgba(139, 0, 0, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(1px);
+        }
+
+        .login-btn.loading {
+            opacity: 0.7;
+            cursor: wait;
+            transform: scale(0.98);
+        }
+
+        /* Sign Up Link */
+        .signup-link {
+            text-align: center;
+            margin-bottom: 22px;
+            padding-bottom: 22px;
+            border-bottom: 1px solid #EFEFEF;
+        }
+
+        .signup-link p {
+            color: #4a4a4a;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .signup-link a {
+            color: #000000;
+            text-decoration: none;
+            font-weight: 800;
+            margin-left: 6px;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .signup-link a:hover {
+            color: #8B0000;
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        .footer p {
+            color: #AAAAAA;
+            font-size: 11px;
+            text-align: center;
+            letter-spacing: 0.3px;
+        }
+
+        /* Success Toast - responsive */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            background: #1F1F1F;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 60px;
+            box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid rgba(255,255,255,0.15);
+            white-space: nowrap;
+            width: auto;
+            max-width: 90vw;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* tablet & extra small adjustments */
+        @media (max-width: 640px) {
+            body {
+                padding: 16px;
+                align-items: center;
+            }
+            .login-card {
+                padding: 28px 20px;
+                border-radius: 32px;
+            }
+            .role-btn {
+                padding: 10px 6px;
+                font-size: 14px;
+            }
+            .options {
+                margin-bottom: 24px;
+            }
+            .login-btn {
+                padding: 14px;
+                font-size: 15px;
+            }
+            .toast {
+                font-size: 13px;
+                padding: 10px 20px;
+                white-space: normal;
+                text-align: center;
+                bottom: 20px;
+            }
+        }
+
+        /* remove global overflow issues */
+        html {
+            overflow-x: hidden;
+        }
+
+        /* Improve touch targets */
+        button, .role-btn, .password-toggle, .forgot, .remember, .signup-link a {
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        input {
+            font-size: 16px; /* prevents zoom on mobile focus */
+        }
+    </style>
+</head>
+<body>
+    <!-- Background decorative elements (non-intrusive) -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="floating-icon icon-1">🥩</div>
+    <div class="floating-icon icon-2">🥬</div>
+    <div class="floating-icon icon-3">🧀</div>
+    <div class="floating-icon icon-4">🍅</div>
+    <div class="floating-icon icon-5">🥕</div>
+    <div class="floating-icon icon-6">🍗</div>
+    <div class="floating-icon icon-7">🐟</div>
+    <div class="floating-icon icon-8">🧄</div>
+
+    <div class="particle particle-1"></div>
+    <div class="particle particle-2"></div>
+    <div class="particle particle-3"></div>
+    <div class="particle particle-4"></div>
+    <div class="particle particle-5"></div>
+    <div class="particle particle-6"></div>
+
+    <div class="line line-1"></div>
+    <div class="line line-2"></div>
+    <div class="line line-3"></div>
+
+    <!-- Main content -->
+    <div class="container">
+        <div class="login-card">
+            <div class="header">
+                <div class="logo-wrapper">
+                    <div class="logo">🍳</div>
+                </div>
+                <h1>Lyceum Kitchen</h1>
+                <p>INVENTORY SYSTEM</p>
+            </div>
+
+            <div class="role-toggle">
+                <div class="role-btn active" data-role="user" id="userRoleBtn">Staff</div>
+                <div class="role-btn" data-role="admin" id="adminRoleBtn">Admin</div>
+            </div>
+
+            <form id="loginForm" action="#" method="post">
+                <div class="form-group">
+                    <label>Username</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="username" placeholder="Enter your username" autocomplete="username" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required>
+                        <span class="password-toggle" id="togglePwdIcon" aria-label="Show password">👁️</span>
+                    </div>
+                </div>
+
+                <div class="options">
+                    <label class="remember">
+                        <input type="checkbox" id="rememberCheckbox" checked>
+                        <span>Remember me</span>
+                    </label>
+                    <button type="button" class="forgot" id="forgotBtn">Forgot password?</button>
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="signup-link">
+                <p>Don't have an account? <a href="#" id="signupLink">Sign up here</a></p>
+            </div>
+
+            <div class="footer">
+                <p>© 2024 Lyceum Kitchen. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">
+        <span>✓</span>
+        <span id="toastMessage">Login successful! Redirecting...</span>
+    </div>
+
+    <script>
+        // Role state
+        let currentRole = 'user';
+
+        // DOM elements
+        const userRoleBtn = document.getElementById('userRoleBtn');
+        const adminRoleBtn = document.getElementById('adminRoleBtn');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginForm = document.getElementById('loginForm');
+        const toastEl = document.getElementById('toast');
+        const toastMessageSpan = document.getElementById('toastMessage');
+        const rememberCheck = document.getElementById('rememberCheckbox');
+        const forgotBtn = document.getElementById('forgotBtn');
+        const signupLink = document.getElementById('signupLink');
+        const togglePwd = document.getElementById('togglePwdIcon');
+
+        // Helper: Show toast message
+        function showToast(message, isError = false) {
+            toastMessageSpan.innerText = message;
+            toastEl.classList.add('show');
+            // optional: change icon for error? but keep simple
+            if (isError) {
+                // small style tweak
+                toastEl.style.background = "rgba(180, 30, 30, 0.95)";
+                setTimeout(() => {
+                    toastEl.style.background = "rgba(0, 0, 0, 0.85)";
+                }, 2000);
+            } else {
+                toastEl.style.background = "rgba(0, 0, 0, 0.85)";
+            }
+            setTimeout(() => {
+                toastEl.classList.remove('show');
+            }, 2000);
+        }
+
+        // Set role (Staff / Admin)
+        function setRole(role) {
+            currentRole = role;
+            if (role === 'user') {
+                userRoleBtn.classList.add('active');
+                adminRoleBtn.classList.remove('active');
+            } else {
+                adminRoleBtn.classList.add('active');
+                userRoleBtn.classList.remove('active');
+            }
+        }
+
+        userRoleBtn.addEventListener('click', () => setRole('user'));
+        adminRoleBtn.addEventListener('click', () => setRole('admin'));
+
+        // Toggle password visibility
+        function togglePasswordVisibility() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            togglePwdIcon.innerText = type === 'password' ? '👁️' : '🙈';
+        }
+        togglePwd.addEventListener('click', togglePasswordVisibility);
+
+        // Forgot password & signup redirection (placeholder navigation with toast for demo context)
+        function handleForgot(e) {
+            e.preventDefault();
+            // Simulate navigation feedback
+            showToast("🔐 Redirecting to password recovery...", false);
+            setTimeout(() => {
+                // In real scenario: window.location.href = 'forgot-password.html';
+                console.log("Navigate to forgot-password.html");
+                // alert would break UX; we keep demo consistent.
+                window.location.href = 'forgot-password.html';
+            }, 800);
+        }
+
+        function handleSignUp(e) {
+            e.preventDefault();
+            showToast("📝 Redirecting to sign-up page...", false);
+            setTimeout(() => {
+                window.location.href = 'signup.html';
+            }, 800);
+        }
+
+        forgotBtn.addEventListener('click', handleForgot);
+        signupLink.addEventListener('click', handleSignUp);
+
+        // Load saved credentials from localStorage (remember me)
+        function loadSavedCredentials() {
+            const savedUser = localStorage.getItem('lyceum_username');
+            const savedPwd = localStorage.getItem('lyceum_password');
+            const savedRole = localStorage.getItem('lyceum_role');
+            const rememberFlag = localStorage.getItem('lyceum_remember');
+            if (rememberFlag === 'true' && savedUser && savedPwd) {
+                usernameInput.value = savedUser;
+                passwordInput.value = savedPwd;
+                rememberCheck.checked = true;
+                if (savedRole === 'admin') setRole('admin');
+                else setRole('user');
+            } else {
+                // optional: if no saved, keep default staff
+                if (rememberCheck) rememberCheck.checked = false;
+            }
+        }
+
+        // Save credentials if "Remember me" checked
+        function saveCredentialsIfNeeded(username, password) {
+            if (rememberCheck.checked) {
+                localStorage.setItem('lyceum_username', username);
+                localStorage.setItem('lyceum_password', password);
+                localStorage.setItem('lyceum_role', currentRole);
+                localStorage.setItem('lyceum_remember', 'true');
+            } else {
+                localStorage.removeItem('lyceum_username');
+                localStorage.removeItem('lyceum_password');
+                localStorage.removeItem('lyceum_role');
+                localStorage.setItem('lyceum_remember', 'false');
+            }
+        }
+
+        // Validate login (demo credentials flexible)
+        function validateCredentials(username, password, role) {
+            // Demo logic: for staff role, any non-empty user/pass works (demo)
+            // Admin: requires admin-specific demo (admin / admin123) to showcase.
+            if (role === 'admin') {
+                // For admin demo, we require specific to demonstrate, but can be custom.
+                if (username === 'admin' && password === 'admin123') return true;
+                else if (username === 'admin@lyceum' && password === 'admin') return true;
+                return false;
+            } else {
+                // Staff: accept any non-empty for demonstration (real system would validate)
+                if (username.trim().length > 0 && password.trim().length > 0) return true;
+                return false;
+            }
+        }
+
+        // Handle login
+        async function handleLoginSubmit(e) {
+            e.preventDefault();
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+
+            if (!username || !password) {
+                showToast("❌ Please enter both username and password", true);
+                return;
+            }
+
+            // Basic client validation
+            const isValid = validateCredentials(username, password, currentRole);
+            if (!isValid) {
+                showToast("⚠️ Invalid credentials. For Admin: admin / admin123", true);
+                return;
+            }
+
+            // Loading state
+            loginBtn.classList.add('loading');
+            const originalText = loginBtn.innerText;
+            loginBtn.textContent = 'Signing in...';
+
+            // Save remember-me
+            saveCredentialsIfNeeded(username, password);
+
+            // Simulate API / network delay
+            setTimeout(() => {
+                loginBtn.classList.remove('loading');
+                loginBtn.textContent = originalText;
+
+                const successMsg = currentRole === 'admin' ? 'Admin login successful! Redirecting...' : `Welcome back, ${username}! Redirecting...`;
+                showToast(successMsg, false);
+
+                // Redirect according to role after short delay
+                setTimeout(() => {
+                    if (currentRole === 'admin') {
+                        window.location.href = 'admin-dashboard.html';
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
+                }, 1300);
+            }, 1200);
+        }
+
+        loginForm.addEventListener('submit', handleLoginSubmit);
+
+        // On page load: load remembered credentials and adjust active role
+        loadSavedCredentials();
+
+        // extra touch: for mobile/tablet ensure input zoom not forced
+        const allInputs = document.querySelectorAll('input');
+        allInputs.forEach(inp => {
+            inp.addEventListener('touchstart', function() {
+                // just for passive improvement
+            });
+        });
+        
+        // Also handle if user clicks on label for checkbox smoothly
+        const rememberLabel = document.querySelector('.remember');
+        if(rememberLabel) {
+            rememberLabel.addEventListener('click', (e) => {
+                if(e.target.tagName !== 'INPUT') {
+                    const cb = document.getElementById('rememberCheckbox');
+                    if(cb) cb.checked = !cb.checked;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

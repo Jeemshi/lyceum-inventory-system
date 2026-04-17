@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Lyceum Kitchen | Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #F8FAFC;
+            overflow-x: hidden;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        .app {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: #F8FAFC;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: #000000;
+            width: 280px;
+            position: fixed;
+            top: 0;
+            left: -280px;
+            bottom: 0;
+            z-index: 1000;
+            transition: left 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            backdrop-filter: blur(3px);
+            display: none;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border-bottom: 1px solid #2C2C2C;
+        }
+
+        .sidebar-logo {
+            font-size: 28px;
+            background: #8B0000;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            color: #FFFFFF;
+        }
+
+        .sidebar-title h2 {
+            font-size: 18px;
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+
+        .sidebar-title p {
+            font-size: 11px;
+            color: #A0A0A0;
+        }
+
+        .sidebar-profile {
+            padding: 16px 20px;
+            border-bottom: 1px solid #2C2C2C;
+        }
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 14px;
+            background: #141414;
+            border-radius: 20px;
+            border: 1px solid #2C2C2C;
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            background: #8B0000;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .profile-details {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #FFFFFF;
+        }
+
+        .profile-role {
+            font-size: 10px;
+            color: #999999;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 20px 16px;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            color: #A0A0A0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: #1A1A1A;
+            color: #FFFFFF;
+        }
+
+        .nav-item.active {
+            background: #8B0000;
+            color: #FFFFFF;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            min-width: 28px;
+        }
+
+        .logout-item {
+            margin-top: auto;
+            border-top: 1px solid #2C2C2C;
+            padding-top: 16px;
+            margin-bottom: 20px;
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .top-bar {
+            background: white;
+            padding: 14px 20px;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .burger-menu {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: #F8FAFC;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #E5E7EB;
+            flex-shrink: 0;
+        }
+
+        .burger-menu:active {
+            background: #E2E8F0;
+        }
+
+        .hamburger-icon {
+            width: 22px;
+            height: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .hamburger-icon span {
+            display: block;
+            height: 2.5px;
+            background: #1A1A1A;
+            border-radius: 4px;
+        }
+
+        .page-title-section {
+            flex: 1;
+        }
+
+        .page-title-section h1 {
+            font-size: 20px;
+            color: #1A1A1A;
+            font-weight: 700;
+        }
+
+        .page-title-section p {
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .notification {
+            position: relative;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            background: #F8FAFC;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #E5E7EB;
+            flex-shrink: 0;
+        }
+
+        .notification span {
+            font-size: 20px;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #8B0000;
+            color: white;
+            font-size: 10px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            font-weight: 700;
+        }
+
+        .date-display {
+            background: #F8FAFC;
+            padding: 6px 12px;
+            border-radius: 40px;
+            font-size: 11px;
+            font-weight: 500;
+            border: 1px solid #E5E7EB;
+            white-space: nowrap;
+            display: none;
+        }
+
+        .dashboard-content {
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            padding-bottom: 100px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: #8B0000;
+            border-radius: 24px;
+            padding: 18px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 20px rgba(139, 0, 0, 0.15);
+        }
+
+        .stat-card:active {
+            transform: scale(0.98);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .stat-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 10px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: white;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 13px;
+            font-weight: 600;
+            margin: 8px 0 10px;
+        }
+
+        .stat-progress {
+            margin-top: 10px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 10px;
+            margin-bottom: 4px;
+        }
+
+        .progress-bar {
+            height: 5px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #FFFFFF;
+            border-radius: 10px;
+        }
+
+        .stat-footer {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 28px;
+            padding: 20px;
+            border: 1px solid #E5E7EB;
+            display: flex;
+            flex-direction: column;
+            max-height: 420px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1A1A1A;
+        }
+
+        .view-link {
+            color: #8B0000;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border: 1.5px solid #8B0000;
+            border-radius: 40px;
+            background: white;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .view-link:active {
+            background: #8B0000;
+            color: white;
+        }
+
+        .expiring-list, .expired-list {
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 4px;
+        }
+
+        .expiring-item, .expired-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border-radius: 20px;
+            gap: 8px;
+            flex-wrap: wrap;
+            background: #F8FAFC;
+            border: 1px solid #E5E7EB;
+        }
+
+        .expired-item {
+            background: #FEF2F2;
+            border-color: #FECACA;
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 2;
+            min-width: 120px;
+        }
+
+        .item-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .item-details h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .item-details p {
+            font-size: 11px;
+            color: #64748B;
+        }
+
+        .item-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .recipe-btn, .remove-btn {
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 11px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .recipe-btn {
+            background: #8B0000;
+            color: white;
+        }
+
+        .remove-btn {
+            background: #DC2626;
+            color: white;
+        }
+
+        .date, .item-qty {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 40px;
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .date {
+            background: rgba(192, 86, 33, 0.1);
+            color: #C05621;
+        }
+
+        .item-qty {
+            background: rgba(197, 48, 48, 0.1);
+            color: #C53030;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .category-card {
+            background: #F8FAFC;
+            border-radius: 20px;
+            padding: 14px;
+            cursor: pointer;
+            border: 1px solid #E5E7EB;
+            transition: 0.2s;
+        }
+
+        .category-card:active {
+            background: #FEE9E9;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .category-icon {
+            width: 38px;
+            height: 38px;
+            background: white;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .category-name {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .category-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+        }
+
+        .category-count {
+            color: #334155;
+            font-weight: 500;
+        }
+
+        .category-status {
+            background: rgba(197, 48, 48, 0.1);
+            padding: 3px 10px;
+            border-radius: 40px;
+            color: #C53030;
+            font-weight: 700;
+            font-size: 10px;
+        }
+
+        /* QR Scanner Modal - Automatic Detection */
+        .scanner-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scanner-modal.active {
+            display: flex;
+        }
+
+        .scanner-container {
+            width: 100%;
+            max-width: 500px;
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #qr-reader {
+            width: 100%;
+        }
+
+        #qr-reader video {
+            width: 100%;
+            height: auto;
+        }
+
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+        }
+
+        .scanner-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        .scan-guide {
+            color: white;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 14px;
+        }
+
+        .manual-input-section {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin: 16px;
+        }
+
+        .manual-input-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .manual-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .manual-input-group input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 30px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .manual-input-group input:focus {
+            border-color: #8B0000;
+            outline: none;
+        }
+
+        .manual-submit-btn {
+            padding: 12px 20px;
+            background: #8B0000;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Product Update Modal */
+        .product-update-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2100;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .product-update-modal.active {
+            display: flex;
+        }
+
+        .product-update-card {
+            background: white;
+            border-radius: 32px;
+            max-width: 400px;
+            width: 100%;
+            padding: 28px;
+            text-align: center;
+        }
+
+        .product-update-icon {
+            font-size: 64px;
+            margin-bottom: 12px;
+        }
+
+        .product-update-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .product-update-category {
+            color: #8B0000;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .current-stock {
+            background: #F8FAFC;
+            padding: 16px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .current-stock-label {
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .current-stock-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1A1A1A;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .qty-control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+            border: none;
+            background: #8B0000;
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .update-quantity {
+            font-size: 24px;
+            font-weight: 700;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 40px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+
+        .action-btn.confirm {
+            background: #8B0000;
+            color: white;
+        }
+
+        .action-btn.cancel {
+            background: #E5E7EB;
+            color: #666;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 60px;
+            z-index: 2200;
+            font-size: 13px;
+            transition: transform 0.3s;
+            white-space: nowrap;
+            max-width: 90vw;
+            white-space: normal;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* CAMERA BUTTON */
+        .camera-fab {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, #8B0000, #6B0000);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(139, 0, 0, 0.4);
+            z-index: 98;
+            transition: all 0.3s ease;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .camera-fab:active {
+            transform: translateX(-50%) scale(0.92);
+        }
+
+        .camera-fab i {
+            font-size: 28px;
+            color: white;
+        }
+
+        @media (max-width: 1024px) {
+            .camera-fab {
+                display: flex;
+            }
+            .burger-menu {
+                display: flex !important;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .camera-fab {
+                display: none !important;
+            }
+            .burger-menu {
+                display: none !important;
+            }
+            .sidebar {
+                position: relative;
+                left: 0;
+                width: 280px;
+                height: 100vh;
+                position: sticky;
+                top: 0;
+                flex-shrink: 0;
+            }
+            .sidebar-overlay {
+                display: none !important;
+            }
+            .app {
+                flex-direction: row;
+            }
+            .date-display {
+                display: inline-block;
+            }
+            .top-bar {
+                padding: 16px 32px;
+            }
+            .page-title-section h1 {
+                font-size: 24px;
+            }
+            .dashboard-content {
+                padding: 28px 32px;
+                padding-bottom: 28px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stat-value {
+                font-size: 26px;
+            }
+            .card-header h2 {
+                font-size: 16px;
+            }
+            .date-display {
+                display: none;
+            }
+            .camera-fab {
+                width: 55px;
+                height: 55px;
+                bottom: 20px;
+            }
+            .camera-fab i {
+                font-size: 24px;
+            }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1100;
+            backdrop-filter: blur(4px);
+            padding: 20px;
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 32px;
+            width: 90%;
+            max-width: 360px;
+            padding: 28px 20px;
+            text-align: center;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #E2E8F0;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8B0000;
+            border-radius: 10px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- HTML5 QR Code Library - For automatic QR scanning -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body>
+<div class="app">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">🍳</div>
+            <div class="sidebar-title">
+                <h2>Lyceum Kitchen</h2>
+                <p>Inventory System</p>
+            </div>
+        </div>
+
+        <div class="sidebar-profile">
+            <div class="profile-card">
+                <div class="profile-avatar">JS</div>
+                <div class="profile-details">
+                    <div class="profile-name">Juan Santos</div>
+                    <div class="profile-role">Kitchen Staff</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-menu">
+            <div class="nav-item active" data-page="dashboard"><span class="nav-icon">📊</span><span>Dashboard</span></div>
+            <div class="nav-item" data-page="inventory"><span class="nav-icon">📦</span><span>Inventory</span></div>
+            <div class="nav-item" data-page="expiring"><span class="nav-icon">⏰</span><span>Expiring</span></div>
+            <div class="nav-item" data-page="stocks"><span class="nav-icon">📉</span><span>Low Stock</span></div>
+            <div class="nav-item" data-page="recipes"><span class="nav-icon">🍳</span><span>Recipes</span></div>
+            <div class="nav-item" data-page="deliveries"><span class="nav-icon">🚚</span><span>Deliveries</span></div>
+            <div class="nav-item" data-page="reports"><span class="nav-icon">📈</span><span>Reports</span></div>
+            <div class="nav-item" data-page="activity"><span class="nav-icon">📋</span><span>Activity Logs</span></div>
+            <div class="nav-item logout-item" data-page="logout"><span class="nav-icon">🚪</span><span>Logout</span></div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="burger-menu" id="burgerMenu">
+                <div class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            <div class="page-title-section">
+                <h1>Dashboard</h1>
+                <p>Welcome back, Juan!</p>
+            </div>
+            <div class="top-right">
+                <div class="notification" onclick="window.location.href='notifications.html'">
+                    <span>🔔</span>
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="date-display" id="currentDate"></div>
+            </div>
+        </div>
+
+        <div class="dashboard-content" id="dashboardContent"></div>
+    </div>
+</div>
+
+<!-- CAMERA BUTTON -->
+<div class="camera-fab" id="cameraFabBtn">
+    <i class="fas fa-camera"></i>
+</div>
+
+<!-- QR Scanner Modal -->
+<div class="scanner-modal" id="scannerModal">
+    <div class="scanner-container">
+        <button class="scanner-close" id="closeScannerBtn">✕</button>
+        <div id="qr-reader" style="width: 100%;"></div>
+        <div class="scanner-overlay">
+            <div class="scan-guide"><i class="fas fa-qrcode"></i> Position QR code in frame</div>
+        </div>
+        <div class="manual-input-section">
+            <div class="manual-input-title">Or enter QR code manually:</div>
+            <div class="manual-input-group">
+                <input type="text" id="manualQrInput" placeholder="Enter QR code value...">
+                <button class="manual-submit-btn" id="manualSubmitBtn">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Product Update Modal -->
+<div class="product-update-modal" id="productUpdateModal">
+    <div class="product-update-card">
+        <div class="product-update-icon" id="updateIcon">📦</div>
+        <div class="product-update-name" id="updateName">Product Name</div>
+        <div class="product-update-category" id="updateCategory">Category</div>
+        <div class="current-stock">
+            <div class="current-stock-label">Current Stock</div>
+            <div class="current-stock-value" id="currentStock">0</div>
+            <div id="currentStockUnit" style="font-size: 14px; color: #64748B;"></div>
+        </div>
+        <div class="quantity-controls">
+            <button class="qty-control-btn" id="decreaseQty">-</button>
+            <span class="update-quantity" id="updateQuantity">0</span>
+            <button class="qty-control-btn" id="increaseQty">+</button>
+        </div>
+        <div class="action-buttons">
+            <button class="action-btn cancel" id="cancelUpdateBtn">Cancel</button>
+            <button class="action-btn confirm" id="confirmUpdateBtn">Update Stock</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast">Ready</div>
+
+<script>
+    // QR Code to Product Database
+    const productDatabase = {
+        "PROD-TOMATO-001": { id: 1, name: "Tomatoes", category: "Vegetables", unit: "pcs", price: 35, qty: 24, icon: "🍅" },
+        "PROD-CHICKEN-002": { id: 2, name: "Chicken Breast", category: "Meat", unit: "pcs", price: 120, qty: 8, icon: "🍗" },
+        "PROD-MILK-003": { id: 3, name: "Fresh Milk", category: "Dairy", unit: "pcs", price: 65, qty: 12, icon: "🥛" },
+        "PROD-RICE-004": { id: 4, name: "White Rice", category: "Grains", unit: "kg", price: 56, qty: 5, icon: "🍚" },
+        "PROD-ONION-005": { id: 5, name: "Onions", category: "Vegetables", unit: "pcs", price: 25, qty: 3, icon: "🧅" },
+        "PROD-SALMON-006": { id: 6, name: "Salmon Fillet", category: "Seafood", unit: "pcs", price: 210, qty: 6, icon: "🐟" },
+        "PROD-GARLIC-007": { id: 7, name: "Garlic", category: "Spices", unit: "bulb", price: 18, qty: 2, icon: "🧄" },
+        "PROD-CHEESE-008": { id: 8, name: "Cheddar Cheese", category: "Dairy", unit: "pcs", price: 85, qty: 4, icon: "🧀" }
+    };
+
+    let currentScannedProduct = null;
+    let newQuantity = 0;
+    let html5QrCode = null;
+
+    let expiredItems = [
+        { id: 'exp1', name: 'Chicken Breast', category: 'Meat', qty: '8 pcs', expiryDate: 'Jan 15', lossValue: 600, icon: '🍗' },
+        { id: 'exp2', name: 'Salmon Fillet', category: 'Seafood', qty: '6 pcs', expiryDate: 'Jan 14', lossValue: 450, icon: '🐟' },
+        { id: 'exp3', name: 'Shrimp', category: 'Seafood', qty: '4 pcs', expiryDate: 'Jan 13', lossValue: 200, icon: '🦐' }
+    ];
+    
+    let expiringItems = [
+        { id: 'soon1', name: 'Tomatoes', category: 'Vegetables', qty: '24 pcs', daysLeft: 3, expiryDate: 'Jan 20', icon: '🍅', recipeLink: 'recipes.html?item=tomato' },
+        { id: 'soon2', name: 'Fresh Milk', category: 'Dairy', qty: '12 pcs', daysLeft: 5, expiryDate: 'Jan 22', icon: '🥛', recipeLink: 'recipes.html?item=milk' },
+        { id: 'soon3', name: 'Cheddar Cheese', category: 'Dairy', qty: '8 pcs', daysLeft: 4, expiryDate: 'Jan 21', icon: '🧀', recipeLink: 'recipes.html?item=cheese' },
+        { id: 'soon4', name: 'Lettuce', category: 'Vegetables', qty: '10 pcs', daysLeft: 2, expiryDate: 'Jan 19', icon: '🥬', recipeLink: 'recipes.html?item=lettuce' }
+    ];
+    
+    let totalFinancialLoss = 1250;
+    let toastTimeout = null;
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toast.textContent = msg;
+        toast.classList.add('show');
+        toastTimeout = setTimeout(() => {
+            toast.classList.remove('show');
+            toastTimeout = null;
+        }, 2500);
+    }
+
+    // Handle scanned QR code - AUTOMATICALLY shows modal!
+    function handleScannedQR(qrCode) {
+        const product = productDatabase[qrCode];
+        
+        if (product) {
+            currentScannedProduct = { ...product };
+            newQuantity = product.qty;
+            
+            // Stop scanner and close modal
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().then(() => {
+                    scannerModal.classList.remove('active');
+                    showProductUpdateModal(product);
+                }).catch(err => console.log("Stop error:", err));
+            } else {
+                scannerModal.classList.remove('active');
+                showProductUpdateModal(product);
+            }
+            
+            showToast(`✓ Found: ${product.name}`);
+        } else {
+            showToast(`❌ Product not found! "${qrCode}" is not in database`);
+        }
+    }
+
+    function showProductUpdateModal(product) {
+        document.getElementById('updateIcon').textContent = product.icon;
+        document.getElementById('updateName').textContent = product.name;
+        document.getElementById('updateCategory').textContent = product.category;
+        document.getElementById('currentStock').textContent = `${product.qty}`;
+        document.getElementById('currentStockUnit').textContent = product.unit;
+        document.getElementById('updateQuantity').textContent = product.qty;
+        newQuantity = product.qty;
+        productUpdateModal.classList.add('active');
+    }
+
+    // Start QR scanner
+    async function startQrScanner() {
+        const qrReaderDiv = document.getElementById('qr-reader');
+        qrReaderDiv.innerHTML = '';
+        
+        html5QrCode = new Html5Qrcode("qr-reader");
+        
+        const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+            console.log("QR Code detected:", decodedText);
+            handleScannedQR(decodedText);
+        };
+        
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+        
+        try {
+            await html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
+            showToast("Camera ready - Scan QR code");
+        } catch (err) {
+            console.error("Failed to start scanner:", err);
+            showToast("Camera error. Please use manual entry.");
+        }
+    }
+
+    function stopScanner() {
+        if (html5QrCode && html5QrCode.isScanning) {
+            html5QrCode.stop().catch(err => console.log("Stop error:", err));
+        }
+    }
+
+    // Quantity controls
+    document.getElementById('decreaseQty').addEventListener('click', () => {
+        if (newQuantity > 0) {
+            newQuantity--;
+            document.getElementById('updateQuantity').textContent = newQuantity;
+        }
+    });
+
+    document.getElementById('increaseQty').addEventListener('click', () => {
+        newQuantity++;
+        document.getElementById('updateQuantity').textContent = newQuantity;
+    });
+
+    document.getElementById('confirmUpdateBtn').addEventListener('click', () => {
+        if (currentScannedProduct) {
+            const difference = newQuantity - currentScannedProduct.qty;
+            const action = difference > 0 ? `added ${difference}` : `removed ${Math.abs(difference)}`;
+            showToast(`✓ ${currentScannedProduct.name} updated! ${action} ${Math.abs(difference)} ${currentScannedProduct.unit}`);
+            
+            // Update database
+            currentScannedProduct.qty = newQuantity;
+            const qrKey = Object.keys(productDatabase).find(key => productDatabase[key].id === currentScannedProduct.id);
+            if (qrKey) productDatabase[qrKey].qty = newQuantity;
+            
+            productUpdateModal.classList.remove('active');
+            currentScannedProduct = null;
+            
+            // Refresh dashboard
+            renderDashboard();
+        }
+    });
+
+    document.getElementById('cancelUpdateBtn').addEventListener('click', () => {
+        productUpdateModal.classList.remove('active');
+        currentScannedProduct = null;
+    });
+
+    document.getElementById('closeScannerBtn').addEventListener('click', () => {
+        stopScanner();
+        scannerModal.classList.remove('active');
+    });
+
+    // Manual input handler
+    document.getElementById('manualSubmitBtn').addEventListener('click', () => {
+        const input = document.getElementById('manualQrInput').value.trim();
+        if (input) {
+            handleScannedQR(input);
+            document.getElementById('manualQrInput').value = '';
+        } else {
+            showToast('Please enter a QR code value');
+        }
+    });
+
+    document.getElementById('manualQrInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            document.getElementById('manualSubmitBtn').click();
+        }
+    });
+
+    // Camera button click - opens scanner
+    document.getElementById('cameraFabBtn').addEventListener('click', () => {
+        scannerModal.classList.add('active');
+        setTimeout(() => startQrScanner(), 500);
+    });
+
+    // Sidebar functions
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const burgerBtn = document.getElementById('burgerMenu');
+    
+    function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    burgerBtn.addEventListener('click', openSidebar);
+    overlay.addEventListener('click', closeSidebar);
+    
+    function navigateTo(page) {
+        if(page === 'logout') {
+            alert('You have been logged out. Redirecting to login page...');
+            window.location.href = 'login.html';
+            return;
+        }
+        if(page === 'activity') {
+            alert('📋 Activity Logs: Recent inventory updates, removals, and recipe views (Demo mode).');
+            return;
+        }
+        window.location.href = page + '.html';
+    }
+    
+    function showRemoveConfirmation(itemId, itemName, lossValue) {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-container">
+                <h3>Confirm Removal</h3>
+                <p>Remove "<strong>${itemName}</strong>" from expired list?</p>
+                <div class="modal-buttons" style="display:flex; gap:12px; margin-top:20px;">
+                    <button class="modal-confirm" style="background:#DC2626; color:white; padding:10px 24px; border-radius:40px; border:none;">Yes</button>
+                    <button class="modal-cancel" style="background:#E5E7EB; padding:10px 24px; border-radius:40px; border:none;">Cancel</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.querySelector('.modal-confirm').onclick = () => {
+            const index = expiredItems.findIndex(i => i.id === itemId);
+            if(index !== -1) expiredItems.splice(index, 1);
+            renderDashboard();
+            modal.remove();
+        };
+        modal.querySelector('.modal-cancel').onclick = () => modal.remove();
+    }
+    
+    function renderDashboard() {
+        const container = document.getElementById('dashboardContent');
+        const meatCount = expiredItems.filter(i => i.category === 'Meat').length;
+        const dairyCount = expiredItems.filter(i => i.category === 'Dairy').length;
+        const expiringPercent = Math.min(100, (expiringItems.length / 12) * 100);
+        const expiredPercent = Math.min(100, (expiredItems.length / 10) * 100);
+        const totalActiveItems = 82 - expiredItems.length;
+        
+        let totalValue = 0;
+        Object.values(productDatabase).forEach(p => {
+            totalValue += p.qty * p.price;
+        });
+        
+        container.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-card" onclick="navigateTo('inventory')">
+                    <div class="stat-header"><div class="stat-icon">📦</div><span class="stat-badge">+12 this week</span></div>
+                    <div class="stat-value">${totalActiveItems}</div>
+                    <div class="stat-label">Total Items</div>
+                    <div class="stat-progress"><div class="progress-label"><span>Storage</span><span>78%</span></div><div class="progress-bar"><div class="progress-fill" style="width:78%"></div></div></div>
+                    <div class="stat-footer"><span>7 categories</span><span>↑ 5%</span></div>
+                </div>
+                <div class="stat-card" onclick="navigateTo('expiring')">
+                    <div class="stat-header"><div class="stat-icon">⏰</div><span class="stat-badge">⚠️ ${expiringItems.length} items</span></div>
+                    <div class="stat-value">${expiringItems.length}</div>
+                    <div class="stat-label">Expiring Soon</div>
+                    <div class="stat-progress"><div class="progress-label"><span>Next 7 days</span><span>${expiringItems.length}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${expiringPercent}%"></div></div></div>
+                    <div class="stat-footer"><span>Earliest: Jan 19</span><span>critical</span></div>
+                </div>
+                <div class="stat-card" onclick="navigateTo('expired-items')">
+                    <div class="stat-header"><div class="stat-icon">❌</div><span class="stat-badge">₱${totalFinancialLoss} lost</span></div>
+                    <div class="stat-value">${expiredItems.length}</div>
+                    <div class="stat-label">Expired Items</div>
+                    <div class="stat-progress"><div class="progress-label"><span>Value lost</span><span>₱${totalFinancialLoss}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${expiredPercent}%"></div></div></div>
+                    <div class="stat-footer"><span>🥩 ${meatCount} meat, 🥛 ${dairyCount} dairy</span><span>recorded</span></div>
+                </div>
+                <div class="stat-card" onclick="navigateTo('stocks')">
+                    <div class="stat-header"><div class="stat-icon">📉</div><span class="stat-badge">8 items low</span></div>
+                    <div class="stat-value">8</div>
+                    <div class="stat-label">Low Stock Items</div>
+                    <div class="stat-progress"><div class="progress-label"><span>Below threshold</span><span>8 items</span></div><div class="progress-bar"><div class="progress-fill" style="width:25%"></div></div></div>
+                    <div class="stat-footer"><span>4 categories</span><span>critical: flour</span></div>
+                </div>
+            </div>
+            <div class="main-grid">
+                <div class="card">
+                    <div class="card-header"><h2><span>⏳</span> Expiring Soon</h2><button class="view-link" onclick="navigateTo('expiring')">View All</button></div>
+                    <div class="expiring-list" id="expiringList"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h2><span>⚠️</span> Expired Items</h2><button class="view-link" onclick="navigateTo('expired-items')">View All</button></div>
+                    <div class="expired-list" id="expiredList"></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header"><h2><span>📊</span> Low Stock by Category</h2><button class="view-link" onclick="navigateTo('stocks')">View All</button></div>
+                <div class="categories-grid">
+                    <div class="category-card" onclick="navigateTo('inventory?category=vegetables')"><div class="category-header"><div class="category-icon">🥕</div><div class="category-name">Vegetables</div></div><div class="category-stats"><span class="category-count">3 items low</span><span class="category-status">Reorder</span></div></div>
+                    <div class="category-card" onclick="navigateTo('inventory?category=dairy')"><div class="category-header"><div class="category-icon">🥛</div><div class="category-name">Dairy</div></div><div class="category-stats"><span class="category-count">2 items low</span><span class="category-status">Reorder</span></div></div>
+                    <div class="category-card" onclick="navigateTo('inventory?category=meat')"><div class="category-header"><div class="category-icon">🥩</div><div class="category-name">Meat</div></div><div class="category-stats"><span class="category-count">1 item low</span><span class="category-status">Reorder</span></div></div>
+                    <div class="category-card" onclick="navigateTo('inventory?category=grains')"><div class="category-header"><div class="category-icon">🌾</div><div class="category-name">Grains</div></div><div class="category-stats"><span class="category-count">2 items low</span><span class="category-status">Reorder</span></div></div>
+                </div>
+            </div>
+        `;
+        
+        const expiringContainer = document.getElementById('expiringList');
+        if(expiringItems.length === 0) {
+            expiringContainer.innerHTML = '<div style="padding:24px;text-align:center;color:#64748B;">✨ No expiring items</div>';
+        } else {
+            expiringContainer.innerHTML = expiringItems.map(item => `
+                <div class="expiring-item">
+                    <div class="item-info"><div class="item-icon">${item.icon}</div><div class="item-details"><h4>${item.name}</h4><p>${item.qty} • ${item.category}</p></div></div>
+                    <div class="item-actions"><button class="recipe-btn" data-recipe="${item.recipeLink}">🍳 Recipe</button><div class="date">${item.daysLeft} days left</div></div>
+                </div>
+            `).join('');
+            document.querySelectorAll('.recipe-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    window.location.href = btn.getAttribute('data-recipe');
+                });
+            });
+        }
+        
+        const expiredContainer = document.getElementById('expiredList');
+        if(expiredItems.length === 0) {
+            expiredContainer.innerHTML = '<div style="padding:24px;text-align:center;color:#64748B;">✅ No expired items</div>';
+        } else {
+            expiredContainer.innerHTML = expiredItems.map(item => `
+                <div class="expired-item">
+                    <div class="item-info"><div class="item-icon">${item.icon}</div><div class="item-details"><h4>${item.name}</h4><p>${item.qty} • ${item.category}</p></div></div>
+                    <div class="item-actions"><button class="remove-btn" data-id="${item.id}" data-name="${item.name}" data-loss="${item.lossValue}">Remove</button><span class="item-qty">Expired ${item.expiryDate}</span></div>
+                </div>
+            `).join('');
+            document.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.dataset.id, name = btn.dataset.name, loss = parseInt(btn.dataset.loss);
+                    showRemoveConfirmation(id, name, loss);
+                });
+            });
+        }
+    }
+    
+    function updateDate() {
+        const now = new Date();
+        const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+        document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+    }
+    
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const page = item.getAttribute('data-page');
+            if(page === 'dashboard') {
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+                renderDashboard();
+            } else {
+                navigateTo(page);
+            }
+            if (window.innerWidth < 1025) closeSidebar();
+        });
+    });
+    
+    renderDashboard();
+    updateDate();
+    
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 1025) closeSidebar();
+    });
+</script>
+</body>
+</html>
