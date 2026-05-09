@@ -625,7 +625,7 @@
             font-size: 10px;
         }
 
-        /* QR Scanner Modal - Automatic Detection */
+        /* Enhanced Scanner Modal with Mode Switching */
         .scanner-modal {
             display: none;
             position: fixed;
@@ -638,6 +638,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            overflow-y: auto;
         }
 
         .scanner-modal.active {
@@ -653,6 +654,31 @@
             position: relative;
         }
 
+        .mode-switch-buttons {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            background: #1a1a1a;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            padding: 10px 24px;
+            border-radius: 40px;
+            border: 2px solid #8B0000;
+            background: transparent;
+            color: #8B0000;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .mode-btn.active {
+            background: #8B0000;
+            color: white;
+        }
+
         #qr-reader {
             width: 100%;
         }
@@ -660,6 +686,57 @@
         #qr-reader video {
             width: 100%;
             height: auto;
+        }
+
+        /* Image Recognition Camera View */
+        .image-camera-view {
+            position: relative;
+            width: 100%;
+            background: #000;
+        }
+
+        #imageVideoPreview {
+            width: 100%;
+            height: auto;
+            transform: scaleX(-1);
+        }
+
+        .capture-btn {
+            background: #8B0000;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 16px;
+            cursor: pointer;
+            width: calc(100% - 32px);
+        }
+
+        .recognition-result {
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px;
+            margin: 12px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .confidence-bar {
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: #8B0000;
+            border-radius: 2px;
+            transition: width 0.3s;
         }
 
         .scanner-overlay {
@@ -886,6 +963,10 @@
             visibility: visible;
         }
 
+        .toast.error {
+            background: #DC2626;
+        }
+
         /* CAMERA BUTTON */
         .camera-fab {
             position: fixed;
@@ -1018,7 +1099,6 @@
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- HTML5 QR Code Library - For automatic QR scanning -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
@@ -1030,7 +1110,7 @@
             <div class="sidebar-logo">🍳</div>
             <div class="sidebar-title">
                 <h2>Lyceum Kitchen</h2>
-                <p>Inventory System</p>
+                <p>Smart Inventory System</p>
             </div>
         </div>
 
@@ -1071,7 +1151,7 @@
                 <p>Welcome back, Juan!</p>
             </div>
             <div class="top-right">
-                <div class="notification" onclick="window.location.href='notifications.html'">
+                <div class="notification">
                     <span>🔔</span>
                     <span class="notification-badge">3</span>
                 </div>
@@ -1088,18 +1168,45 @@
     <i class="fas fa-camera"></i>
 </div>
 
-<!-- QR Scanner Modal -->
+<!-- Scanner Modal with Mode Switching -->
 <div class="scanner-modal" id="scannerModal">
     <div class="scanner-container">
         <button class="scanner-close" id="closeScannerBtn">✕</button>
-        <div id="qr-reader" style="width: 100%;"></div>
-        <div class="scanner-overlay">
-            <div class="scan-guide"><i class="fas fa-qrcode"></i> Position QR code in frame</div>
+        
+        <!-- Mode Selection -->
+        <div class="mode-switch-buttons">
+            <button class="mode-btn active" data-mode="qr">📱 QR Code</button>
+            <button class="mode-btn" data-mode="image">🖼️ Image Recognition</button>
         </div>
+        
+        <!-- QR Scanner Section -->
+        <div id="qrScannerSection">
+            <div id="qr-reader" style="width: 100%;"></div>
+            <div class="scanner-overlay">
+                <div class="scan-guide"><i class="fas fa-qrcode"></i> Position QR code in frame</div>
+            </div>
+        </div>
+        
+        <!-- Image Recognition Section (hidden initially) -->
+        <div id="imageRecognitionSection" style="display: none;">
+            <div class="image-camera-view">
+                <video id="imageVideoPreview" autoplay playsinline muted></video>
+            </div>
+            <button class="capture-btn" id="captureImageBtn">
+                <i class="fas fa-camera"></i> Capture & Recognize
+            </button>
+            <div id="recognitionResult" class="recognition-result" style="display: none;">
+                <div id="recognitionText"></div>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+        
         <div class="manual-input-section">
-            <div class="manual-input-title">Or enter QR code manually:</div>
+            <div class="manual-input-title">Or enter manually:</div>
             <div class="manual-input-group">
-                <input type="text" id="manualQrInput" placeholder="Enter QR code value...">
+                <input type="text" id="manualQrInput" placeholder="Enter QR code or product name...">
                 <button class="manual-submit-btn" id="manualSubmitBtn">Submit</button>
             </div>
         </div>
@@ -1132,22 +1239,58 @@
 <div class="toast" id="toast">Ready</div>
 
 <script>
-    // QR Code to Product Database
+    // ============================================
+    // PRODUCT DATABASE (expanded with color data)
+    // ============================================
     const productDatabase = {
-        "PROD-TOMATO-001": { id: 1, name: "Tomatoes", category: "Vegetables", unit: "pcs", price: 35, qty: 24, icon: "🍅" },
-        "PROD-CHICKEN-002": { id: 2, name: "Chicken Breast", category: "Meat", unit: "pcs", price: 120, qty: 8, icon: "🍗" },
-        "PROD-MILK-003": { id: 3, name: "Fresh Milk", category: "Dairy", unit: "pcs", price: 65, qty: 12, icon: "🥛" },
-        "PROD-RICE-004": { id: 4, name: "White Rice", category: "Grains", unit: "kg", price: 56, qty: 5, icon: "🍚" },
-        "PROD-ONION-005": { id: 5, name: "Onions", category: "Vegetables", unit: "pcs", price: 25, qty: 3, icon: "🧅" },
-        "PROD-SALMON-006": { id: 6, name: "Salmon Fillet", category: "Seafood", unit: "pcs", price: 210, qty: 6, icon: "🐟" },
-        "PROD-GARLIC-007": { id: 7, name: "Garlic", category: "Spices", unit: "bulb", price: 18, qty: 2, icon: "🧄" },
-        "PROD-CHEESE-008": { id: 8, name: "Cheddar Cheese", category: "Dairy", unit: "pcs", price: 85, qty: 4, icon: "🧀" }
+        "PROD-TOMATO-001": { id: 1, name: "Tomatoes", category: "Vegetables", unit: "pcs", price: 35, qty: 24, icon: "🍅", colorProfile: { dominant: "red", variations: ["red", "orange"] } },
+        "PROD-CHICKEN-002": { id: 2, name: "Chicken Breast", category: "Meat", unit: "pcs", price: 120, qty: 8, icon: "🍗", colorProfile: { dominant: "white/pink", variations: ["white", "pink"] } },
+        "PROD-MILK-003": { id: 3, name: "Fresh Milk", category: "Dairy", unit: "pcs", price: 65, qty: 12, icon: "🥛", colorProfile: { dominant: "white", variations: ["white"] } },
+        "PROD-RICE-004": { id: 4, name: "White Rice", category: "Grains", unit: "kg", price: 56, qty: 5, icon: "🍚", colorProfile: { dominant: "white", variations: ["white"] } },
+        "PROD-ONION-005": { id: 5, name: "Onions", category: "Vegetables", unit: "pcs", price: 25, qty: 3, icon: "🧅", colorProfile: { dominant: "brown", variations: ["brown", "yellow"] } },
+        "PROD-SALMON-006": { id: 6, name: "Salmon Fillet", category: "Seafood", unit: "pcs", price: 210, qty: 6, icon: "🐟", colorProfile: { dominant: "orange/pink", variations: ["orange", "pink"] } },
+        "PROD-GARLIC-007": { id: 7, name: "Garlic", category: "Spices", unit: "bulb", price: 18, qty: 2, icon: "🧄", colorProfile: { dominant: "white", variations: ["white"] } },
+        "PROD-CHEESE-008": { id: 8, name: "Cheddar Cheese", category: "Dairy", unit: "pcs", price: 85, qty: 4, icon: "🧀", colorProfile: { dominant: "yellow", variations: ["yellow", "orange"] } },
+        "PROD-EGG-009": { id: 9, name: "Eggs", category: "Dairy", unit: "dozen", price: 95, qty: 10, icon: "🥚", colorProfile: { dominant: "white/brown", variations: ["white", "brown"] } },
+        "PROD-CARROT-010": { id: 10, name: "Carrots", category: "Vegetables", unit: "pcs", price: 15, qty: 15, icon: "🥕", colorProfile: { dominant: "orange", variations: ["orange"] } },
+        "PROD-POTATO-011": { id: 11, name: "Potatoes", category: "Vegetables", unit: "pcs", price: 10, qty: 20, icon: "🥔", colorProfile: { dominant: "brown", variations: ["brown"] } },
+        "PROD-BANANA-012": { id: 12, name: "Bananas", category: "Fruits", unit: "pcs", price: 8, qty: 12, icon: "🍌", colorProfile: { dominant: "yellow", variations: ["yellow"] } }
     };
-
+    
+    // Color-to-product mapping for image recognition
+    const colorRecognitionMap = {
+        "red": ["Tomatoes"],
+        "orange": ["Carrots", "Salmon Fillet"],
+        "yellow": ["Bananas", "Cheddar Cheese"],
+        "brown": ["Onions", "Potatoes", "Eggs"],
+        "white": ["Rice", "Garlic", "Milk", "Eggs", "Chicken Breast"],
+        "pink": ["Salmon Fillet", "Chicken Breast"],
+        "green": ["Lettuce", "Broccoli"]
+    };
+    
+    // Name aliases for text-based recognition
+    const nameAliases = {
+        "tomato": "Tomatoes",
+        "tomatos": "Tomatoes",
+        "chicken": "Chicken Breast",
+        "milk": "Fresh Milk",
+        "rice": "White Rice",
+        "onion": "Onions",
+        "salmon": "Salmon Fillet",
+        "garlic": "Garlic",
+        "cheese": "Cheddar Cheese",
+        "egg": "Eggs",
+        "carrot": "Carrots",
+        "potato": "Potatoes",
+        "banana": "Bananas"
+    };
+    
     let currentScannedProduct = null;
     let newQuantity = 0;
     let html5QrCode = null;
-
+    let imageStream = null;
+    let currentMode = "qr";
+    
     let expiredItems = [
         { id: 'exp1', name: 'Chicken Breast', category: 'Meat', qty: '8 pcs', expiryDate: 'Jan 15', lossValue: 600, icon: '🍗' },
         { id: 'exp2', name: 'Salmon Fillet', category: 'Seafood', qty: '6 pcs', expiryDate: 'Jan 14', lossValue: 450, icon: '🐟' },
@@ -1163,19 +1306,174 @@
     
     let totalFinancialLoss = 1250;
     let toastTimeout = null;
-
-    function showToast(msg) {
+    
+    function showToast(msg, isError = false) {
         const toast = document.getElementById('toast');
         if (toastTimeout) clearTimeout(toastTimeout);
         toast.textContent = msg;
         toast.classList.add('show');
+        if (isError) toast.classList.add('error');
+        else toast.classList.remove('error');
         toastTimeout = setTimeout(() => {
             toast.classList.remove('show');
             toastTimeout = null;
         }, 2500);
     }
-
-    // Handle scanned QR code - AUTOMATICALLY shows modal!
+    
+    // ============================================
+    // IMAGE RECOGNITION USING COLOR ANALYSIS
+    // ============================================
+    async function analyzeImageColor(videoElement) {
+        // Create a canvas to capture the video frame
+        const canvas = document.createElement('canvas');
+        canvas.width = videoElement.videoWidth;
+        canvas.height = videoElement.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+        
+        // Get pixel data from the center of the image
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const sampleSize = 50;
+        const startX = Math.max(0, centerX - sampleSize/2);
+        const startY = Math.max(0, centerY - sampleSize/2);
+        const endX = Math.min(canvas.width, startX + sampleSize);
+        const endY = Math.min(canvas.height, startY + sampleSize);
+        
+        const imageData = ctx.getImageData(startX, startY, endX - startX, endY - startY);
+        const pixels = imageData.data;
+        
+        // Analyze RGB values to determine dominant color
+        let r = 0, g = 0, b = 0;
+        let pixelCount = 0;
+        
+        for (let i = 0; i < pixels.length; i += 4) {
+            r += pixels[i];
+            g += pixels[i+1];
+            b += pixels[i+2];
+            pixelCount++;
+        }
+        
+        r = Math.floor(r / pixelCount);
+        g = Math.floor(g / pixelCount);
+        b = Math.floor(b / pixelCount);
+        
+        // Determine color name from RGB
+        let detectedColor = getColorName(r, g, b);
+        
+        return { color: detectedColor, rgb: { r, g, b } };
+    }
+    
+    function getColorName(r, g, b) {
+        // Simple color detection logic
+        if (r > 200 && g < 150 && b < 150) return "red";
+        if (r > 200 && g > 150 && g < 200 && b < 100) return "orange";
+        if (r > 200 && g > 200 && b < 150) return "yellow";
+        if (r > 150 && g < 150 && b < 150) return "brown";
+        if (r > 200 && g > 200 && b > 200) return "white";
+        if (r > 150 && g > 100 && g < 180 && b > 100 && b < 180) return "pink";
+        if (r < 100 && g > 150 && b < 100) return "green";
+        if (r > 100 && r < 180 && g > 80 && g < 150 && b < 100) return "brown";
+        return "unknown";
+    }
+    
+    function findProductByColor(color) {
+        const possibleProducts = colorRecognitionMap[color] || [];
+        if (possibleProducts.length === 0) return null;
+        
+        // For simplicity, return the first matching product
+        const productName = possibleProducts[0];
+        const productEntry = Object.entries(productDatabase).find(([key, product]) => product.name === productName);
+        return productEntry ? { qrCode: productEntry[0], product: productEntry[1] } : null;
+    }
+    
+    function findProductByName(searchText) {
+        const lowerSearch = searchText.toLowerCase().trim();
+        
+        // Check aliases
+        if (nameAliases[lowerSearch]) {
+            const productEntry = Object.entries(productDatabase).find(([key, product]) => product.name === nameAliases[lowerSearch]);
+            if (productEntry) return { qrCode: productEntry[0], product: productEntry[1] };
+        }
+        
+        // Check partial matches in product names
+        for (const [qrCode, product] of Object.entries(productDatabase)) {
+            if (product.name.toLowerCase().includes(lowerSearch) || lowerSearch.includes(product.name.toLowerCase())) {
+                return { qrCode, product };
+            }
+        }
+        
+        return null;
+    }
+    
+    async function captureAndRecognize() {
+        const video = document.getElementById('imageVideoPreview');
+        if (!video || !video.videoWidth) {
+            showToast("Please wait for camera to initialize", true);
+            return;
+        }
+        
+        showToast("Analyzing image...");
+        
+        try {
+            const result = await analyzeImageColor(video);
+            console.log("Detected color:", result.color);
+            
+            const productMatch = findProductByColor(result.color);
+            const resultDiv = document.getElementById('recognitionResult');
+            const resultText = document.getElementById('recognitionText');
+            const confidenceFill = document.getElementById('confidenceFill');
+            
+            if (productMatch) {
+                const confidence = result.color === productMatch.product.colorProfile.dominant ? 85 : 65;
+                resultText.innerHTML = `<i class="fas fa-check-circle" style="color: #4CAF50;"></i> Detected: <strong>${productMatch.product.name}</strong><br><small>Color: ${result.color} | Match: ${confidence}%</small>`;
+                confidenceFill.style.width = `${confidence}%`;
+                resultDiv.style.display = 'block';
+                
+                // Auto-show update modal after 1 second
+                setTimeout(() => {
+                    currentScannedProduct = { ...productMatch.product };
+                    newQuantity = currentScannedProduct.qty;
+                    showProductUpdateModal(currentScannedProduct);
+                    stopImageRecognition();
+                    scannerModal.classList.remove('active');
+                }, 1000);
+            } else {
+                resultText.innerHTML = `<i class="fas fa-question-circle" style="color: #FF9800;"></i> Could not identify item<br><small>Detected color: ${result.color}. Try different lighting or angle.</small>`;
+                confidenceFill.style.width = `30%`;
+                resultDiv.style.display = 'block';
+            }
+        } catch (error) {
+            console.error("Recognition error:", error);
+            showToast("Recognition failed. Please try again.", true);
+        }
+    }
+    
+    async function startImageRecognition() {
+        try {
+            const video = document.getElementById('imageVideoPreview');
+            imageStream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: "environment" } 
+            });
+            video.srcObject = imageStream;
+            await video.play();
+            showToast("Camera ready - Point at an item and tap Capture");
+        } catch (err) {
+            console.error("Camera error:", err);
+            showToast("Cannot access camera. Please check permissions.", true);
+        }
+    }
+    
+    function stopImageRecognition() {
+        if (imageStream) {
+            imageStream.getTracks().forEach(track => track.stop());
+            imageStream = null;
+        }
+    }
+    
+    // ============================================
+    // QR SCANNER FUNCTIONS
+    // ============================================
     function handleScannedQR(qrCode) {
         const product = productDatabase[qrCode];
         
@@ -1183,7 +1481,6 @@
             currentScannedProduct = { ...product };
             newQuantity = product.qty;
             
-            // Stop scanner and close modal
             if (html5QrCode && html5QrCode.isScanning) {
                 html5QrCode.stop().then(() => {
                     scannerModal.classList.remove('active');
@@ -1196,22 +1493,29 @@
             
             showToast(`✓ Found: ${product.name}`);
         } else {
-            showToast(`❌ Product not found! "${qrCode}" is not in database`);
+            showToast(`❌ Product not found! "${qrCode}" is not in database`, true);
         }
     }
-
-    function showProductUpdateModal(product) {
-        document.getElementById('updateIcon').textContent = product.icon;
-        document.getElementById('updateName').textContent = product.name;
-        document.getElementById('updateCategory').textContent = product.category;
-        document.getElementById('currentStock').textContent = `${product.qty}`;
-        document.getElementById('currentStockUnit').textContent = product.unit;
-        document.getElementById('updateQuantity').textContent = product.qty;
-        newQuantity = product.qty;
-        productUpdateModal.classList.add('active');
+    
+    function handleManualInput(input) {
+        // Check if it's a QR code format
+        if (productDatabase[input]) {
+            handleScannedQR(input);
+        } else {
+            // Try to find by name
+            const productMatch = findProductByName(input);
+            if (productMatch) {
+                currentScannedProduct = { ...productMatch.product };
+                newQuantity = currentScannedProduct.qty;
+                scannerModal.classList.remove('active');
+                showProductUpdateModal(currentScannedProduct);
+                showToast(`✓ Found: ${productMatch.product.name}`);
+            } else {
+                showToast(`❌ No product found matching "${input}"`, true);
+            }
+        }
     }
-
-    // Start QR scanner
+    
     async function startQrScanner() {
         const qrReaderDiv = document.getElementById('qr-reader');
         qrReaderDiv.innerHTML = '';
@@ -1230,114 +1534,61 @@
             showToast("Camera ready - Scan QR code");
         } catch (err) {
             console.error("Failed to start scanner:", err);
-            showToast("Camera error. Please use manual entry.");
+            showToast("Camera error. Please use manual entry.", true);
         }
     }
-
+    
     function stopScanner() {
         if (html5QrCode && html5QrCode.isScanning) {
             html5QrCode.stop().catch(err => console.log("Stop error:", err));
         }
+        stopImageRecognition();
     }
-
-    // Quantity controls
-    document.getElementById('decreaseQty').addEventListener('click', () => {
-        if (newQuantity > 0) {
-            newQuantity--;
-            document.getElementById('updateQuantity').textContent = newQuantity;
-        }
-    });
-
-    document.getElementById('increaseQty').addEventListener('click', () => {
-        newQuantity++;
-        document.getElementById('updateQuantity').textContent = newQuantity;
-    });
-
-    document.getElementById('confirmUpdateBtn').addEventListener('click', () => {
-        if (currentScannedProduct) {
-            const difference = newQuantity - currentScannedProduct.qty;
-            const action = difference > 0 ? `added ${difference}` : `removed ${Math.abs(difference)}`;
-            showToast(`✓ ${currentScannedProduct.name} updated! ${action} ${Math.abs(difference)} ${currentScannedProduct.unit}`);
-            
-            // Update database
-            currentScannedProduct.qty = newQuantity;
-            const qrKey = Object.keys(productDatabase).find(key => productDatabase[key].id === currentScannedProduct.id);
-            if (qrKey) productDatabase[qrKey].qty = newQuantity;
-            
-            productUpdateModal.classList.remove('active');
-            currentScannedProduct = null;
-            
-            // Refresh dashboard
-            renderDashboard();
-        }
-    });
-
-    document.getElementById('cancelUpdateBtn').addEventListener('click', () => {
-        productUpdateModal.classList.remove('active');
-        currentScannedProduct = null;
-    });
-
-    document.getElementById('closeScannerBtn').addEventListener('click', () => {
-        stopScanner();
-        scannerModal.classList.remove('active');
-    });
-
-    // Manual input handler
-    document.getElementById('manualSubmitBtn').addEventListener('click', () => {
-        const input = document.getElementById('manualQrInput').value.trim();
-        if (input) {
-            handleScannedQR(input);
-            document.getElementById('manualQrInput').value = '';
+    
+    // ============================================
+    // MODAL CONTROLS
+    // ============================================
+    function showProductUpdateModal(product) {
+        document.getElementById('updateIcon').textContent = product.icon;
+        document.getElementById('updateName').textContent = product.name;
+        document.getElementById('updateCategory').textContent = product.category;
+        document.getElementById('currentStock').textContent = `${product.qty}`;
+        document.getElementById('currentStockUnit').textContent = product.unit;
+        document.getElementById('updateQuantity').textContent = product.qty;
+        newQuantity = product.qty;
+        productUpdateModal.classList.add('active');
+    }
+    
+    // Mode switching
+    function switchMode(mode) {
+        currentMode = mode;
+        const qrSection = document.getElementById('qrScannerSection');
+        const imageSection = document.getElementById('imageRecognitionSection');
+        const qrBtn = document.querySelector('.mode-btn[data-mode="qr"]');
+        const imageBtn = document.querySelector('.mode-btn[data-mode="image"]');
+        
+        if (mode === "qr") {
+            qrSection.style.display = "block";
+            imageSection.style.display = "none";
+            qrBtn.classList.add("active");
+            imageBtn.classList.remove("active");
+            stopImageRecognition();
+            startQrScanner();
         } else {
-            showToast('Please enter a QR code value');
+            qrSection.style.display = "none";
+            imageSection.style.display = "block";
+            imageBtn.classList.add("active");
+            qrBtn.classList.remove("active");
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop();
+            }
+            startImageRecognition();
         }
-    });
-
-    document.getElementById('manualQrInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            document.getElementById('manualSubmitBtn').click();
-        }
-    });
-
-    // Camera button click - opens scanner
-    document.getElementById('cameraFabBtn').addEventListener('click', () => {
-        scannerModal.classList.add('active');
-        setTimeout(() => startQrScanner(), 500);
-    });
-
-    // Sidebar functions
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    const burgerBtn = document.getElementById('burgerMenu');
-    
-    function openSidebar() {
-        sidebar.classList.add('open');
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
     }
     
-    function closeSidebar() {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-    
-    burgerBtn.addEventListener('click', openSidebar);
-    overlay.addEventListener('click', closeSidebar);
-    
-    function navigateTo(page) {
-        if(page === 'logout') {
-            alert('You have been logged out. Redirecting to login page...');
-            window.location.href = 'login.html';
-            return;
-        }
-        if(page === 'activity') {
-            alert('📋 Activity Logs: Recent inventory updates, removals, and recipe views (Demo mode).');
-            return;
-        }
-        window.location.href = page + '.html';
-    }
-    
+    // ============================================
+    // DASHBOARD RENDERING
+    // ============================================
     function showRemoveConfirmation(itemId, itemName, lossValue) {
         const modal = document.createElement('div');
         modal.className = 'modal-overlay';
@@ -1469,6 +1720,119 @@
         const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
         document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
     }
+    
+    function navigateTo(page) {
+        if(page === 'logout') {
+            alert('You have been logged out. Redirecting to login page...');
+            window.location.href = 'login.html';
+            return;
+        }
+        if(page === 'activity') {
+            alert('📋 Activity Logs: Recent inventory updates, removals, and recipe views (Demo mode).');
+            return;
+        }
+        window.location.href = page + '.html';
+    }
+    
+    // ============================================
+    // EVENT LISTENERS
+    // ============================================
+    document.getElementById('decreaseQty').addEventListener('click', () => {
+        if (newQuantity > 0) {
+            newQuantity--;
+            document.getElementById('updateQuantity').textContent = newQuantity;
+        }
+    });
+    
+    document.getElementById('increaseQty').addEventListener('click', () => {
+        newQuantity++;
+        document.getElementById('updateQuantity').textContent = newQuantity;
+    });
+    
+    document.getElementById('confirmUpdateBtn').addEventListener('click', () => {
+        if (currentScannedProduct) {
+            const difference = newQuantity - currentScannedProduct.qty;
+            const action = difference > 0 ? `added ${difference}` : `removed ${Math.abs(difference)}`;
+            showToast(`✓ ${currentScannedProduct.name} updated! ${action} ${Math.abs(difference)} ${currentScannedProduct.unit}`);
+            
+            currentScannedProduct.qty = newQuantity;
+            const qrKey = Object.keys(productDatabase).find(key => productDatabase[key].id === currentScannedProduct.id);
+            if (qrKey) productDatabase[qrKey].qty = newQuantity;
+            
+            productUpdateModal.classList.remove('active');
+            currentScannedProduct = null;
+            renderDashboard();
+        }
+    });
+    
+    document.getElementById('cancelUpdateBtn').addEventListener('click', () => {
+        productUpdateModal.classList.remove('active');
+        currentScannedProduct = null;
+    });
+    
+    document.getElementById('closeScannerBtn').addEventListener('click', () => {
+        stopScanner();
+        scannerModal.classList.remove('active');
+    });
+    
+    document.getElementById('manualSubmitBtn').addEventListener('click', () => {
+        const input = document.getElementById('manualQrInput').value.trim();
+        if (input) {
+            handleManualInput(input);
+            document.getElementById('manualQrInput').value = '';
+        } else {
+            showToast('Please enter a QR code or product name', true);
+        }
+    });
+    
+    document.getElementById('manualQrInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            document.getElementById('manualSubmitBtn').click();
+        }
+    });
+    
+    document.getElementById('cameraFabBtn').addEventListener('click', () => {
+        scannerModal.classList.add('active');
+        setTimeout(() => {
+            if (currentMode === "qr") {
+                startQrScanner();
+            } else {
+                startImageRecognition();
+            }
+        }, 500);
+    });
+    
+    document.getElementById('captureImageBtn').addEventListener('click', () => {
+        captureAndRecognize();
+    });
+    
+    // Mode switching
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const mode = btn.getAttribute('data-mode');
+            switchMode(mode);
+        });
+    });
+    
+    // Sidebar functions
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const burgerBtn = document.getElementById('burgerMenu');
+    
+    function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    burgerBtn.addEventListener('click', openSidebar);
+    overlay.addEventListener('click', closeSidebar);
     
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', () => {
