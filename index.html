@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>Lyceum Kitchen | Smart Image Recognition</title>
+    <title>Lyceum Kitchen | Smart Color Recognition</title>
     <style>
         * {
             margin: 0;
@@ -1080,6 +1080,26 @@
             background: #8B0000;
             border-radius: 10px;
         }
+        
+        /* Color guide for users */
+        .color-guide {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px;
+            background: #F8FAFC;
+            border-radius: 16px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+        
+        .color-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -1093,7 +1113,7 @@
             <div class="sidebar-logo">🍳</div>
             <div class="sidebar-title">
                 <h2>Lyceum Kitchen</h2>
-                <p>Smart Inventory System</p>
+                <p>Smart Color Recognition</p>
             </div>
         </div>
 
@@ -1159,7 +1179,7 @@
         <!-- Mode Selection -->
         <div class="mode-switch-buttons">
             <button class="mode-btn active" data-mode="qr">📱 QR Code</button>
-            <button class="mode-btn" data-mode="image">🖼️ Image Recognition</button>
+            <button class="mode-btn" data-mode="image">🎨 Color Recognition</button>
         </div>
         
         <!-- QR Scanner Section -->
@@ -1173,13 +1193,25 @@
                 <video id="imageVideoPreview" autoplay playsinline muted></video>
             </div>
             <button class="capture-btn" id="captureImageBtn">
-                <i class="fas fa-camera"></i> Capture & Recognize
+                <i class="fas fa-camera"></i> Capture & Recognize by Color
             </button>
             <div id="recognitionResult" class="recognition-result" style="display: none;">
                 <div id="recognitionText"></div>
                 <div class="confidence-bar">
                     <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
                 </div>
+            </div>
+            <div class="color-guide">
+                <span style="font-size: 11px; color: #888;">Detectable colors:</span>
+                <span class="color-badge" style="background: #FF4444;">🔴 Red</span>
+                <span class="color-badge" style="background: #FF8C00;">🟠 Orange</span>
+                <span class="color-badge" style="background: #FFD700;">🟡 Yellow</span>
+                <span class="color-badge" style="background: #4CAF50;">🟢 Green</span>
+                <span class="color-badge" style="background: #2196F3;">🔵 Blue</span>
+                <span class="color-badge" style="background: #9C27B0;">🟣 Purple</span>
+                <span class="color-badge" style="background: #8B4513;">🟤 Brown</span>
+                <span class="color-badge" style="background: #FF69B4;">🩷 Pink</span>
+                <span class="color-badge" style="background: #FFFFFF; color: #333; border:1px solid #ccc;">⚪ White</span>
             </div>
         </div>
         
@@ -1220,48 +1252,55 @@
 
 <script>
     // ============================================
-    // PRODUCT DATABASE
+    // PRODUCT DATABASE - ONE PRODUCT PER COLOR
     // ============================================
     const productDatabase = {
-        "PROD-TOMATO-001": { id: 1, name: "Tomatoes", category: "Vegetables", unit: "pcs", price: 35, qty: 24, icon: "🍅", colorMatch: ["red"] },
-        "PROD-CHICKEN-002": { id: 2, name: "Chicken Breast", category: "Meat", unit: "pcs", price: 120, qty: 8, icon: "🍗", colorMatch: ["pink", "white"] },
-        "PROD-MILK-003": { id: 3, name: "Fresh Milk", category: "Dairy", unit: "pcs", price: 65, qty: 12, icon: "🥛", colorMatch: ["white"] },
-        "PROD-RICE-004": { id: 4, name: "White Rice", category: "Grains", unit: "kg", price: 56, qty: 5, icon: "🍚", colorMatch: ["white"] },
-        "PROD-ONION-005": { id: 5, name: "Onions", category: "Vegetables", unit: "pcs", price: 25, qty: 3, icon: "🧅", colorMatch: ["brown", "yellow"] },
-        "PROD-SALMON-006": { id: 6, name: "Salmon Fillet", category: "Seafood", unit: "pcs", price: 210, qty: 6, icon: "🐟", colorMatch: ["orange", "pink"] },
-        "PROD-GARLIC-007": { id: 7, name: "Garlic", category: "Spices", unit: "bulb", price: 18, qty: 2, icon: "🧄", colorMatch: ["white"] },
-        "PROD-CHEESE-008": { id: 8, name: "Cheddar Cheese", category: "Dairy", unit: "pcs", price: 85, qty: 4, icon: "🧀", colorMatch: ["yellow", "orange"] },
-        "PROD-CARROT-009": { id: 9, name: "Carrots", category: "Vegetables", unit: "pcs", price: 15, qty: 15, icon: "🥕", colorMatch: ["orange"] },
-        "PROD-POTATO-010": { id: 10, name: "Potatoes", category: "Vegetables", unit: "pcs", price: 10, qty: 20, icon: "🥔", colorMatch: ["brown"] },
-        "PROD-BANANA-011": { id: 11, name: "Bananas", category: "Fruits", unit: "pcs", price: 8, qty: 12, icon: "🍌", colorMatch: ["yellow"] },
-        "PROD-EGG-012": { id: 12, name: "Eggs", category: "Dairy", unit: "dozen", price: 95, qty: 10, icon: "🥚", colorMatch: ["white", "brown"] }
+        // QR Code based products (for QR scanning)
+        "PROD-TOMATO-001": { id: 1, name: "Tomatoes", category: "Vegetables", unit: "pcs", price: 35, qty: 24, icon: "🍅", colorMatch: "red" },
+        "PROD-CARROT-002": { id: 2, name: "Carrots", category: "Vegetables", unit: "pcs", price: 15, qty: 15, icon: "🥕", colorMatch: "orange" },
+        "PROD-BANANA-003": { id: 3, name: "Bananas", category: "Fruits", unit: "pcs", price: 8, qty: 12, icon: "🍌", colorMatch: "yellow" },
+        "PROD-LETTUCE-004": { id: 4, name: "Lettuce", category: "Vegetables", unit: "pcs", price: 25, qty: 10, icon: "🥬", colorMatch: "green" },
+        "PROD-BLUEBERRY-005": { id: 5, name: "Blueberries", category: "Fruits", unit: "box", price: 120, qty: 8, icon: "🫐", colorMatch: "blue" },
+        "PROD-EGGPLANT-006": { id: 6, name: "Eggplant", category: "Vegetables", unit: "pcs", price: 30, qty: 6, icon: "🍆", colorMatch: "purple" },
+        "PROD-POTATO-007": { id: 7, name: "Potatoes", category: "Vegetables", unit: "pcs", price: 10, qty: 20, icon: "🥔", colorMatch: "brown" },
+        "PROD-SALMON-008": { id: 8, name: "Salmon Fillet", category: "Seafood", unit: "pcs", price: 210, qty: 6, icon: "🐟", colorMatch: "pink" },
+        "PROD-RICE-009": { id: 9, name: "White Rice", category: "Grains", unit: "kg", price: 56, qty: 5, icon: "🍚", colorMatch: "white" },
+        "PROD-ONION-010": { id: 10, name: "Onions", category: "Vegetables", unit: "pcs", price: 25, qty: 3, icon: "🧅", colorMatch: "brown" },
+        "PROD-GARLIC-011": { id: 11, name: "Garlic", category: "Spices", unit: "bulb", price: 18, qty: 2, icon: "🧄", colorMatch: "white" },
+        "PROD-MILK-012": { id: 12, name: "Fresh Milk", category: "Dairy", unit: "pcs", price: 65, qty: 12, icon: "🥛", colorMatch: "white" },
+        "PROD-CHEESE-013": { id: 13, name: "Cheddar Cheese", category: "Dairy", unit: "pcs", price: 85, qty: 4, icon: "🧀", colorMatch: "yellow" },
+        "PROD-CHICKEN-014": { id: 14, name: "Chicken Breast", category: "Meat", unit: "pcs", price: 120, qty: 8, icon: "🍗", colorMatch: "pink" }
     };
     
-    // Color mapping for quick lookup
+    // COLOR TO PRODUCT MAPPING - ONE PRODUCT PER COLOR (ACCURATE)
     const colorToProducts = {
-        "red": ["Tomatoes"],
-        "orange": ["Carrots", "Salmon Fillet", "Cheddar Cheese"],
-        "yellow": ["Bananas", "Cheddar Cheese", "Onions"],
-        "brown": ["Onions", "Potatoes", "Eggs"],
-        "white": ["White Rice", "Garlic", "Fresh Milk", "Eggs", "Chicken Breast"],
-        "pink": ["Salmon Fillet", "Chicken Breast"],
-        "green": []
+        "red":     "Tomatoes",
+        "orange":  "Carrots", 
+        "yellow":  "Bananas",
+        "green":   "Lettuce",
+        "blue":    "Blueberries",
+        "purple":  "Eggplant",
+        "brown":   "Potatoes",
+        "pink":    "Salmon Fillet",
+        "white":   "White Rice"
     };
     
-    // Name aliases
+    // Name aliases for manual search
     const nameAliases = {
         "tomato": "Tomatoes", "tomatos": "Tomatoes",
-        "chicken": "Chicken Breast",
-        "milk": "Fresh Milk",
-        "rice": "White Rice",
-        "onion": "Onions",
+        "carrot": "Carrots", "carrots": "Carrots",
+        "banana": "Bananas", "bananas": "Bananas",
+        "lettuce": "Lettuce",
+        "blueberry": "Blueberries", "blueberries": "Blueberries",
+        "eggplant": "Eggplant", "aubergine": "Eggplant",
+        "potato": "Potatoes", "potatoes": "Potatoes",
         "salmon": "Salmon Fillet",
+        "rice": "White Rice",
+        "onion": "Onions", "onions": "Onions",
         "garlic": "Garlic",
+        "milk": "Fresh Milk",
         "cheese": "Cheddar Cheese",
-        "carrot": "Carrots",
-        "potato": "Potatoes",
-        "banana": "Bananas",
-        "egg": "Eggs"
+        "chicken": "Chicken Breast"
     };
     
     let currentScannedProduct = null;
@@ -1300,24 +1339,68 @@
     }
     
     // ============================================
-    // IMAGE COLOR ANALYSIS
+    // IMPROVED COLOR DETECTION
     // ============================================
+    function classifyColor(r, g, b) {
+        const brightness = (r + g + b) / 3;
+        
+        // White detection (high brightness, balanced)
+        if (r > 200 && g > 200 && b > 200) return "white";
+        
+        // Black/Dark detection
+        if (brightness < 60) return "brown";
+        
+        // Color classification based on dominant channel
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        const delta = max - min;
+        
+        // Red (strong red, low green and blue)
+        if (r > 150 && g < 120 && b < 120) return "red";
+        
+        // Orange (strong red, medium green, low blue)
+        if (r > 180 && g > 100 && g < 160 && b < 100) return "orange";
+        
+        // Yellow (strong red and green, low blue)
+        if (r > 180 && g > 160 && b < 120) return "yellow";
+        
+        // Green (strong green, lower red and blue)
+        if (g > 140 && r < 130 && b < 130) return "green";
+        
+        // Blue (strong blue, lower red and green)
+        if (b > 140 && r < 130 && g < 130) return "blue";
+        
+        // Purple (strong red and blue, lower green)
+        if (r > 130 && b > 130 && g < 110) return "purple";
+        
+        // Brown (moderate red and green, low blue, medium brightness)
+        if (r > 100 && r < 180 && g > 80 && g < 150 && b < 100) return "brown";
+        
+        // Pink (high red, medium green and blue)
+        if (r > 180 && g > 100 && g < 180 && b > 100 && b < 180) return "pink";
+        
+        return "unknown";
+    }
+    
     function getDominantColor(imageData, width, height) {
-        // Sample pixels from the center of the image
- const step = 5;
+        const step = 8;
         const pixels = imageData.data;
-        const colorCounts = {
-            red: 0, orange: 0, yellow: 0, green: 0, 
-            blue: 0, brown: 0, white: 0, pink: 0, unknown: 0
-        };
+        const colorCounts = {};
         
         const centerX = width / 2;
         const centerY = height / 2;
-        const sampleRadius = Math.min(width, height) / 3;
+        const sampleRadius = Math.min(width, height) / 2.5;
         
-        for (let y = Math.max(0, centerY - sampleRadius); y < Math.min(height, centerY + sampleRadius); y += step) {
-            for (let x = Math.max(0, centerX - sampleRadius); x < Math.min(width, centerX + sampleRadius); x += step) {
-                const idx = (y * width + x) * 4;
+        let startY = Math.max(0, centerY - sampleRadius);
+        let endY = Math.min(height, centerY + sampleRadius);
+        let startX = Math.max(0, centerX - sampleRadius);
+        let endX = Math.min(width, centerX + sampleRadius);
+        
+        for (let y = startY; y < endY; y += step) {
+            for (let x = startX; x < endX; x += step) {
+                const idx = (Math.floor(y) * width + Math.floor(x)) * 4;
+                if (idx + 2 >= pixels.length) continue;
+                
                 const r = pixels[idx];
                 const g = pixels[idx + 1];
                 const b = pixels[idx + 2];
@@ -1327,7 +1410,6 @@
             }
         }
         
-        // Find dominant color
         let dominantColor = "unknown";
         let maxCount = 0;
         for (const [color, count] of Object.entries(colorCounts)) {
@@ -1340,33 +1422,10 @@
         return dominantColor;
     }
     
-    function classifyColor(r, g, b) {
-        // Brightness
-        const brightness = (r + g + b) / 3;
-        
-        // White detection
-        if (r > 200 && g > 200 && b > 200) return "white";
-        
-        // Black/Dark detection
-        if (brightness < 60) return "brown";
-        
-        // Color classification
-        if (r > 150 && g < 120 && b < 120) return "red";
-        if (r > 180 && g > 100 && g < 160 && b < 100) return "orange";
-        if (r > 180 && g > 160 && b < 120) return "yellow";
-        if (r > 100 && r < 180 && g > 80 && g < 150 && b < 100) return "brown";
-        if (r > 150 && g > 100 && g < 170 && b > 100 && b < 170) return "pink";
-        if (r < 120 && g > 140 && b < 120) return "green";
-        if (r > 150 && g > 150 && b < 150) return "yellow";
-        
-        return "unknown";
-    }
-    
     function findProductByColor(color) {
-        const possibleProducts = colorToProducts[color] || [];
-        if (possibleProducts.length === 0) return null;
+        const productName = colorToProducts[color];
+        if (!productName) return null;
         
-        const productName = possibleProducts[0];
         const productEntry = Object.entries(productDatabase).find(([key, product]) => product.name === productName);
         return productEntry ? { qrCode: productEntry[0], product: productEntry[1] } : null;
     }
@@ -1378,38 +1437,32 @@
             return;
         }
         
-        showToast("Analyzing image...");
+        showToast("Analyzing color...");
         
         try {
-            // Create canvas and capture frame
             const canvas = document.createElement('canvas');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             
-            // Get image data
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const dominantColor = getDominantColor(imageData, canvas.width, canvas.height);
+            const detectedColor = getDominantColor(imageData, canvas.width, canvas.height);
             
-            console.log("Detected color:", dominantColor);
+            console.log("Detected color:", detectedColor);
             
-            const productMatch = findProductByColor(dominantColor);
+            const productMatch = findProductByColor(detectedColor);
             const resultDiv = document.getElementById('recognitionResult');
             const resultText = document.getElementById('recognitionText');
             const confidenceFill = document.getElementById('confidenceFill');
             
             if (productMatch) {
-                let confidence = 70;
-                if (productMatch.product.colorMatch.includes(dominantColor)) {
-                    confidence = 85;
-                }
+                let confidence = detectedColor === productMatch.product.colorMatch ? 90 : 75;
                 
-                resultText.innerHTML = `<i class="fas fa-check-circle" style="color: #4CAF50;"></i> Detected: <strong>${productMatch.product.name}</strong><br><small>Color: ${dominantColor} | Confidence: ${confidence}%</small>`;
+                resultText.innerHTML = `<i class="fas fa-check-circle" style="color: #4CAF50;"></i> Detected: <strong>${productMatch.product.name}</strong><br><small>Color: ${detectedColor.toUpperCase()} | Match: ${confidence}%</small>`;
                 confidenceFill.style.width = `${confidence}%`;
                 resultDiv.style.display = 'block';
                 
-                // Auto-show update modal
                 setTimeout(() => {
                     currentScannedProduct = { ...productMatch.product };
                     newQuantity = currentScannedProduct.qty;
@@ -1418,7 +1471,11 @@
                     scannerModal.classList.remove('active');
                 }, 1000);
             } else {
-                resultText.innerHTML = `<i class="fas fa-question-circle" style="color: #FF9800;"></i> Could not identify item<br><small>Detected color: ${dominantColor}. Try different lighting or angle.</small>`;
+                let suggestion = "";
+                if (detectedColor !== "unknown") {
+                    suggestion = `<br><small>Try: ${detectedColor.toUpperCase()} colored items like ${Object.keys(colorToProducts).join(", ")}</small>`;
+                }
+                resultText.innerHTML = `<i class="fas fa-question-circle" style="color: #FF9800;"></i> Could not identify item<br><small>Detected: ${detectedColor.toUpperCase()}${suggestion}</small>`;
                 confidenceFill.style.width = `30%`;
                 resultDiv.style.display = 'block';
             }
@@ -1437,7 +1494,7 @@
             video.srcObject = imageStream;
             video.onloadedmetadata = () => {
                 video.play();
-                showToast("Camera ready - Point at an item and tap Capture");
+                showToast("Camera ready - Point at colorful item and tap Capture");
             };
         } catch (err) {
             console.error("Camera error:", err);
@@ -1485,10 +1542,9 @@
             handleScannedQR(input);
         } else {
             const lowerInput = input.toLowerCase().trim();
-            const productMatch = nameAliases[lowerInput];
             
-            if (productMatch) {
-                const productEntry = Object.entries(productDatabase).find(([key, product]) => product.name === productMatch);
+            if (nameAliases[lowerInput]) {
+                const productEntry = Object.entries(productDatabase).find(([key, product]) => product.name === nameAliases[lowerInput]);
                 if (productEntry) {
                     currentScannedProduct = { ...productEntry[1] };
                     newQuantity = currentScannedProduct.qty;
@@ -1499,7 +1555,6 @@
                 }
             }
             
-            // Try partial match
             for (const [qrCode, product] of Object.entries(productDatabase)) {
                 if (product.name.toLowerCase().includes(lowerInput)) {
                     currentScannedProduct = { ...product };
@@ -1587,7 +1642,7 @@
     // ============================================
     // DASHBOARD RENDERING
     // ============================================
-    function showRemoveConfirmation(itemId, itemName, lossValue) {
+    function showRemoveConfirmation(itemId, itemName) {
         const modal = document.createElement('div');
         modal.className = 'modal-overlay';
         modal.innerHTML = `
@@ -1617,11 +1672,6 @@
         const expiringPercent = Math.min(100, (expiringItems.length / 12) * 100);
         const expiredPercent = Math.min(100, (expiredItems.length / 10) * 100);
         const totalActiveItems = 82 - expiredItems.length;
-        
-        let totalValue = 0;
-        Object.values(productDatabase).forEach(p => {
-            totalValue += p.qty * p.price;
-        });
         
         container.innerHTML = `
             <div class="stats-grid">
@@ -1665,12 +1715,17 @@
                 </div>
             </div>
             <div class="card">
-                <div class="card-header"><h2><span>📊</span> Low Stock by Category</h2><button class="view-link" onclick="navigateTo('stocks')">View All</button></div>
+                <div class="card-header"><h2><span>🎨</span> Color Recognition Guide</h2><button class="view-link" onclick="document.getElementById('cameraFabBtn').click()">Try It</button></div>
                 <div class="categories-grid">
-                    <div class="category-card" onclick="navigateTo('inventory?category=vegetables')"><div class="category-header"><div class="category-icon">🥕</div><div class="category-name">Vegetables</div></div><div class="category-stats"><span class="category-count">3 items low</span><span class="category-status">Reorder</span></div></div>
-                    <div class="category-card" onclick="navigateTo('inventory?category=dairy')"><div class="category-header"><div class="category-icon">🥛</div><div class="category-name">Dairy</div></div><div class="category-stats"><span class="category-count">2 items low</span><span class="category-status">Reorder</span></div></div>
-                    <div class="category-card" onclick="navigateTo('inventory?category=meat')"><div class="category-header"><div class="category-icon">🥩</div><div class="category-name">Meat</div></div><div class="category-stats"><span class="category-count">1 item low</span><span class="category-status">Reorder</span></div></div>
-                    <div class="category-card" onclick="navigateTo('inventory?category=grains')"><div class="category-header"><div class="category-icon">🌾</div><div class="category-name">Grains</div></div><div class="category-stats"><span class="category-count">2 items low</span><span class="category-status">Reorder</span></div></div>
+                    <div class="category-card" style="background: #FFF3F3;"><div class="category-header"><div class="category-icon">🔴</div><div class="category-name">Red → Tomatoes</div></div><div class="category-stats"><span class="category-count">🍅</span><span class="category-status" style="background:#FF4444;">Ready</span></div></div>
+                    <div class="category-card" style="background: #FFF8F0;"><div class="category-header"><div class="category-icon">🟠</div><div class="category-name">Orange → Carrots</div></div><div class="category-stats"><span class="category-count">🥕</span><span class="category-status" style="background:#FF8C00;">Ready</span></div></div>
+                    <div class="category-card" style="background: #FFFFF0;"><div class="category-header"><div class="category-icon">🟡</div><div class="category-name">Yellow → Bananas</div></div><div class="category-stats"><span class="category-count">🍌</span><span class="category-status" style="background:#FFD700;">Ready</span></div></div>
+                    <div class="category-card" style="background: #F0FFF0;"><div class="category-header"><div class="category-icon">🟢</div><div class="category-name">Green → Lettuce</div></div><div class="category-stats"><span class="category-count">🥬</span><span class="category-status" style="background:#4CAF50;">Ready</span></div></div>
+                    <div class="category-card" style="background: #F0F4FF;"><div class="category-header"><div class="category-icon">🔵</div><div class="category-name">Blue → Blueberries</div></div><div class="category-stats"><span class="category-count">🫐</span><span class="category-status" style="background:#2196F3;">Ready</span></div></div>
+                    <div class="category-card" style="background: #F9F0FF;"><div class="category-header"><div class="category-icon">🟣</div><div class="category-name">Purple → Eggplant</div></div><div class="category-stats"><span class="category-count">🍆</span><span class="category-status" style="background:#9C27B0;">Ready</span></div></div>
+                    <div class="category-card" style="background: #FFF8F0;"><div class="category-header"><div class="category-icon">🟤</div><div class="category-name">Brown → Potatoes</div></div><div class="category-stats"><span class="category-count">🥔</span><span class="category-status" style="background:#8B4513;">Ready</span></div></div>
+                    <div class="category-card" style="background: #FFF0F5;"><div class="category-header"><div class="category-icon">🩷</div><div class="category-name">Pink → Salmon</div></div><div class="category-stats"><span class="category-count">🐟</span><span class="category-status" style="background:#FF69B4;">Ready</span></div></div>
+                    <div class="category-card" style="background: #F8F8F8;"><div class="category-header"><div class="category-icon">⚪</div><div class="category-name">White → Rice</div></div><div class="category-stats"><span class="category-count">🍚</span><span class="category-status" style="background:#999;">Ready</span></div></div>
                 </div>
             </div>
         `;
@@ -1700,7 +1755,7 @@
             expiredContainer.innerHTML = expiredItems.map(item => `
                 <div class="expired-item">
                     <div class="item-info"><div class="item-icon">${item.icon}</div><div class="item-details"><h4>${item.name}</h4><p>${item.qty} • ${item.category}</p></div></div>
-                    <div class="item-actions"><button class="remove-btn" data-id="${item.id}" data-name="${item.name}" data-loss="${item.lossValue}">Remove</button><span class="item-qty">Expired ${item.expiryDate}</span></div>
+                    <div class="item-actions"><button class="remove-btn" data-id="${item.id}" data-name="${item.name}">Remove</button><span class="item-qty">Expired ${item.expiryDate}</span></div>
                 </div>
             `).join('');
             document.querySelectorAll('.remove-btn').forEach(btn => {
@@ -1804,7 +1859,6 @@
         captureAndRecognize();
     });
     
-    // Mode switching
     document.querySelectorAll('.mode-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const mode = btn.getAttribute('data-mode');
@@ -1812,7 +1866,6 @@
         });
     });
     
-    // Sidebar functions
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
     const burgerBtn = document.getElementById('burgerMenu');
