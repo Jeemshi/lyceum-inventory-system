@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>Lyceum Kitchen | Smart Color Recognition</title>
+    <title>Lyceum Kitchen | Smart Scanner</title>
     <style>
         * {
             margin: 0;
@@ -27,7 +27,6 @@
             background: #F8FAFC;
         }
 
-        /* Sidebar */
         .sidebar {
             background: #000000;
             width: 280px;
@@ -180,7 +179,6 @@
             margin-bottom: 20px;
         }
 
-        /* Main content */
         .main-content {
             flex: 1;
             display: flex;
@@ -309,7 +307,6 @@
             padding-bottom: 100px;
         }
 
-        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -689,7 +686,7 @@
             height: auto;
         }
 
-        /* Image Recognition Camera View - NO inversion */
+        /* Image Recognition Camera View */
         .image-camera-view {
             position: relative;
             width: 100%;
@@ -704,7 +701,89 @@
         #imageVideoPreview {
             width: 100%;
             height: auto;
-            /* REMOVED transform: scaleX(-1) - now normal view */
+        }
+
+        /* SCANNING ANIMATION OVERLAY */
+        .scan-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: 0;
+        }
+
+        .scan-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #8B0000, #ff4444, #8B0000, transparent);
+            animation: scanMove 2s ease-in-out infinite;
+            box-shadow: 0 0 10px #ff0000;
+        }
+
+        @keyframes scanMove {
+            0% {
+                top: 0%;
+            }
+            50% {
+                top: 100%;
+            }
+            100% {
+                top: 0%;
+            }
+        }
+
+        .scan-corner {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #8B0000;
+        }
+
+        .scan-corner-tl {
+            top: 10px;
+            left: 10px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .scan-corner-tr {
+            top: 10px;
+            right: 10px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .scan-corner-bl {
+            bottom: 10px;
+            left: 10px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .scan-corner-br {
+            bottom: 10px;
+            right: 10px;
+            border-left: none;
+            border-top: none;
+        }
+
+        .scan-text {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: white;
+            font-size: 12px;
+            background: rgba(0,0,0,0.6);
+            padding: 8px;
+            margin: 0 20px;
+            border-radius: 20px;
         }
 
         .capture-btn {
@@ -728,21 +807,7 @@
             border-radius: 12px;
             text-align: center;
             font-size: 14px;
-        }
-
-        .confidence-bar {
-            height: 4px;
-            background: #333;
-            border-radius: 2px;
-            margin-top: 8px;
-            overflow: hidden;
-        }
-
-        .confidence-fill {
-            height: 100%;
-            background: #8B0000;
-            border-radius: 2px;
-            transition: width 0.3s;
+            display: none;
         }
 
         .scanner-close {
@@ -949,7 +1014,6 @@
             background: #DC2626;
         }
 
-        /* CAMERA BUTTON */
         .camera-fab {
             position: fixed;
             bottom: 24px;
@@ -1092,7 +1156,7 @@
             <div class="sidebar-logo">🍳</div>
             <div class="sidebar-title">
                 <h2>Lyceum Kitchen</h2>
-                <p>Smart Color Recognition</p>
+                <p>Smart Scanner</p>
             </div>
         </div>
 
@@ -1150,36 +1214,37 @@
     <i class="fas fa-camera"></i>
 </div>
 
-<!-- Scanner Modal with Mode Switching -->
+<!-- Scanner Modal -->
 <div class="scanner-modal" id="scannerModal">
     <div class="scanner-container">
         <button class="scanner-close" id="closeScannerBtn">✕</button>
         
-        <!-- Mode Selection -->
         <div class="mode-switch-buttons">
             <button class="mode-btn active" data-mode="qr">📱 QR Code</button>
-            <button class="mode-btn" data-mode="image">🎨 Color Recognition</button>
+            <button class="mode-btn" data-mode="image">🎨 Smart Scan</button>
         </div>
         
-        <!-- QR Scanner Section -->
         <div id="qrScannerSection">
             <div id="qr-reader" style="width: 100%;"></div>
         </div>
         
-        <!-- Image Recognition Section (hidden initially) - NO color guide -->
         <div id="imageRecognitionSection" style="display: none;">
             <div class="image-camera-view">
                 <video id="imageVideoPreview" autoplay playsinline muted></video>
-            </div>
-            <button class="capture-btn" id="captureImageBtn">
-                <i class="fas fa-camera"></i> Capture & Recognize by Color
-            </button>
-            <div id="recognitionResult" class="recognition-result" style="display: none;">
-                <div id="recognitionText"></div>
-                <div class="confidence-bar">
-                    <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+                <!-- SCANNING ANIMATION -->
+                <div class="scan-animation" id="scanAnimation">
+                    <div class="scan-line"></div>
+                    <div class="scan-corner scan-corner-tl"></div>
+                    <div class="scan-corner scan-corner-tr"></div>
+                    <div class="scan-corner scan-corner-bl"></div>
+                    <div class="scan-corner scan-corner-br"></div>
+                    <div class="scan-text">🔍 Position item in frame</div>
                 </div>
             </div>
+            <button class="capture-btn" id="captureImageBtn">
+                <i class="fas fa-camera"></i> Scan Item
+            </button>
+            <div id="recognitionResult" class="recognition-result"></div>
         </div>
         
         <div class="manual-input-section">
@@ -1219,7 +1284,7 @@
 
 <script>
     // ============================================
-    // PRODUCT DATABASE - ONE PRODUCT PER COLOR
+    // PRODUCT DATABASE
     // ============================================
     const productDatabase = {
         "PROD-TOMATO-001": { id: 1, name: "Tomatoes", category: "Vegetables", unit: "pcs", price: 35, qty: 24, icon: "🍅", colorMatch: "red" },
@@ -1233,30 +1298,16 @@
         "PROD-RICE-009": { id: 9, name: "White Rice", category: "Grains", unit: "kg", price: 56, qty: 5, icon: "🍚", colorMatch: "white" }
     };
     
-    // COLOR TO PRODUCT MAPPING - ONE PRODUCT PER COLOR (ACCURATE)
     const colorToProducts = {
-        "red":     "Tomatoes",
-        "orange":  "Carrots", 
-        "yellow":  "Bananas",
-        "green":   "Lettuce",
-        "blue":    "Blueberries",
-        "purple":  "Eggplant",
-        "brown":   "Potatoes",
-        "pink":    "Salmon Fillet",
-        "white":   "White Rice"
+        "red": "Tomatoes", "orange": "Carrots", "yellow": "Bananas",
+        "green": "Lettuce", "blue": "Blueberries", "purple": "Eggplant",
+        "brown": "Potatoes", "pink": "Salmon Fillet", "white": "White Rice"
     };
     
-    // Name aliases for manual search
     const nameAliases = {
-        "tomato": "Tomatoes", "tomatos": "Tomatoes",
-        "carrot": "Carrots", "carrots": "Carrots",
-        "banana": "Bananas", "bananas": "Bananas",
-        "lettuce": "Lettuce",
-        "blueberry": "Blueberries", "blueberries": "Blueberries",
-        "eggplant": "Eggplant", "aubergine": "Eggplant",
-        "potato": "Potatoes", "potatoes": "Potatoes",
-        "salmon": "Salmon Fillet",
-        "rice": "White Rice"
+        "tomato": "Tomatoes", "carrot": "Carrots", "banana": "Bananas",
+        "lettuce": "Lettuce", "blueberry": "Blueberries", "eggplant": "Eggplant",
+        "potato": "Potatoes", "salmon": "Salmon Fillet", "rice": "White Rice"
     };
     
     let currentScannedProduct = null;
@@ -1264,7 +1315,6 @@
     let html5QrCode = null;
     let imageStream = null;
     let currentMode = "qr";
-    let isProcessing = false; // Prevent multiple captures
     
     let expiredItems = [
         { id: 'exp1', name: 'Chicken Breast', category: 'Meat', qty: '8 pcs', expiryDate: 'Jan 15', lossValue: 600, icon: '🍗' },
@@ -1295,106 +1345,58 @@
         }, 2500);
     }
     
-    // ============================================
-    // IMPROVED COLOR DETECTION - FASTER & STABLE
-    // ============================================
+    // SIMPLE COLOR DETECTION - FAST AND SILENT
     function classifyColor(r, g, b) {
         const brightness = (r + g + b) / 3;
-        
-        // White detection
         if (r > 200 && g > 200 && b > 200) return "white";
-        
-        // Dark colors
         if (brightness < 70) return "brown";
-        
-        // Red
         if (r > 150 && g < 120 && b < 120) return "red";
-        
-        // Orange
         if (r > 180 && g > 100 && g < 160 && b < 100) return "orange";
-        
-        // Yellow
         if (r > 180 && g > 160 && b < 130) return "yellow";
-        
-        // Green
         if (g > 140 && r < 130 && b < 130) return "green";
-        
-        // Blue
         if (b > 140 && r < 130 && g < 130) return "blue";
-        
-        // Purple
         if (r > 130 && b > 130 && g < 110) return "purple";
-        
-        // Pink
         if (r > 180 && g > 100 && g < 180 && b > 100 && b < 180) return "pink";
-        
         return "unknown";
     }
     
     function getDominantColor(imageData, width, height) {
-        // Larger step = faster processing, less wobble
-        const step = 12;
+        const step = 15;
         const pixels = imageData.data;
         const colorCounts = {};
         
         const centerX = width / 2;
         const centerY = height / 2;
-        const sampleRadius = Math.min(width, height) / 2.8;
+        const sampleRadius = Math.min(width, height) / 2.5;
         
-        let startY = Math.max(0, centerY - sampleRadius);
-        let endY = Math.min(height, centerY + sampleRadius);
-        let startX = Math.max(0, centerX - sampleRadius);
-        let endX = Math.min(width, centerX + sampleRadius);
-        
-        for (let y = startY; y < endY; y += step) {
-            for (let x = startX; x < endX; x += step) {
+        for (let y = Math.max(0, centerY - sampleRadius); y < Math.min(height, centerY + sampleRadius); y += step) {
+            for (let x = Math.max(0, centerX - sampleRadius); x < Math.min(width, centerX + sampleRadius); x += step) {
                 const idx = (Math.floor(y) * width + Math.floor(x)) * 4;
                 if (idx + 2 >= pixels.length) continue;
-                
-                const r = pixels[idx];
-                const g = pixels[idx + 1];
-                const b = pixels[idx + 2];
-                
-                const colorName = classifyColor(r, g, b);
-                colorCounts[colorName] = (colorCounts[colorName] || 0) + 1;
+                const color = classifyColor(pixels[idx], pixels[idx+1], pixels[idx+2]);
+                colorCounts[color] = (colorCounts[color] || 0) + 1;
             }
         }
         
-        let dominantColor = "unknown";
+        let dominant = "unknown";
         let maxCount = 0;
         for (const [color, count] of Object.entries(colorCounts)) {
-            if (count > maxCount) {
-                maxCount = count;
-                dominantColor = color;
-            }
+            if (count > maxCount) { maxCount = count; dominant = color; }
         }
-        
-        return dominantColor;
-    }
-    
-    function findProductByColor(color) {
-        const productName = colorToProducts[color];
-        if (!productName) return null;
-        
-        const productEntry = Object.entries(productDatabase).find(([key, product]) => product.name === productName);
-        return productEntry ? { qrCode: productEntry[0], product: productEntry[1] } : null;
+        return dominant;
     }
     
     async function captureAndRecognize() {
-        // Prevent multiple simultaneous captures
-        if (isProcessing) {
-            showToast("Processing, please wait...");
-            return;
-        }
-        
         const video = document.getElementById('imageVideoPreview');
-        if (!video || !video.videoWidth || video.videoWidth === 0) {
-            showToast("Please wait for camera to initialize", true);
+        if (!video || !video.videoWidth) {
+            showToast("Please wait for camera", true);
             return;
         }
         
-        isProcessing = true;
-        showToast("Analyzing color...");
+        // Add flash effect
+        const scanAnimation = document.getElementById('scanAnimation');
+        scanAnimation.style.opacity = '0.5';
+        setTimeout(() => { scanAnimation.style.opacity = '1'; }, 200);
         
         try {
             const canvas = document.createElement('canvas');
@@ -1406,38 +1408,22 @@
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const detectedColor = getDominantColor(imageData, canvas.width, canvas.height);
             
-            console.log("Detected color:", detectedColor);
-            
-            const productMatch = findProductByColor(detectedColor);
-            const resultDiv = document.getElementById('recognitionResult');
-            const resultText = document.getElementById('recognitionText');
-            const confidenceFill = document.getElementById('confidenceFill');
-            
-            if (productMatch) {
-                let confidence = detectedColor === productMatch.product.colorMatch ? 90 : 75;
-                
-                resultText.innerHTML = `<i class="fas fa-check-circle" style="color: #4CAF50;"></i> Detected: <strong>${productMatch.product.name}</strong><br><small>Color: ${detectedColor.toUpperCase()} | Confidence: ${confidence}%</small>`;
-                confidenceFill.style.width = `${confidence}%`;
-                resultDiv.style.display = 'block';
-                
-                setTimeout(() => {
-                    currentScannedProduct = { ...productMatch.product };
+            const productName = colorToProducts[detectedColor];
+            if (productName) {
+                const productEntry = Object.entries(productDatabase).find(([key, p]) => p.name === productName);
+                if (productEntry) {
+                    currentScannedProduct = { ...productEntry[1] };
                     newQuantity = currentScannedProduct.qty;
-                    showProductUpdateModal(currentScannedProduct);
                     stopImageRecognition();
                     scannerModal.classList.remove('active');
-                    isProcessing = false;
-                }, 800);
+                    showProductUpdateModal(currentScannedProduct);
+                    showToast(`✓ ${currentScannedProduct.name} detected!`);
+                }
             } else {
-                resultText.innerHTML = `<i class="fas fa-question-circle" style="color: #FF9800;"></i> Could not identify item<br><small>Detected: ${detectedColor.toUpperCase()}</small>`;
-                confidenceFill.style.width = `30%`;
-                resultDiv.style.display = 'block';
-                isProcessing = false;
+                showToast("❌ Item not recognized. Try QR code mode.", true);
             }
         } catch (error) {
-            console.error("Recognition error:", error);
-            showToast("Recognition failed. Please try again.", true);
-            isProcessing = false;
+            showToast("Scan failed. Please try again.", true);
         }
     }
     
@@ -1448,13 +1434,9 @@
                 video: { facingMode: "environment" } 
             });
             video.srcObject = imageStream;
-            video.onloadedmetadata = () => {
-                video.play();
-                showToast("Camera ready - Point at item and tap Capture");
-            };
+            video.onloadedmetadata = () => video.play();
         } catch (err) {
-            console.error("Camera error:", err);
-            showToast("Cannot access camera. Please check permissions.", true);
+            showToast("Cannot access camera", true);
         }
     }
     
@@ -1463,33 +1445,25 @@
             imageStream.getTracks().forEach(track => track.stop());
             imageStream = null;
         }
-        const video = document.getElementById('imageVideoPreview');
-        if (video) video.srcObject = null;
     }
     
-    // ============================================
-    // QR SCANNER FUNCTIONS
-    // ============================================
     function handleScannedQR(qrCode) {
         const product = productDatabase[qrCode];
-        
         if (product) {
             currentScannedProduct = { ...product };
             newQuantity = product.qty;
-            
             if (html5QrCode && html5QrCode.isScanning) {
                 html5QrCode.stop().then(() => {
                     scannerModal.classList.remove('active');
                     showProductUpdateModal(product);
-                }).catch(err => console.log("Stop error:", err));
+                }).catch(() => {});
             } else {
                 scannerModal.classList.remove('active');
                 showProductUpdateModal(product);
             }
-            
             showToast(`✓ Found: ${product.name}`);
         } else {
-            showToast(`❌ Product not found! "${qrCode}" is not in database`, true);
+            showToast(`❌ Product not found`, true);
         }
     }
     
@@ -1498,11 +1472,10 @@
             handleScannedQR(input);
         } else {
             const lowerInput = input.toLowerCase().trim();
-            
             if (nameAliases[lowerInput]) {
-                const productEntry = Object.entries(productDatabase).find(([key, product]) => product.name === nameAliases[lowerInput]);
-                if (productEntry) {
-                    currentScannedProduct = { ...productEntry[1] };
+                const entry = Object.entries(productDatabase).find(([k, p]) => p.name === nameAliases[lowerInput]);
+                if (entry) {
+                    currentScannedProduct = { ...entry[1] };
                     newQuantity = currentScannedProduct.qty;
                     scannerModal.classList.remove('active');
                     showProductUpdateModal(currentScannedProduct);
@@ -1510,8 +1483,7 @@
                     return;
                 }
             }
-            
-            for (const [qrCode, product] of Object.entries(productDatabase)) {
+            for (const [code, product] of Object.entries(productDatabase)) {
                 if (product.name.toLowerCase().includes(lowerInput)) {
                     currentScannedProduct = { ...product };
                     newQuantity = currentScannedProduct.qty;
@@ -1521,43 +1493,27 @@
                     return;
                 }
             }
-            
-            showToast(`❌ No product found matching "${input}"`, true);
+            showToast(`❌ No product found`, true);
         }
     }
     
     async function startQrScanner() {
         const qrReaderDiv = document.getElementById('qr-reader');
         qrReaderDiv.innerHTML = '';
-        
         html5QrCode = new Html5Qrcode("qr-reader");
-        
-        const qrCodeSuccessCallback = (decodedText, decodedResult) => {
-            console.log("QR Code detected:", decodedText);
-            handleScannedQR(decodedText);
-        };
-        
-        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-        
         try {
-            await html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
-            showToast("Camera ready - Scan QR code");
+            await html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } }, 
+                (decodedText) => handleScannedQR(decodedText));
         } catch (err) {
-            console.error("Failed to start scanner:", err);
-            showToast("Camera error. Please use manual entry.", true);
+            showToast("Camera error", true);
         }
     }
     
     function stopScanner() {
-        if (html5QrCode && html5QrCode.isScanning) {
-            html5QrCode.stop().catch(err => console.log("Stop error:", err));
-        }
+        if (html5QrCode && html5QrCode.isScanning) html5QrCode.stop().catch(() => {});
         stopImageRecognition();
     }
     
-    // ============================================
-    // MODAL CONTROLS
-    // ============================================
     function showProductUpdateModal(product) {
         document.getElementById('updateIcon').textContent = product.icon;
         document.getElementById('updateName').textContent = product.name;
@@ -1588,37 +1544,9 @@
             imageSection.style.display = "block";
             imageBtn.classList.add("active");
             qrBtn.classList.remove("active");
-            if (html5QrCode && html5QrCode.isScanning) {
-                html5QrCode.stop();
-            }
+            if (html5QrCode && html5QrCode.isScanning) html5QrCode.stop();
             startImageRecognition();
         }
-    }
-    
-    // ============================================
-    // DASHBOARD RENDERING
-    // ============================================
-    function showRemoveConfirmation(itemId, itemName) {
-        const modal = document.createElement('div');
-        modal.className = 'modal-overlay';
-        modal.innerHTML = `
-            <div class="modal-container">
-                <h3>Confirm Removal</h3>
-                <p>Remove "<strong>${itemName}</strong>" from expired list?</p>
-                <div class="modal-buttons" style="display:flex; gap:12px; margin-top:20px;">
-                    <button class="modal-confirm" style="background:#DC2626; color:white; padding:10px 24px; border-radius:40px; border:none;">Yes</button>
-                    <button class="modal-cancel" style="background:#E5E7EB; padding:10px 24px; border-radius:40px; border:none;">Cancel</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        modal.querySelector('.modal-confirm').onclick = () => {
-            const index = expiredItems.findIndex(i => i.id === itemId);
-            if(index !== -1) expiredItems.splice(index, 1);
-            renderDashboard();
-            modal.remove();
-        };
-        modal.querySelector('.modal-cancel').onclick = () => modal.remove();
     }
     
     function renderDashboard() {
@@ -1671,17 +1599,17 @@
                 </div>
             </div>
             <div class="card">
-                <div class="card-header"><h2><span>🎨</span> Color Recognition</h2><button class="view-link" onclick="document.getElementById('cameraFabBtn').click()">Scan Now</button></div>
+                <div class="card-header"><h2><span>🎨</span> Smart Scanner</h2><button class="view-link" onclick="document.getElementById('cameraFabBtn').click()">Scan Now</button></div>
                 <div class="categories-grid">
-                    <div class="category-card"><div class="category-header"><div class="category-icon">🔴</div><div class="category-name">Red → Tomatoes</div></div><div class="category-stats"><span class="category-count">🍅</span></div></div>
-                    <div class="category-card"><div class="category-header"><div class="category-icon">🟠</div><div class="category-name">Orange → Carrots</div></div><div class="category-stats"><span class="category-count">🥕</span></div></div>
-                    <div class="category-card"><div class="category-header"><div class="category-icon">🟡</div><div class="category-name">Yellow → Bananas</div></div><div class="category-stats"><span class="category-count">🍌</span></div></div>
-                    <div class="category-card"><div class="category-header"><div class="category-icon">🟢</div><div class="category-name">Green → Lettuce</div></div><div class="category-stats"><span class="category-count">🥬</span></div></div>
-                    <div class="category-card"><div class="category-header"><div class="category-icon">🔵</div><div class="category-name">Blue → Blueberries</div></div><div class="category-stats"><span class="category-count">🫐</span></div></div>
-                    <div class="category-card"><div class="category-header"><div class="category-icon">🟣</div><div class="category-name">Purple → Eggplant</div></div><div class="category-stats"><span class="category-count">🍆</span></div></div>
-                    <div class="category-card"><div class="category-header"><div class="category-icon">🟤</div><div class="category-name">Brown → Potatoes</div></div><div class="category-stats"><span class="category-count">🥔</span></div></div>
-                    <div class="category-card"><div class="category-header"><div class="category-icon">🩷</div><div class="category-name">Pink → Salmon</div></div><div class="category-stats"><span class="category-count">🐟</span></div></div>
-                    <div class="category-card"><div class="category-header"><div class="category-icon">⚪</div><div class="category-name">White → Rice</div></div><div class="category-stats"><span class="category-count">🍚</span></div></div>
+                    <div class="category-card"><div class="category-header"><div class="category-icon">🔴</div><div class="category-name">Red → Tomatoes</div></div></div>
+                    <div class="category-card"><div class="category-header"><div class="category-icon">🟠</div><div class="category-name">Orange → Carrots</div></div></div>
+                    <div class="category-card"><div class="category-header"><div class="category-icon">🟡</div><div class="category-name">Yellow → Bananas</div></div></div>
+                    <div class="category-card"><div class="category-header"><div class="category-icon">🟢</div><div class="category-name">Green → Lettuce</div></div></div>
+                    <div class="category-card"><div class="category-header"><div class="category-icon">🔵</div><div class="category-name">Blue → Blueberries</div></div></div>
+                    <div class="category-card"><div class="category-header"><div class="category-icon">🟣</div><div class="category-name">Purple → Eggplant</div></div></div>
+                    <div class="category-card"><div class="category-header"><div class="category-icon">🟤</div><div class="category-name">Brown → Potatoes</div></div></div>
+                    <div class="category-card"><div class="category-header"><div class="category-icon">🩷</div><div class="category-name">Pink → Salmon</div></div></div>
+                    <div class="category-card"><div class="category-header"><div class="category-icon">⚪</div><div class="category-name">White → Rice</div></div></div>
                 </div>
             </div>
         `;
@@ -1724,6 +1652,29 @@
         }
     }
     
+    function showRemoveConfirmation(itemId, itemName) {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-container">
+                <h3>Confirm Removal</h3>
+                <p>Remove "<strong>${itemName}</strong>" from expired list?</p>
+                <div class="modal-buttons" style="display:flex; gap:12px; margin-top:20px;">
+                    <button class="modal-confirm" style="background:#DC2626; color:white; padding:10px 24px; border-radius:40px; border:none;">Yes</button>
+                    <button class="modal-cancel" style="background:#E5E7EB; padding:10px 24px; border-radius:40px; border:none;">Cancel</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.querySelector('.modal-confirm').onclick = () => {
+            const index = expiredItems.findIndex(i => i.id === itemId);
+            if(index !== -1) expiredItems.splice(index, 1);
+            renderDashboard();
+            modal.remove();
+        };
+        modal.querySelector('.modal-cancel').onclick = () => modal.remove();
+    }
+    
     function updateDate() {
         const now = new Date();
         const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
@@ -1732,115 +1683,72 @@
     
     function navigateTo(page) {
         if(page === 'logout') {
-            alert('You have been logged out. Redirecting to login page...');
+            alert('You have been logged out.');
             window.location.href = 'login.html';
             return;
         }
         if(page === 'activity') {
-            alert('📋 Activity Logs: Recent inventory updates, removals, and recipe views (Demo mode).');
+            alert('📋 Activity Logs (Demo mode)');
             return;
         }
         window.location.href = page + '.html';
     }
     
-    // ============================================
-    // EVENT LISTENERS
-    // ============================================
+    // Event Listeners
     document.getElementById('decreaseQty').addEventListener('click', () => {
-        if (newQuantity > 0) {
-            newQuantity--;
-            document.getElementById('updateQuantity').textContent = newQuantity;
-        }
+        if (newQuantity > 0) { newQuantity--; document.getElementById('updateQuantity').textContent = newQuantity; }
     });
-    
     document.getElementById('increaseQty').addEventListener('click', () => {
-        newQuantity++;
-        document.getElementById('updateQuantity').textContent = newQuantity;
+        newQuantity++; document.getElementById('updateQuantity').textContent = newQuantity;
     });
-    
     document.getElementById('confirmUpdateBtn').addEventListener('click', () => {
         if (currentScannedProduct) {
-            const difference = newQuantity - currentScannedProduct.qty;
-            const action = difference > 0 ? `added ${difference}` : `removed ${Math.abs(difference)}`;
-            showToast(`✓ ${currentScannedProduct.name} updated! ${action} ${Math.abs(difference)} ${currentScannedProduct.unit}`);
-            
+            const diff = newQuantity - currentScannedProduct.qty;
+            const action = diff > 0 ? `added ${diff}` : `removed ${Math.abs(diff)}`;
+            showToast(`✓ ${currentScannedProduct.name} updated! ${action} ${Math.abs(diff)} ${currentScannedProduct.unit}`);
             currentScannedProduct.qty = newQuantity;
-            const qrKey = Object.keys(productDatabase).find(key => productDatabase[key].id === currentScannedProduct.id);
-            if (qrKey) productDatabase[qrKey].qty = newQuantity;
-            
+            const key = Object.keys(productDatabase).find(k => productDatabase[k].id === currentScannedProduct.id);
+            if (key) productDatabase[key].qty = newQuantity;
             productUpdateModal.classList.remove('active');
             currentScannedProduct = null;
             renderDashboard();
         }
     });
-    
     document.getElementById('cancelUpdateBtn').addEventListener('click', () => {
         productUpdateModal.classList.remove('active');
         currentScannedProduct = null;
     });
-    
     document.getElementById('closeScannerBtn').addEventListener('click', () => {
         stopScanner();
         scannerModal.classList.remove('active');
     });
-    
     document.getElementById('manualSubmitBtn').addEventListener('click', () => {
         const input = document.getElementById('manualQrInput').value.trim();
-        if (input) {
-            handleManualInput(input);
-            document.getElementById('manualQrInput').value = '';
-        } else {
-            showToast('Please enter a QR code or product name', true);
-        }
+        if (input) { handleManualInput(input); document.getElementById('manualQrInput').value = ''; }
+        else showToast('Please enter a value', true);
     });
-    
     document.getElementById('manualQrInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            document.getElementById('manualSubmitBtn').click();
-        }
+        if (e.key === 'Enter') document.getElementById('manualSubmitBtn').click();
     });
-    
     document.getElementById('cameraFabBtn').addEventListener('click', () => {
         scannerModal.classList.add('active');
         setTimeout(() => {
-            if (currentMode === "qr") {
-                startQrScanner();
-            } else {
-                startImageRecognition();
-            }
+            if (currentMode === "qr") startQrScanner();
+            else startImageRecognition();
         }, 500);
     });
-    
-    document.getElementById('captureImageBtn').addEventListener('click', () => {
-        captureAndRecognize();
-    });
-    
+    document.getElementById('captureImageBtn').addEventListener('click', () => captureAndRecognize());
     document.querySelectorAll('.mode-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const mode = btn.getAttribute('data-mode');
-            switchMode(mode);
-        });
+        btn.addEventListener('click', () => switchMode(btn.getAttribute('data-mode')));
     });
     
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
     const burgerBtn = document.getElementById('burgerMenu');
-    
-    function openSidebar() {
-        sidebar.classList.add('open');
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-    
-    function closeSidebar() {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-    
+    function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
+    function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('active'); document.body.style.overflow = ''; }
     burgerBtn.addEventListener('click', openSidebar);
     overlay.addEventListener('click', closeSidebar);
-    
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', () => {
             const page = item.getAttribute('data-page');
@@ -1848,19 +1756,14 @@
                 document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
                 item.classList.add('active');
                 renderDashboard();
-            } else {
-                navigateTo(page);
-            }
+            } else { navigateTo(page); }
             if (window.innerWidth < 1025) closeSidebar();
         });
     });
     
     renderDashboard();
     updateDate();
-    
-    window.addEventListener('resize', () => {
-        if (window.innerWidth >= 1025) closeSidebar();
-    });
+    window.addEventListener('resize', () => { if (window.innerWidth >= 1025) closeSidebar(); });
 </script>
 </body>
 </html>
