@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>Lyceum Kitchen | Home Dashboard</title>
+    <title>Lyceum Kitchen | Smart Scanner</title>
     <style>
         * {
             margin: 0;
@@ -557,71 +557,6 @@
             color: #C53030;
         }
 
-        .categories-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 12px;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .category-card {
-            background: #F8FAFC;
-            border-radius: 20px;
-            padding: 14px;
-            cursor: pointer;
-            border: 1px solid #E5E7EB;
-            transition: 0.2s;
-        }
-
-        .category-card:active {
-            background: #FEE9E9;
-        }
-
-        .category-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .category-icon {
-            width: 38px;
-            height: 38px;
-            background: white;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-
-        .category-name {
-            font-weight: 700;
-            font-size: 14px;
-        }
-
-        .category-stats {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-        }
-
-        .category-count {
-            color: #334155;
-            font-weight: 500;
-        }
-
-        .category-status {
-            background: rgba(197, 48, 48, 0.1);
-            padding: 3px 10px;
-            border-radius: 40px;
-            color: #C53030;
-            font-weight: 700;
-            font-size: 10px;
-        }
-
         /* Scanner Modal */
         .scanner-modal {
             display: none;
@@ -686,7 +621,6 @@
             height: auto;
         }
 
-        /* Image Recognition Camera View */
         .image-camera-view {
             position: relative;
             width: 100%;
@@ -703,7 +637,7 @@
             height: auto;
         }
 
-        /* SCANNING ANIMATION OVERLAY */
+        /* SCANNING ANIMATION */
         .scan-animation {
             position: absolute;
             top: 0;
@@ -726,15 +660,9 @@
         }
 
         @keyframes scanMove {
-            0% {
-                top: 0%;
-            }
-            50% {
-                top: 100%;
-            }
-            100% {
-                top: 0%;
-            }
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
         }
 
         .scan-corner {
@@ -744,33 +672,10 @@
             border: 3px solid #8B0000;
         }
 
-        .scan-corner-tl {
-            top: 10px;
-            left: 10px;
-            border-right: none;
-            border-bottom: none;
-        }
-
-        .scan-corner-tr {
-            top: 10px;
-            right: 10px;
-            border-left: none;
-            border-bottom: none;
-        }
-
-        .scan-corner-bl {
-            bottom: 10px;
-            left: 10px;
-            border-right: none;
-            border-top: none;
-        }
-
-        .scan-corner-br {
-            bottom: 10px;
-            right: 10px;
-            border-left: none;
-            border-top: none;
-        }
+        .scan-corner-tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+        .scan-corner-tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+        .scan-corner-bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+        .scan-corner-br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
 
         .scan-text {
             position: absolute;
@@ -870,7 +775,6 @@
             cursor: pointer;
         }
 
-        /* Product Update Modal */
         .product-update-modal {
             display: none;
             position: fixed;
@@ -1043,21 +947,13 @@
         }
 
         @media (max-width: 1024px) {
-            .camera-fab {
-                display: flex;
-            }
-            .burger-menu {
-                display: flex !important;
-            }
+            .camera-fab { display: flex; }
+            .burger-menu { display: flex !important; }
         }
 
         @media (min-width: 1025px) {
-            .camera-fab {
-                display: none !important;
-            }
-            .burger-menu {
-                display: none !important;
-            }
+            .camera-fab { display: none !important; }
+            .burger-menu { display: none !important; }
             .sidebar {
                 position: relative;
                 left: 0;
@@ -1067,45 +963,20 @@
                 top: 0;
                 flex-shrink: 0;
             }
-            .sidebar-overlay {
-                display: none !important;
-            }
-            .app {
-                flex-direction: row;
-            }
-            .date-display {
-                display: inline-block;
-            }
-            .top-bar {
-                padding: 16px 32px;
-            }
-            .page-title-section h1 {
-                font-size: 24px;
-            }
-            .dashboard-content {
-                padding: 28px 32px;
-                padding-bottom: 28px;
-            }
+            .sidebar-overlay { display: none !important; }
+            .app { flex-direction: row; }
+            .date-display { display: inline-block; }
+            .top-bar { padding: 16px 32px; }
+            .page-title-section h1 { font-size: 24px; }
+            .dashboard-content { padding: 28px 32px; padding-bottom: 28px; }
         }
 
         @media (max-width: 480px) {
-            .stat-value {
-                font-size: 26px;
-            }
-            .card-header h2 {
-                font-size: 16px;
-            }
-            .date-display {
-                display: none;
-            }
-            .camera-fab {
-                width: 55px;
-                height: 55px;
-                bottom: 20px;
-            }
-            .camera-fab i {
-                font-size: 24px;
-            }
+            .stat-value { font-size: 26px; }
+            .card-header h2 { font-size: 16px; }
+            .date-display { display: none; }
+            .camera-fab { width: 55px; height: 55px; bottom: 20px; }
+            .camera-fab i { font-size: 24px; }
         }
 
         .modal-overlay {
@@ -1132,17 +1003,9 @@
             text-align: center;
         }
 
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #E2E8F0;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #8B0000;
-            border-radius: 10px;
-        }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #E2E8F0; }
+        ::-webkit-scrollbar-thumb { background: #8B0000; border-radius: 10px; }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -1209,12 +1072,10 @@
     </div>
 </div>
 
-<!-- CAMERA BUTTON -->
 <div class="camera-fab" id="cameraFabBtn">
     <i class="fas fa-camera"></i>
 </div>
 
-<!-- Scanner Modal -->
 <div class="scanner-modal" id="scannerModal">
     <div class="scanner-container">
         <button class="scanner-close" id="closeScannerBtn">✕</button>
@@ -1231,7 +1092,6 @@
         <div id="imageRecognitionSection" style="display: none;">
             <div class="image-camera-view">
                 <video id="imageVideoPreview" autoplay playsinline muted></video>
-                <!-- SCANNING ANIMATION -->
                 <div class="scan-animation" id="scanAnimation">
                     <div class="scan-line"></div>
                     <div class="scan-corner scan-corner-tl"></div>
@@ -1257,7 +1117,6 @@
     </div>
 </div>
 
-<!-- Product Update Modal -->
 <div class="product-update-modal" id="productUpdateModal">
     <div class="product-update-card">
         <div class="product-update-icon" id="updateIcon">📦</div>
@@ -1283,9 +1142,6 @@
 <div class="toast" id="toast">Ready</div>
 
 <script>
-    // ============================================
-    // PRODUCT DATABASE
-    // ============================================
     const productDatabase = {
         "PROD-TOMATO-001": { id: 1, name: "Tomatoes", category: "Vegetables", unit: "pcs", price: 35, qty: 24, icon: "🍅", colorMatch: "red" },
         "PROD-CARROT-002": { id: 2, name: "Carrots", category: "Vegetables", unit: "pcs", price: 15, qty: 15, icon: "🥕", colorMatch: "orange" },
@@ -1345,7 +1201,6 @@
         }, 2500);
     }
     
-    // SIMPLE COLOR DETECTION - FAST AND SILENT
     function classifyColor(r, g, b) {
         const brightness = (r + g + b) / 3;
         if (r > 200 && g > 200 && b > 200) return "white";
@@ -1364,7 +1219,6 @@
         const step = 15;
         const pixels = imageData.data;
         const colorCounts = {};
-        
         const centerX = width / 2;
         const centerY = height / 2;
         const sampleRadius = Math.min(width, height) / 2.5;
@@ -1393,7 +1247,6 @@
             return;
         }
         
-        // Add flash effect
         const scanAnimation = document.getElementById('scanAnimation');
         scanAnimation.style.opacity = '0.5';
         setTimeout(() => { scanAnimation.style.opacity = '1'; }, 200);
@@ -1598,20 +1451,6 @@
                     <div class="expired-list" id="expiredList"></div>
                 </div>
             </div>
-            <div class="card">
-                <div class="card-header"><h2><span>🎨</span> Smart Scanner</h2><button class="view-link" onclick="document.getElementById('cameraFabBtn').click()">Scan Now</button></div>
-                <div class="categories-grid">
-                    <div class="category-card"><div class="category-header"><div class="category-icon">🔴</div><div class="category-name">Red → Tomatoes</div></div></div>
-                    <div class="category-card"><div class="category-header"><div class="category-icon">🟠</div><div class="category-name">Orange → Carrots</div></div></div>
-                    <div class="category-card"><div class="category-header"><div class="category-icon">🟡</div><div class="category-name">Yellow → Bananas</div></div></div>
-                    <div class="category-card"><div class="category-header"><div class="category-icon">🟢</div><div class="category-name">Green → Lettuce</div></div></div>
-                    <div class="category-card"><div class="category-header"><div class="category-icon">🔵</div><div class="category-name">Blue → Blueberries</div></div></div>
-                    <div class="category-card"><div class="category-header"><div class="category-icon">🟣</div><div class="category-name">Purple → Eggplant</div></div></div>
-                    <div class="category-card"><div class="category-header"><div class="category-icon">🟤</div><div class="category-name">Brown → Potatoes</div></div></div>
-                    <div class="category-card"><div class="category-header"><div class="category-icon">🩷</div><div class="category-name">Pink → Salmon</div></div></div>
-                    <div class="category-card"><div class="category-header"><div class="category-icon">⚪</div><div class="category-name">White → Rice</div></div></div>
-                </div>
-            </div>
         `;
         
         const expiringContainer = document.getElementById('expiringList');
@@ -1694,7 +1533,6 @@
         window.location.href = page + '.html';
     }
     
-    // Event Listeners
     document.getElementById('decreaseQty').addEventListener('click', () => {
         if (newQuantity > 0) { newQuantity--; document.getElementById('updateQuantity').textContent = newQuantity; }
     });
